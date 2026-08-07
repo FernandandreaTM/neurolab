@@ -1,7 +1,10 @@
 # Base de datos (se regenera con admin/migrate.php + admin/seed.php)
-data/neurolab.db
-data/neurolab.db-wal
-data/neurolab.db-shm
+data/*.db
+data/*.db-wal
+data/*.db-shm
+admin/data/*.db
+admin/data/*.db-wal
+admin/data/*.db-shm
 
 # PHP
 *.log
