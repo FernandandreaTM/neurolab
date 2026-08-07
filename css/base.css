@@ -1,0 +1,336 @@
+/* ============================================================
+   NeuroLab — base.css
+   Variables, reset, tipografía, utilitarios, animaciones
+   Paleta: morado/violeta (neurociencia)
+   ============================================================ */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+/* --- Variables (paleta morada) --- */
+:root {
+    --navy:       #1A0E2E;          /* fondo principal: morado muy oscuro */
+    --navy-mid:   #2A1A4A;          /* cards / superficies */
+    --violet:     #8B5CF6;          /* acento principal */
+    --violet-light:#A78BFA;
+    --violet-dim: #6D28D9;
+    --pink:       #EC4899;          /* acento secundario (rosa neuro) */
+    --pink-glow:  rgba(236,72,153,0.25);
+    --gold:       #C9A84C;          /* compatibilidad con skin ares */
+    --white:      #FFFFFF;
+    --gray-50:    #F8F9FC;
+    --gray-100:   #EEF1F8;
+    --gray-300:   #C8B8E0;          /* tono morado en textos secundarios */
+    --gray-500:   #9C8AB5;
+    --gray-700:   #4A3A6A;
+    --text:       #0D1424;
+    --radius:     14px;
+    --radius-lg:  22px;
+
+    /* Glassmorphism */
+    --glass-bg:     rgba(42,26,74,0.55);
+    --glass-border: rgba(139,92,246,0.18);
+    --glass-blur:   blur(18px);
+
+    /* Sombras */
+    --shadow-sm:  0 2px 8px rgba(0,0,0,0.25);
+    --shadow-md:  0 6px 24px rgba(0,0,0,0.35);
+    --shadow-lg:  0 16px 48px rgba(0,0,0,0.45);
+
+    /* Transiciones */
+    --t-fast:   150ms ease;
+    --t-base:   250ms ease;
+    --t-slow:   400ms ease;
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--navy);
+    color: var(--gray-100);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+img, video, svg {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: var(--violet-light);
+    text-decoration: none;
+    transition: color var(--t-fast);
+}
+a:hover { color: var(--violet); }
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+ul, ol { list-style: none; }
+
+/* --- Tipografía --- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--white);
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); }
+h3 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); }
+h4 { font-size: 1.1rem; font-weight: 700; }
+
+p {
+    color: var(--gray-300);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.lead {
+    font-size: 1.15rem;
+    color: var(--gray-100);
+    font-weight: 400;
+}
+
+.label {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--violet);
+}
+
+/* --- Mesh gradient background (morado) --- */
+.bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 10%,  rgba(139,92,246,0.20) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%,  rgba(236,72,153,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 60% 40%,  rgba(109,40,217,0.10) 0%, transparent 50%),
+        var(--navy);
+    pointer-events: none;
+}
+
+/* --- Contenedores --- */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.container-narrow {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.section {
+    padding: 5rem 0;
+}
+
+/* --- Glassmorphism card --- */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+}
+
+.card {
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+
+.card:hover {
+    border-color: rgba(139,92,246,0.35);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- Botones --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .65rem 1.4rem;
+    border-radius: var(--radius);
+    border: none;
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.btn:hover { opacity: .88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+    background: var(--violet);
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(139,92,246,0.3);
+}
+.btn-pink {
+    background: var(--pink);
+    color: var(--white);
+    box-shadow: 0 4px 16px var(--pink-glow);
+}
+.btn-gold {
+    background: var(--gold);
+    color: var(--navy);
+}
+.btn-ghost {
+    background: transparent;
+    color: var(--gray-100);
+    border: 1.5px solid var(--gray-700);
+}
+.btn-ghost:hover { border-color: var(--violet); color: var(--violet); opacity: 1; }
+
+.btn-sm {
+    padding: .4rem .9rem;
+    font-size: .8rem;
+}
+
+/* --- Badges --- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .25rem .7rem;
+    border-radius: 100px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+.badge-violet { background: rgba(139,92,246,.15);  color: var(--violet-light); }
+.badge-pink   { background: rgba(236,72,153,.18);   color: #F472B6; }
+.badge-gold   { background: rgba(201,168,76,.18);   color: var(--gold); }
+.badge-gray   { background: rgba(122,132,158,.15);  color: var(--gray-300); }
+
+/* --- Divisor --- */
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gray-700), transparent);
+    border: none;
+    margin: 2rem 0;
+}
+
+/* --- Scroll reveal --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stagger > *:nth-child(1) { transition-delay: 0ms; }
+.stagger > *:nth-child(2) { transition-delay: 80ms; }
+.stagger > *:nth-child(3) { transition-delay: 160ms; }
+.stagger > *:nth-child(4) { transition-delay: 240ms; }
+.stagger > *:nth-child(5) { transition-delay: 320ms; }
+.stagger > *:nth-child(6) { transition-delay: 400ms; }
+
+/* --- Animaciones --- */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .5; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+}
+
+/* --- Loader --- */
+.spinner {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--gray-700);
+    border-top-color: var(--violet);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+/* --- Utilidades --- */
+.text-violet { color: var(--violet); }
+.text-pink   { color: var(--pink); }
+.text-gold   { color: var(--gold); }
+.text-muted  { color: var(--gray-500); }
+.text-white  { color: var(--white); }
+.text-sm     { font-size: .875rem; }
+.text-xs     { font-size: .75rem; }
+
+.fw-800 { font-weight: 800; }
+.fw-700 { font-weight: 700; }
+.fw-600 { font-weight: 600; }
+
+.d-flex   { display: flex; }
+.d-grid   { display: grid; }
+.d-none   { display: none; }
+.d-block  { display: block; }
+
+.align-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: .5rem; }
+.gap-md { gap: 1rem; }
+.gap-lg { gap: 1.5rem; }
+
+.mt-1 { margin-top: .5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: .5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.overflow-clip { overflow: clip; }
+
+/* --- IntersectionObserver init (JS añade class .in) --- */
+/* Aplicar en JS:
+   const io = new IntersectionObserver(entries => {
+       entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+   }, { threshold: 0.12 });
+   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+*/

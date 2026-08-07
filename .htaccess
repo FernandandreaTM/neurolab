@@ -1,0 +1,3 @@
+RewriteEngine On
+# Evitar listado de directorios
+Options -Indexes

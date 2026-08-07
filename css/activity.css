@@ -1,0 +1,180 @@
+/* ============================================================
+   NeuroLab — activity.css
+   Layout split para actividad.php: stage izq | panel der
+   ============================================================ */
+
+.nl-act-header {
+    padding: 6rem 0 1.5rem;
+}
+.nl-act-back {
+    font-size: .85rem;
+    color: var(--violet-light);
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+.nl-act-meta {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .5rem;
+}
+.nl-act-header h1 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-bottom: 0;
+}
+
+.nl-act-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+    padding-bottom: 4rem;
+}
+
+/* --- Stage (izquierda) --- */
+.nl-act-stage {
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+}
+.nl-act-tabs {
+    display: flex;
+    gap: .25rem;
+    padding: .75rem 1rem 0;
+    border-bottom: 1px solid var(--gray-700);
+    flex-wrap: wrap;
+}
+.nl-act-tab {
+    background: transparent;
+    border: none;
+    color: var(--gray-300);
+    padding: .5rem .9rem;
+    font-size: .85rem;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: color var(--t-fast), background var(--t-fast);
+}
+.nl-act-tab:hover { color: var(--white); background: rgba(255,255,255,.05); }
+.nl-act-tab.active {
+    color: var(--violet-light);
+    background: rgba(139,92,246,.1);
+    border-bottom: 2px solid var(--violet);
+}
+
+.nl-act-recurso {
+    flex: 1;
+    position: relative;
+    background: #000;
+}
+.nl-act-recurso-pane {
+    display: none;
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+    position: relative;
+}
+.nl-act-recurso-pane.active { display: block; }
+.nl-act-img { width: 100%; height: auto; display: block; }
+.nl-act-iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+    border: none;
+    display: block;
+}
+.nl-act-html { padding: 1.5rem; color: var(--gray-100); }
+.nl-act-html .comparador-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+.nl-act-html .comparador-table th,
+.nl-act-html .comparador-table td {
+    border: 1px solid var(--gray-700);
+    padding: .65rem .9rem;
+    text-align: left;
+}
+.nl-act-html .comparador-table th {
+    background: rgba(139,92,246,.1);
+    color: var(--violet-light);
+}
+.nl-act-caption {
+    padding: .65rem 1rem;
+    font-size: .8rem;
+    color: var(--gray-500);
+    background: var(--navy-mid);
+    border-top: 1px solid var(--gray-700);
+    margin: 0;
+}
+
+/* --- Panel (derecha) --- */
+.nl-act-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.nl-act-section {
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+}
+.nl-act-desc-general {
+    margin-top: .5rem;
+    color: var(--gray-100);
+    font-size: .95rem;
+    line-height: 1.6;
+}
+.nl-act-carreras {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    margin-top: .5rem;
+}
+.nl-act-carrera-card {
+    background: var(--navy);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: .9rem 1rem;
+    transition: border-color var(--t-base);
+}
+.nl-act-carrera-card:hover { border-color: rgba(139,92,246,.3); }
+.nl-act-carrera-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .35rem;
+    font-size: .9rem;
+}
+.nl-act-carrera-head strong { color: var(--white); }
+.nl-act-carrera-card p {
+    font-size: .82rem;
+    color: var(--gray-300);
+    line-height: 1.5;
+}
+
+/* Quiz box */
+.nl-act-quiz {
+    margin-top: .75rem;
+    padding: 1rem;
+    background: var(--navy);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+}
+.nl-act-quiz-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .65rem;
+    font-size: .9rem;
+}
+.nl-act-quiz-body { margin-top: 1rem; }
+
+@media (max-width: 900px) {
+    .nl-act-layout { grid-template-columns: 1fr; }
+    .nl-act-carreras { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="cv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3B9ECC"/>
+      <stop offset="100%" stop-color="#1A8C5B"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="90" fill="url(#cv)"/>
+  <text x="100" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="#FFFFFF" font-weight="bold">CV</text>
+</svg>
