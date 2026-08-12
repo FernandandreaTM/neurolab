@@ -40,7 +40,7 @@ if (file_exists($db_path)) {
 }
 .nl-hero__bg {
     position: absolute; inset: 0;
-    background: url('img/hero.jpg') center right/contain no-repeat;
+    background: url('img/hero.png') center right/contain no-repeat;
     opacity: .14;
     z-index: 0;
 }
