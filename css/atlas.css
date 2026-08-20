@@ -1,0 +1,147 @@
+/* ============================================================
+   NeuroLab — atlas.css
+   Árbol de temas numerado y desplegable (panel lateral del atlas)
+   ============================================================ */
+
+/* --- Cabecera del panel --- */
+.nl-tree-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .85rem;
+}
+.nl-tree-head h3 {
+    font-size: .85rem;
+    margin: 0;
+    color: var(--gray-300);
+}
+.nl-tree-toggle-all {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: color var(--t-fast);
+    white-space: nowrap;
+}
+.nl-tree-toggle-all:hover { color: var(--violet-light); }
+
+/* --- Nodo del árbol --- */
+#topic-tree .nl-tree-node {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: .45rem .55rem;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: .85rem;
+    color: var(--gray-300);
+    transition: background var(--t-fast), color var(--t-fast);
+    user-select: none;
+}
+#topic-tree .nl-tree-node:hover { background: rgba(139,92,246,.1); color: var(--white); }
+#topic-tree .nl-tree-node:focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 1px;
+}
+
+/* Tema principal: más peso visual que un subtema */
+#topic-tree .nl-tree-node.is-root {
+    font-weight: 700;
+    color: var(--gray-100);
+    margin-top: .15rem;
+}
+#topic-tree .nl-tree-node.is-child { font-size: .8rem; font-weight: 600; }
+
+#topic-tree .nl-tree-node.active {
+    background: rgba(139,92,246,.16);
+    color: var(--violet-light);
+    font-weight: 700;
+}
+
+/* Numeración */
+.nl-tree-node__num {
+    flex-shrink: 0;
+    padding-top: .08rem;
+    min-width: 2.1rem;
+    font-size: .72rem;
+    font-weight: 800;
+    color: var(--violet);
+    letter-spacing: .04em;   /* los romanos respiran mejor con algo de tracking */
+    text-align: right;       /* alinea los íconos en columna, como un índice impreso */
+}
+.nl-tree-node.is-child .nl-tree-node__num {
+    min-width: 2.4rem;
+    font-size: .68rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .01em;
+    color: var(--gray-500);
+    font-weight: 700;
+}
+.nl-tree-node.active .nl-tree-node__num { color: var(--violet-light); }
+
+.nl-tree-node__ico { flex-shrink: 0; font-size: .95rem; line-height: 1; }
+.nl-tree-node__txt {
+    flex: 1;
+    line-height: 1.3;
+    min-width: 0;
+    overflow-wrap: anywhere;   /* el nombre completo se ve, aunque el panel sea angosto */
+}
+
+/* Contador de subtemas */
+.nl-tree-node__count {
+    flex-shrink: 0;
+    margin-top: .1rem;
+    min-width: 1.15rem;
+    padding: .05rem .3rem;
+    border-radius: 100px;
+    background: rgba(139,92,246,.15);
+    color: var(--violet-light);
+    font-size: .62rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.5;
+}
+.nl-tree-node.is-open .nl-tree-node__count {
+    background: rgba(139,92,246,.07);
+    color: var(--gray-500);
+}
+
+/* Chevron que gira al desplegar */
+.nl-tree-node__chev {
+    flex-shrink: 0;
+    margin-top: .32rem;
+    width: 0; height: 0;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    color: var(--gray-500);
+    transition: transform var(--t-fast), color var(--t-fast);
+}
+.nl-tree-node:hover .nl-tree-node__chev { color: var(--violet-light); }
+.nl-tree-node.is-open .nl-tree-node__chev { transform: rotate(90deg); }
+
+/* --- Rama de subtemas --- */
+#topic-tree .nl-tree-children {
+    margin: .15rem 0 .35rem .95rem;
+    padding-left: .55rem;
+    border-left: 1.5px solid var(--gray-700);
+    animation: nlTreeIn var(--t-fast) ease both;
+}
+#topic-tree .nl-tree-children[hidden] { display: none; }
+
+@keyframes nlTreeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #topic-tree .nl-tree-node,
+    .nl-tree-node__chev,
+    #topic-tree .nl-tree-children { transition: none; animation: none; }
+}

@@ -22,14 +22,14 @@ INSERT OR IGNORE INTO topics (id, slug, nombre, parent_id, icono, tipo, orden) V
   (1,  'celulas-sn',          'Células del Sistema Nervioso',  NULL, '🧠', 'estructura', 1),
   (2,  'potencial-accion',    'Potencial de Acción',          NULL, '⚡', 'proceso',    2),
   (3,  'sinapsis',            'Sinapsis y Neurotransmisión',  NULL, '🔗', 'proceso',    3),
-  (4,  'sn-sensitivo',        'Sistema Nervioso Sensitivo',   NULL, '�️', 'sensitivo',  4),
+  (4,  'sn-sensitivo',        'Sistema Nervioso Sensitivo',   NULL, '👁️', 'sensitivo',  4),
   (5,  'sn-autonomo',         'Sistema Nervioso Autónomo',    NULL, '⚙️', 'motor',      5);
 
 -- Sub-temas de ejemplo (hijos)
 INSERT OR IGNORE INTO topics (id, slug, nombre, parent_id, icono, tipo, orden) VALUES
   (6,  'neurona',             'Neurona',                      1,    '🔬', 'estructura', 1),
   (7,  'glia',                'Células gliales',              1,    '🕸️', 'estructura', 2),
-  (8,  'morfologia-neurona',  'Morfología neuronal',          6,    '�', 'estructura', 1),
+  (8,  'morfologia-neurona',  'Morfología neuronal',          6,    '🧬', 'estructura', 1),
   (9,  'canales-ionicos',     'Canales iónicos',              2,    '🧪', 'proceso',    1),
   (10, 'neurotransmisores',   'Neurotransmisores',            3,    '💊', 'proceso',    1);
 

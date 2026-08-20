@@ -47,21 +47,6 @@ $active_page = 'atlas';
     overflow-y: auto;
 }
 .nl-tree-panel h3 { font-size: .85rem; margin-bottom: 1rem; color: var(--gray-300); }
-.nl-tree-node {
-    padding: .45rem .75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: .875rem;
-    color: var(--gray-300);
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    transition: background var(--t-fast), color var(--t-fast);
-}
-.nl-tree-node:hover { background: rgba(139,92,246,.1); color: var(--white); }
-.nl-tree-node.active { background: rgba(139,92,246,.15); color: var(--violet-light); font-weight: 700; }
-.nl-tree-children { padding-left: 1.2rem; margin-top: .25rem; }
-
 .nl-act-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
 .nl-act-card {
     background: var(--navy-mid);
@@ -104,7 +89,7 @@ $active_page = 'atlas';
   <div class="container">
     <span class="label">Atlas de Actividades</span>
     <h1 class="mt-2">Explora el sistema nervioso</h1>
-    <p>Selecciona un tema y elige una actividad. Cada actividad tiene una descripción general y descripciones específicas para Fonoaudiología y Terapia Ocupacional.</p>
+    <p>Presiona un tema principal para desplegar sus subtemas y elige una actividad. Cada actividad tiene una descripción general y descripciones específicas para Fonoaudiología y Terapia Ocupacional.</p>
     <div class="nl-atlas-tabs">
       <button class="nl-atlas-tab active" data-filtro="todos">Todos</button>
       <button class="nl-atlas-tab" data-filtro="estructura">🔬 Morfología</button>
@@ -119,7 +104,10 @@ $active_page = 'atlas';
   <div class="container">
     <div class="nl-tree-layout">
       <aside class="nl-tree-panel">
-        <h3>Temas</h3>
+        <div class="nl-tree-head">
+          <h3>Temas</h3>
+          <button type="button" id="tree-toggle-all" class="nl-tree-toggle-all" data-modo="expandir">Expandir todo</button>
+        </div>
         <div id="topic-tree"><p class="text-muted text-sm">Cargando…</p></div>
       </aside>
       <section>
