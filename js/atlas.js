@@ -3,6 +3,7 @@
  * Carga topics + actividades, renderiza árbol lateral y grilla filtrable.
  */
 import { isDone } from './progress.js';
+import { renderMapa } from './mapa.js';
 
 const STATE = { topics: [], actividades: [], filtroTipo: 'todos', topicSel: null };
 
@@ -27,8 +28,20 @@ function renderTree() {
             STATE.topicSel = +el.dataset.id;
             document.querySelectorAll('.nl-tree-node').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
+            renderMapaTema();
             renderGrid();
         });
+    });
+}
+
+/** Dibuja el mapa conceptual del tema seleccionado. */
+function renderMapaTema() {
+    const host = document.getElementById('mapa-conceptual');
+    if (!host) return;
+    renderMapa(host, {
+        topics: STATE.topics,
+        actividades: STATE.actividades,
+        topicId: STATE.topicSel,
     });
 }
 
