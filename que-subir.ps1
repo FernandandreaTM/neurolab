@@ -43,6 +43,28 @@ if (-not $noMerged) {
 }
 
 Write-Host ""
+Write-Host "=== BRANCHES REMOTAS YA Y MERGEADAS (candidatas a borrar) ===" -ForegroundColor Magenta
+$merged = git branch -r --merged main | Where-Object { $_ -notmatch "main" -and $_ -notmatch "HEAD" }
+if (-not $merged) {
+    Write-Host "(ninguna)" -ForegroundColor Green
+} else {
+    Write-Host "Estas branches ya estan en main." -ForegroundColor Yellow
+    $merged | ForEach-Object {
+        $nombre = ($_ -replace "^\s*origin/", "").Trim()
+        Write-Host "  [-] origin/$nombre" -ForegroundColor DarkYellow
+    }
+    $resp = Read-Host "Borrar las branches remotas ya mergeadas? (s/n)"
+    if ($resp -eq "s" -or $resp -eq "S") {
+        $merged | ForEach-Object {
+            $nombre = ($_ -replace "^\s*origin/", "").Trim()
+            git push origin --delete $nombre
+        }
+    } else {
+        Write-Host "(puedes borrarlas despues desde GitHub con el boton Delete branch)" -ForegroundColor DarkGray
+    }
+}
+
+Write-Host ""
 Write-Host "=== ULTIMOS 10 COMMITS EN main ===" -ForegroundColor Magenta
 git log --oneline -10
 
