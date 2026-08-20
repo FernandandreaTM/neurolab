@@ -53,10 +53,10 @@ if (-not $N) { $N = 3 }
 
 Write-Host ""
 Write-Host "Archivos tocados en los ultimos $N commits:" -ForegroundColor Cyan
-$archivos = git diff HEAD~$N..HEAD --name-only 2>&1
+$archivos = git diff HEAD~$N..HEAD --name-status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[!] No hay suficientes commits. Prueba con N=1 o N=2." -ForegroundColor Yellow
-    $archivos = git diff HEAD~$N..HEAD --name-only
+    $archivos = git diff HEAD~$N..HEAD --name-status
 }
 $archivos | ForEach-Object { Write-Host "  -> $_" -ForegroundColor White }
 
@@ -71,6 +71,14 @@ if ($peligrosos) {
 }
 
 Write-Host ""
+Write-Host "=== ARCHIVOS QUE NO SE SUBEN POR FTP (solo para tu Git local) ===" -ForegroundColor Magenta
+$noSubir = $archivos | Where-Object { $_ -match "^\.gitignore$" -or $_ -match "que-subir\.ps1$" -or $_ -match "README\.md$" -or $_ -match "PLAN\.md$" -or $_ -match "\.ps1$" }
+if ($noSubir) {
+    Write-Host "Estos viven en tu repo pero NO se suben al hosting:" -ForegroundColor Yellow
+    $noSubir | ForEach-Object { Write-Host "  [-] $_" -ForegroundColor DarkGray }
+}
+
+Write-Host ""
 Write-Host "=== HAY CAMBIOS SIN COMMITEAR EN TU WORKING DIR? ===" -ForegroundColor Magenta
 $porCommit = git status --porcelain
 if ($porCommit) {
@@ -82,11 +90,37 @@ if ($porCommit) {
 
 Write-Host ""
 Write-Host "=== RESUMEN PARA SUBIR POR FTP ===" -ForegroundColor Magenta
-Write-Host "Sube SOLO estos archivos a /ferlopezmoncada/neurolab/ :" -ForegroundColor Yellow
-Write-Host "(respeta la ruta: si es 'css/base.css', va dentro de /ferlopezmoncada/neurolab/css/)" -ForegroundColor Yellow
+Write-Host "Cambios separados por accion:" -ForegroundColor Cyan
 Write-Host ""
-$archivos | Where-Object { $_ -notmatch "\.db$|\.env$" } | ForEach-Object {
-    Write-Host "  [FTP] $_" -ForegroundColor Green
+
+$subir = @()
+$borrar = @()
+foreach ($linea in $archivos) {
+    # formato de git diff --name-status: "M\tarchivo" o "A\tarchivo" o "D\tarchivo"
+    $partes = $linea -split "`t", 2
+    if ($partes.Count -lt 2) { continue }
+    $status = $partes[0]
+    $file = $partes[1]
+    # Filtrar archivos que no se suben
+    if ($file -match "\.db$|\.env$|\.gitignore$|que-subir\.ps1$|README\.md$|PLAN\.md$|\.ps1$") { continue }
+    if ($status -eq "D") {
+        $borrar += $file
+    } else {
+        $subir += $file
+    }
+}
+
+if ($subir.Count -gt 0) {
+    Write-Host "  [+] SUBIR estos archivos al hosting:" -ForegroundColor Green
+    $subir | ForEach-Object { Write-Host "      [FTP upload] $_" -ForegroundColor Green }
+}
+if ($borrar.Count -gt 0) {
+    Write-Host ""
+    Write-Host "  [-] BORRAR estos archivos del hosting (ya no estan en tu repo):" -ForegroundColor Yellow
+    $borrar | ForEach-Object { Write-Host "      [FTP delete] $_" -ForegroundColor Yellow }
+}
+if ($subir.Count -eq 0 -and $borrar.Count -eq 0) {
+    Write-Host "  (no hay cambios que afecten al hosting)" -ForegroundColor Green
 }
 
 Write-Host ""
