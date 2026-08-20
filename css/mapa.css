@@ -1,0 +1,255 @@
+/* ============================================================
+   NeuroLab — mapa.css
+   Mapa conceptual jerárquico (de lo general a lo específico).
+   Sin dependencias: CSS grid + SVG dibujado por js/mapa.js
+   ============================================================ */
+
+.nl-mapa {
+    position: relative;
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.25rem 1rem;
+    margin-bottom: 1.75rem;
+}
+
+/* --- Encabezado --- */
+.nl-mapa__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+.nl-mapa__title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.nl-mapa__hint {
+    font-size: .75rem;
+    color: var(--gray-500);
+}
+.nl-mapa__actions { display: flex; gap: .4rem; }
+.nl-mapa__btn {
+    padding: .3rem .7rem;
+    border-radius: 100px;
+    border: 1px solid var(--gray-700);
+    background: transparent;
+    color: var(--gray-300);
+    font-family: inherit;
+    font-size: .72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.nl-mapa__btn:hover {
+    border-color: var(--violet);
+    color: var(--violet-light);
+    background: rgba(139,92,246,.08);
+}
+
+/* --- Lienzo: columnas = niveles de profundidad --- */
+.nl-mapa__canvas {
+    position: relative;
+    overflow-x: auto;
+    padding: .25rem 0 .5rem;
+}
+.nl-mapa__levels {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 2.75rem;
+    min-width: min-content;
+    z-index: 1;
+}
+.nl-mapa__level {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: .5rem;
+    min-width: 190px;
+}
+.nl-mapa__level-label {
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: .35rem;
+    white-space: nowrap;
+}
+
+/* Líneas conectoras (SVG generado en JS) */
+.nl-mapa__links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
+}
+.nl-mapa__link {
+    fill: none;
+    stroke: var(--gray-700);
+    stroke-width: 1.5;
+    transition: stroke var(--t-base), stroke-width var(--t-base);
+}
+.nl-mapa__link.is-path {
+    stroke: var(--violet);
+    stroke-width: 2.5;
+}
+
+/* --- Nodos --- */
+.nl-mapa__node {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    padding: .55rem .7rem;
+    border-radius: 10px;
+    border: 1px solid var(--gray-700);
+    background: rgba(26,14,46,.75);
+    color: var(--gray-300);
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--t-fast), background var(--t-fast),
+                color var(--t-fast), transform var(--t-fast);
+}
+.nl-mapa__node:hover {
+    border-color: rgba(139,92,246,.5);
+    color: var(--white);
+    transform: translateX(2px);
+}
+.nl-mapa__node:focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 2px;
+}
+.nl-mapa__node.is-path {
+    border-color: rgba(139,92,246,.45);
+    color: var(--white);
+}
+.nl-mapa__node.is-current {
+    border-color: var(--violet);
+    background: rgba(139,92,246,.18);
+    color: var(--white);
+    box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+}
+.nl-mapa__node.is-selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink-glow);
+}
+
+.nl-mapa__node-ico { flex-shrink: 0; font-size: .95rem; line-height: 1; }
+.nl-mapa__node-txt { flex: 1; line-height: 1.35; }
+
+/* Nodo de actividad: se distingue del nodo de tema */
+.nl-mapa__node.is-act {
+    border-style: dashed;
+    font-weight: 600;
+    font-size: .78rem;
+}
+.nl-mapa__node.is-act .nl-mapa__node-txt { color: var(--gray-300); }
+
+/* Contador de hijos ocultos */
+.nl-mapa__badge {
+    flex-shrink: 0;
+    min-width: 1.35rem;
+    padding: .1rem .35rem;
+    border-radius: 100px;
+    background: rgba(139,92,246,.18);
+    color: var(--violet-light);
+    font-size: .65rem;
+    font-weight: 700;
+    text-align: center;
+}
+.nl-mapa__node[aria-expanded="true"] .nl-mapa__badge {
+    background: rgba(139,92,246,.08);
+    color: var(--gray-500);
+}
+
+/* --- Panel de detalle --- */
+.nl-mapa__detail {
+    margin-top: 1rem;
+    padding: .9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--gray-700);
+    border-left: 3px solid var(--violet);
+    background: rgba(26,14,46,.6);
+    animation: nlMapaIn var(--t-base) ease both;
+}
+.nl-mapa__detail-head {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: .4rem;
+}
+.nl-mapa__detail-title {
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--white);
+}
+.nl-mapa__detail-ruta {
+    font-size: .72rem;
+    color: var(--gray-500);
+    margin-bottom: .5rem;
+}
+.nl-mapa__detail-ruta span { color: var(--violet-light); }
+.nl-mapa__detail p {
+    font-size: .82rem;
+    line-height: 1.6;
+    color: var(--gray-300);
+    margin-bottom: .6rem;
+}
+.nl-mapa__detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--violet-light);
+    text-decoration: none;
+}
+.nl-mapa__detail-link:hover { color: var(--violet); }
+
+.nl-mapa__empty {
+    font-size: .82rem;
+    color: var(--gray-500);
+    padding: .5rem 0;
+}
+
+@keyframes nlMapaIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* --- Responsive: en móvil el mapa se apila verticalmente --- */
+@media (max-width: 800px) {
+    .nl-mapa__levels {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.1rem;
+    }
+    .nl-mapa__level { min-width: 0; }
+    .nl-mapa__links { display: none; }
+    .nl-mapa__level:not(:first-child) {
+        padding-left: .9rem;
+        border-left: 2px solid var(--gray-700);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nl-mapa__node,
+    .nl-mapa__link,
+    .nl-mapa__detail { transition: none; animation: none; }
+}

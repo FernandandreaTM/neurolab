@@ -11,6 +11,7 @@ $active_page = 'atlas';
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/nav.css">
 <link rel="stylesheet" href="css/atlas.css">
+<link rel="stylesheet" href="css/mapa.css">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <style>
 /* Layout mínimo del atlas (paleta morada) — Fase 1 lo reemplaza por atlas.css */
@@ -122,6 +123,7 @@ $active_page = 'atlas';
         <div id="topic-tree"><p class="text-muted text-sm">Cargando…</p></div>
       </aside>
       <section>
+        <div id="mapa-conceptual"></div>
         <div id="act-grid" class="nl-act-grid">
           <p class="text-muted">Selecciona un tema para ver sus actividades.</p>
         </div>
