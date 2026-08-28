@@ -1,5 +1,5 @@
 <?php
-// $active_page: 'home' | 'atlas' | 'actividad'
+// $active_page: 'home' | 'morfologia' | 'funcion' | 'atlas' | 'actividad'
 $active_page = $active_page ?? 'home';
 ?>
 <nav class="nav" id="nav">
@@ -11,7 +11,9 @@ $active_page = $active_page ?? 'home';
       </a>
       <ul class="nav__links" id="nav-links">
         <li><a href="index.php" <?= $active_page==='home'  ? 'class="active"' : '' ?>>Inicio</a></li>
-        <li><a href="atlas.php" <?= $active_page==='atlas' ? 'class="active"' : '' ?>>Atlas</a></li>
+        <li><a href="morfologia.php" <?= $active_page==='morfologia' ? 'class="active"' : '' ?>>🔬 Morfología</a></li>
+        <li><a href="funcion.php" <?= $active_page==='funcion' ? 'class="active"' : '' ?>>⚡ Función</a></li>
+        <li><a href="atlas.php" <?= $active_page==='atlas' ? 'class="active"' : '' ?>>Atlas completo</a></li>
         <li><a href="admin/index.php">⚙️ Admin</a></li>
       </ul>
       <div class="nav__actions">
@@ -19,8 +21,8 @@ $active_page = $active_page ?? 'home';
           <span class="nav__progress-dot"></span>
           <span id="progress-text">0 completados</span>
         </div>
-        <?php if ($active_page !== 'atlas'): ?>
-        <a href="atlas.php" class="btn btn-primary btn-sm">Explorar Atlas →</a>
+        <?php if (!in_array($active_page, ['morfologia', 'funcion', 'atlas'], true)): ?>
+        <a href="morfologia.php" class="btn btn-primary btn-sm">Explorar Atlas →</a>
         <?php endif; ?>
       </div>
       <button class="nav__toggle" id="nav-toggle" aria-label="Menú">

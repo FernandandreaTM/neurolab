@@ -145,3 +145,150 @@
     .nl-tree-node__chev,
     #topic-tree .nl-tree-children { transition: none; animation: none; }
 }
+
+/* ============================================================
+   Layout compartido de los atlas por área (morfologia.php / funcion.php)
+   Las mismas reglas que atlas.php trae en línea, más el acento por área.
+   ============================================================ */
+
+/* --- Cabecera --- */
+.nl-atlas-header { padding: 6rem 0 2rem; text-align: center; }
+.nl-atlas-header h1 { margin-bottom: .5rem; }
+.nl-atlas-header p { max-width: 560px; margin: 0 auto 1.5rem; }
+
+.nl-atlas-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .9rem;
+    border-radius: 100px;
+    border: 1px solid var(--area-borde, rgba(139,92,246,.4));
+    background: var(--area-suave, rgba(139,92,246,.1));
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--area, var(--violet-light));
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.nl-atlas-header h1 .nl-atlas-header__area { color: var(--area, var(--violet)); }
+
+/* Enlace al atlas hermano */
+.nl-atlas-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin-top: .35rem;
+    padding: .4rem .95rem;
+    border-radius: 100px;
+    border: 1px solid var(--gray-700);
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--gray-300);
+    text-decoration: none;
+    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.nl-atlas-switch:hover {
+    border-color: var(--area-alt, var(--violet));
+    color: var(--area-alt, var(--violet-light));
+    background: var(--area-alt-suave, rgba(139,92,246,.08));
+}
+
+/* --- Tabs de filtro --- */
+.nl-atlas-tabs {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+.nl-atlas-tab {
+    padding: .5rem 1.1rem;
+    border-radius: 100px;
+    border: 1px solid var(--gray-700);
+    background: transparent;
+    color: var(--gray-300);
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.nl-atlas-tab:hover,
+.nl-atlas-tab.active {
+    border-color: var(--area, var(--violet));
+    color: var(--area, var(--violet));
+    background: var(--area-suave, rgba(139,92,246,.08));
+}
+
+/* --- Cuerpo --- */
+.nl-atlas-body { padding: 2rem 0 4rem; }
+.nl-tree-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; }
+.nl-tree-panel {
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* --- Grilla de actividades --- */
+.nl-act-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.nl-act-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: border-color var(--t-base), transform var(--t-base);
+}
+.nl-act-card:hover {
+    border-color: var(--area-borde, rgba(139,92,246,.35));
+    transform: translateY(-3px);
+}
+.nl-act-card__tipo {
+    display: inline-block;
+    padding: .2rem .65rem;
+    border-radius: 100px;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .65rem;
+}
+.nl-act-card__tipo.lamina     { background: rgba(139,92,246,.15); color: var(--violet-light); }
+.nl-act-card__tipo.simulador  { background: rgba(236,72,153,.18); color: #F472B6; }
+.nl-act-card__tipo.comparador { background: rgba(109,40,217,.18); color: var(--violet-light); }
+.nl-act-card__tipo.labeling   { background: rgba(139,92,246,.15); color: var(--violet-light); }
+.nl-act-card__tipo.quiz       { background: rgba(236,72,153,.18); color: #F472B6; }
+.nl-act-card__title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .35rem; }
+.nl-act-card__desc  { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
+
+@media (max-width: 800px) {
+    .nl-tree-layout { grid-template-columns: 1fr; }
+}
+
+/* --- Acento por área --------------------------------------- */
+/* Morfología = violeta (estructura) · Función = rosa (fisiología) */
+body[data-area="morfologia"] {
+    --area:            var(--violet);
+    --area-borde:      rgba(139,92,246,.4);
+    --area-suave:      rgba(139,92,246,.1);
+    --area-alt:        var(--pink);
+    --area-alt-suave:  rgba(236,72,153,.1);
+}
+body[data-area="funcion"] {
+    --area:            #F472B6;
+    --area-borde:      rgba(236,72,153,.42);
+    --area-suave:      rgba(236,72,153,.12);
+    --area-alt:        var(--violet);
+    --area-alt-suave:  rgba(139,92,246,.1);
+}
+body[data-area="funcion"] #topic-tree .nl-tree-node.active {
+    background: rgba(236,72,153,.16);
+    color: #F9A8D4;
+}
+body[data-area="funcion"] .nl-tree-node__num       { color: #F472B6; }
+body[data-area="funcion"] .nl-tree-node.is-child .nl-tree-node__num { color: var(--gray-500); }
+body[data-area="funcion"] .nl-tree-node__count     { background: rgba(236,72,153,.15); color: #F9A8D4; }
+body[data-area="funcion"] .nl-tree-toggle-all:hover{ color: #F9A8D4; }

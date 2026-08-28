@@ -10,6 +10,14 @@
 import { isDone } from './progress.js';
 import { renderMapa } from './mapa.js';
 
+/**
+ * Configuración opcional que inyecta la página (morfologia.php / funcion.php).
+ * Si no existe — como en atlas.php — el atlas muestra todos los temas.
+ *   temas: null  → todos los temas
+ *   temas: ['celulas-sn', 'neurona'] → solo esos temas raíz y sus subtemas
+ */
+const CFG = window.NL_ATLAS || {};
+
 const STATE = {
     topics: [],
     actividades: [],
@@ -55,9 +63,18 @@ function hijosDe(id) {
 }
 
 function raices() {
+    const permitidos = Array.isArray(CFG.temas) ? CFG.temas : null;
     return STATE.topics
         .filter(t => !t.parent_id)
+        .filter(t => !permitidos || permitidos.includes(t.slug))
         .sort((a, b) => (a.orden - b.orden) || a.nombre.localeCompare(b.nombre));
+}
+
+/** Ids de todos los temas visibles en esta página (raíces + descendientes). */
+function temasVisibles() {
+    const out = [];
+    raices().forEach(r => out.push(...collectDescendants(r.id)));
+    return out;
 }
 
 function renderTree() {
@@ -186,7 +203,7 @@ function aplicarEnlaceDirecto() {
     const m = /^#topic-(\d+)$/.exec(location.hash || '');
     if (!id && m) id = Number(m[1]);
 
-    if (id && STATE.topics.some(t => Number(t.id) === id)) {
+    if (id && temasVisibles().includes(Number(id))) {
         STATE.topicSel = id;
         STATE.abiertos.add(id);
         abrirRuta(id);
@@ -225,10 +242,8 @@ function renderMapaTema() {
    --------------------------------------------------------------- */
 function renderGrid() {
     let acts = STATE.actividades;
-    if (STATE.topicSel) {
-        const ids = collectDescendants(STATE.topicSel);
-        acts = acts.filter(a => ids.includes(Number(a.topic_id)));
-    }
+    const ids = STATE.topicSel ? collectDescendants(STATE.topicSel) : temasVisibles();
+    acts = acts.filter(a => ids.includes(Number(a.topic_id)));
     if (STATE.filtroTipo !== 'todos') {
         acts = acts.filter(a => (a.tipo || '').toLowerCase().includes(STATE.filtroTipo)
                              || topicTipo(a.topic_id) === STATE.filtroTipo);

@@ -316,12 +316,12 @@ if (file_exists($db_path)) {
           </h1>
         </div>
         <div class="nl-hero__discipline-row">
-          <a href="atlas.php?tipo=estructura" class="nl-disc">
+          <a href="morfologia.php" class="nl-disc">
             <div class="nl-disc__icon">🔬</div>
             <div class="nl-disc__name">Morfología</div>
             <div class="nl-disc__meta">Estructura del SN</div>
           </a>
-          <a href="atlas.php?tipo=proceso" class="nl-disc">
+          <a href="funcion.php" class="nl-disc">
             <div class="nl-disc__icon">⚡</div>
             <div class="nl-disc__name">Función</div>
             <div class="nl-disc__meta">Fisiología del SN</div>
@@ -403,7 +403,8 @@ if (file_exists($db_path)) {
   <div class="nl-bottom-row">
     <div class="nl-modules-row stagger">
       <?php foreach($root_topics as $t): ?>
-      <a href="atlas.php#topic-<?= $t['id'] ?>" class="nl-module-mini reveal">
+      <?php $t_atlas = ($t['tipo'] ?? '') === 'estructura' ? 'morfologia.php' : 'funcion.php'; ?>
+      <a href="<?= $t_atlas ?>#topic-<?= $t['id'] ?>" class="nl-module-mini reveal">
         <div class="nl-module-mini__icon"><?= htmlspecialchars($t['icono']) ?></div>
         <div>
           <div class="nl-module-mini__name"><?= htmlspecialchars($t['nombre']) ?></div>
