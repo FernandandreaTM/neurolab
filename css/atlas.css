@@ -32,20 +32,53 @@
 .nl-tree-toggle-all:hover { color: var(--violet-light); }
 
 /* --- Nodo del árbol --- */
+/* El nodo es una fila: enlace al tema + botón que despliega los subtemas. */
 #topic-tree .nl-tree-node {
     display: flex;
     align-items: flex-start;
-    gap: .5rem;
-    padding: .45rem .55rem;
+    gap: .15rem;
     border-radius: 9px;
-    cursor: pointer;
     font-size: .85rem;
     color: var(--gray-300);
     transition: background var(--t-fast), color var(--t-fast);
-    user-select: none;
 }
 #topic-tree .nl-tree-node:hover { background: rgba(139,92,246,.1); color: var(--white); }
-#topic-tree .nl-tree-node:focus-visible {
+
+/* Enlace: abre tema.php */
+#topic-tree .nl-tree-node__link {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: .45rem .3rem .45rem .55rem;
+    border-radius: 9px;
+    color: inherit;
+    text-decoration: none;
+}
+#topic-tree .nl-tree-node__link:hover { color: var(--white); }
+#topic-tree .nl-tree-node__link:focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 1px;
+}
+
+/* Botón: despliega / repliega los subtemas */
+#topic-tree .nl-tree-node__toggle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .45rem .5rem;
+    border: 0;
+    background: none;
+    border-radius: 9px;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--t-fast);
+}
+#topic-tree .nl-tree-node__toggle:hover { background: rgba(139,92,246,.16); }
+#topic-tree .nl-tree-node__toggle:focus-visible {
     outline: 2px solid var(--violet);
     outline-offset: 1px;
 }
@@ -96,7 +129,6 @@
 /* Contador de subtemas */
 .nl-tree-node__count {
     flex-shrink: 0;
-    margin-top: .1rem;
     min-width: 1.15rem;
     padding: .05rem .3rem;
     border-radius: 100px;
@@ -115,7 +147,6 @@
 /* Chevron que gira al desplegar */
 .nl-tree-node__chev {
     flex-shrink: 0;
-    margin-top: .32rem;
     width: 0; height: 0;
     border-left: 5px solid currentColor;
     border-top: 4px solid transparent;
@@ -123,7 +154,7 @@
     color: var(--gray-500);
     transition: transform var(--t-fast), color var(--t-fast);
 }
-.nl-tree-node:hover .nl-tree-node__chev { color: var(--violet-light); }
+.nl-tree-node__toggle:hover .nl-tree-node__chev { color: var(--violet-light); }
 .nl-tree-node.is-open .nl-tree-node__chev { transform: rotate(90deg); }
 
 /* --- Rama de subtemas --- */
@@ -142,6 +173,61 @@
 
 @media (prefers-reduced-motion: reduce) {
     #topic-tree .nl-tree-node,
+    #topic-tree .nl-tree-node__toggle,
     .nl-tree-node__chev,
     #topic-tree .nl-tree-children { transition: none; animation: none; }
+}
+
+/* ============================================================
+   Tarjeta de actividad — compartida por atlas.php y tema.php
+   (antes vivía en el <style> inline de atlas.php)
+   ============================================================ */
+.nl-act-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+.nl-act-card {
+    display: block;
+    background: var(--navy-mid);
+    border: 1px solid var(--gray-700);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: border-color var(--t-base), transform var(--t-base);
+}
+.nl-act-card:hover {
+    border-color: rgba(139,92,246,.35);
+    transform: translateY(-3px);
+}
+.nl-act-card__tipo {
+    display: inline-block;
+    padding: .2rem .65rem;
+    border-radius: 100px;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .65rem;
+}
+.nl-act-card__tipo.lamina     { background: rgba(139,92,246,.15); color: var(--violet-light); }
+.nl-act-card__tipo.simulador  { background: rgba(236,72,153,.18); color: #F472B6; }
+.nl-act-card__tipo.comparador { background: rgba(109,40,217,.18); color: var(--violet-light); }
+.nl-act-card__tipo.labeling   { background: rgba(139,92,246,.15); color: var(--violet-light); }
+.nl-act-card__tipo.quiz       { background: rgba(236,72,153,.18); color: #F472B6; }
+.nl-act-card__title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .35rem; }
+.nl-act-card__desc  { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
+
+/* Tema de origen, cuando la actividad viene de un subtema */
+.nl-act-card__origen {
+    display: block;
+    margin-top: .6rem;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--gray-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nl-act-card { transition: none; }
+    .nl-act-card:hover { transform: none; }
 }

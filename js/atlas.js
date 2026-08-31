@@ -1,20 +1,20 @@
 /**
  * NeuroLab — atlas.js
- * Carga topics + actividades, renderiza el árbol lateral numerado y la grilla filtrable.
+ * Índice de temas: árbol lateral numerado + grilla de actividades filtrable.
  *
  * Árbol de temas:
  *   - los temas principales van en números romanos (I, II, III…) y parten colapsados
- *   - al presionar un tema principal se despliegan sus subtemas (I.1, I.2…)
- *   - un subtema con hijos se comporta igual, en cascada
+ *   - el NOMBRE del tema es un enlace: abre su página propia (tema.php?slug=…),
+ *     donde vive el mapa conceptual, la descripción, los quices y el material del tema
+ *   - el chevron de la derecha despliega/repliega los subtemas sin salir del atlas
  */
 import { isDone } from './progress.js';
-import { renderMapa } from './mapa.js';
 
 const STATE = {
     topics: [],
     actividades: [],
     filtroTipo: 'todos',
-    topicSel: null,
+    destacado: null,       // tema resaltado por enlace directo (?topic= / #topic-N)
     abiertos: new Set(),   // ids de temas desplegados
 };
 
@@ -29,7 +29,6 @@ async function load() {
     aplicarEnlaceDirecto();
     renderTree();
     renderGrid();
-    if (STATE.topicSel) renderMapaTema();
 }
 
 /* ---------------------------------------------------------------
@@ -69,10 +68,10 @@ function renderTree() {
 }
 
 function nodeHTML(node, num, depth) {
-    const hijos     = hijosDe(node.id);
-    const tiene     = hijos.length > 0;
-    const abierto   = STATE.abiertos.has(node.id);
-    const activo    = Number(STATE.topicSel) === Number(node.id);
+    const hijos   = hijosDe(node.id);
+    const tiene   = hijos.length > 0;
+    const abierto = STATE.abiertos.has(node.id);
+    const activo  = Number(STATE.destacado) === Number(node.id);
 
     const clases = [
         'nl-tree-node',
@@ -88,45 +87,39 @@ function nodeHTML(node, num, depth) {
            </div>`
         : '';
 
+    const toggleHTML = tiene
+        ? `<button type="button" class="nl-tree-node__toggle" data-id="${node.id}"
+                   aria-expanded="${abierto}"
+                   aria-label="${abierto ? 'Ocultar' : 'Mostrar'} los ${hijos.length} subtemas de ${escapeHTML(node.nombre)}">
+               <span class="nl-tree-node__count">${hijos.length}</span>
+               <span class="nl-tree-node__chev" aria-hidden="true"></span>
+           </button>`
+        : '';
+
     return `
-        <div class="${clases}" data-id="${node.id}" data-tiene="${tiene ? 1 : 0}"
-             role="button" tabindex="0"
-             ${tiene ? `aria-expanded="${abierto}"` : ''}
-             title="${escapeHTML(node.nombre)}">
-            <span class="nl-tree-node__num">${num}</span>
-            <span class="nl-tree-node__ico">${node.icono || '•'}</span>
-            <span class="nl-tree-node__txt">${escapeHTML(node.nombre)}</span>
-            ${tiene ? `<span class="nl-tree-node__count" title="${hijos.length} subtema${hijos.length === 1 ? '' : 's'}">${hijos.length}</span>
-                       <span class="nl-tree-node__chev" aria-hidden="true"></span>` : ''}
+        <div class="${clases}" data-id="${node.id}">
+            <a class="nl-tree-node__link" href="tema.php?slug=${encodeURIComponent(node.slug)}"
+               title="Abrir la página de ${escapeHTML(node.nombre)}">
+                <span class="nl-tree-node__num">${num}</span>
+                <span class="nl-tree-node__ico">${node.icono || '•'}</span>
+                <span class="nl-tree-node__txt">${escapeHTML(node.nombre)}</span>
+            </a>
+            ${toggleHTML}
         </div>
         ${kidsHTML}`;
 }
 
 function enlazarTree() {
-    document.querySelectorAll('#topic-tree .nl-tree-node').forEach(el => {
-        const activar = () => seleccionarTema(+el.dataset.id, el.dataset.tiene === '1');
-        el.addEventListener('click', activar);
-        el.addEventListener('keydown', ev => {
-            if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); activar(); }
+    document.querySelectorAll('#topic-tree .nl-tree-node__toggle').forEach(btn => {
+        btn.addEventListener('click', ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const id = Number(btn.dataset.id);
+            if (STATE.abiertos.has(id)) STATE.abiertos.delete(id);
+            else STATE.abiertos.add(id);
+            renderTree();
         });
     });
-}
-
-/** Presionar un tema: lo selecciona y despliega/repliega sus subtemas. */
-function seleccionarTema(id, tieneHijos) {
-    const yaEstaba = Number(STATE.topicSel) === Number(id);
-
-    if (tieneHijos) {
-        // Si vuelvo a presionar el mismo tema ya abierto, lo repliego.
-        if (STATE.abiertos.has(id) && yaEstaba) STATE.abiertos.delete(id);
-        else STATE.abiertos.add(id);
-    }
-
-    STATE.topicSel = id;
-    abrirRuta(id);
-    renderTree();
-    renderMapaTema();
-    renderGrid();
 }
 
 /** Deja visible la ruta desde la raíz hasta el tema indicado. */
@@ -162,7 +155,8 @@ document.getElementById('tree-toggle-all')?.addEventListener('click', () => {
 });
 
 /* ---------------------------------------------------------------
-   Enlace directo desde el home: atlas.php#topic-3 o atlas.php?topic=slug
+   Enlace directo: atlas.php#topic-3 o atlas.php?topic=slug
+   Resalta el tema en el árbol (la página del tema es tema.php).
    --------------------------------------------------------------- */
 function aplicarEnlaceDirecto() {
     const params = new URLSearchParams(location.search);
@@ -187,86 +181,66 @@ function aplicarEnlaceDirecto() {
     if (!id && m) id = Number(m[1]);
 
     if (id && STATE.topics.some(t => Number(t.id) === id)) {
-        STATE.topicSel = id;
+        STATE.destacado = id;
         STATE.abiertos.add(id);
         abrirRuta(id);
     }
 }
 
-/** Un enlace #topic-N dentro de la misma página no recarga: hay que escucharlo. */
 window.addEventListener('hashchange', () => {
     const m = /^#topic-(\d+)$/.exec(location.hash || '');
     if (!m) return;
     const id = Number(m[1]);
     if (!STATE.topics.some(t => Number(t.id) === id)) return;
+    STATE.destacado = id;
     STATE.abiertos.add(id);
     abrirRuta(id);
-    STATE.topicSel = id;
     renderTree();
-    renderMapaTema();
-    renderGrid();
 });
 
 /* ---------------------------------------------------------------
-   Mapa conceptual del tema seleccionado
-   --------------------------------------------------------------- */
-function renderMapaTema() {
-    const host = document.getElementById('mapa-conceptual');
-    if (!host) return;
-    renderMapa(host, {
-        topics: STATE.topics,
-        actividades: STATE.actividades,
-        topicId: STATE.topicSel,
-    });
-}
-
-/* ---------------------------------------------------------------
-   Grilla de actividades
+   Grilla de actividades (todas, filtrables por tipo)
    --------------------------------------------------------------- */
 function renderGrid() {
     let acts = STATE.actividades;
-    if (STATE.topicSel) {
-        const ids = collectDescendants(STATE.topicSel);
-        acts = acts.filter(a => ids.includes(Number(a.topic_id)));
-    }
     if (STATE.filtroTipo !== 'todos') {
         acts = acts.filter(a => (a.tipo || '').toLowerCase().includes(STATE.filtroTipo)
                              || topicTipo(a.topic_id) === STATE.filtroTipo);
     }
 
+    const contador = document.getElementById('act-count');
+    if (contador) {
+        contador.textContent = acts.length === 1 ? '1 actividad' : `${acts.length} actividades`;
+    }
+
     const grid = document.getElementById('act-grid');
     if (!acts.length) {
-        grid.innerHTML = STATE.topicSel
-            ? '<p class="text-muted">Este tema todavía no tiene actividades con este filtro.</p>'
-            : '<p class="text-muted">Selecciona un tema para ver sus actividades.</p>';
+        grid.innerHTML = '<p class="text-muted">No hay actividades con este filtro.</p>';
         return;
     }
 
     grid.innerHTML = acts.map(a => {
         const done = isDone(a.slug) ? ' ✓' : '';
         const desc = (a.descripcion || '');
+        const tema = topicNombre(a.topic_id);
         return `
         <a class="nl-act-card" href="actividad.php?slug=${encodeURIComponent(a.slug)}">
             <span class="nl-act-card__tipo ${a.tipo}">${tipoLabel(a.tipo)}</span>
             <div class="nl-act-card__title">${escapeHTML(a.titulo)}${done}</div>
             <div class="nl-act-card__desc">${escapeHTML(desc.slice(0, 120))}${desc.length > 120 ? '…' : ''}</div>
+            ${tema ? `<span class="nl-act-card__origen">en ${escapeHTML(tema)}</span>` : ''}
         </a>`;
     }).join('');
-}
-
-function collectDescendants(rootId) {
-    const out = [Number(rootId)];
-    const stack = [Number(rootId)];
-    while (stack.length) {
-        const cur = stack.pop();
-        hijosDe(cur).forEach(c => { out.push(Number(c.id)); stack.push(Number(c.id)); });
-    }
-    return out;
 }
 
 function topicTipo(id) {
     const t = STATE.topics.find(x => Number(x.id) === Number(id));
     return t ? (t.tipo || '').toLowerCase() : '';
+}
+
+function topicNombre(id) {
+    const t = STATE.topics.find(x => Number(x.id) === Number(id));
+    return t ? t.nombre : '';
 }
 
 function tipoLabel(t) {
