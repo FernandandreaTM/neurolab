@@ -19,8 +19,24 @@ CREATE TABLE IF NOT EXISTS topics (
     icono       TEXT,
     tipo        TEXT,                        -- estructura | proceso | sensitivo | motor | lenguaje | tronco
     orden       INTEGER NOT NULL DEFAULT 0,
+    descripcion TEXT,                        -- texto introductorio que se muestra en tema.php
     FOREIGN KEY (parent_id) REFERENCES topics(id)
 );
+
+-- Material del TEMA (no de una actividad): imagenes, enlaces, videos, texto libre.
+-- Pensada para ir creciendo: la pagina del tema ya la muestra aunque este vacia.
+CREATE TABLE IF NOT EXISTS topic_recursos (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    topic_id    INTEGER NOT NULL,
+    tipo        TEXT    NOT NULL,            -- imagen | enlace | video | documento | texto_html
+    titulo      TEXT,
+    url         TEXT,
+    caption     TEXT,
+    orden       INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (topic_id) REFERENCES topics(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_topic_recursos_topic ON topic_recursos(topic_id);
 
 CREATE TABLE IF NOT EXISTS actividades (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,

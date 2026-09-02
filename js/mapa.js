@@ -134,6 +134,7 @@ function buildNode(topic) {
         id: topic.id,
         kind: 'topic',
         nombre: topic.nombre,
+        slug: topic.slug || '',
         icono: topic.icono || '•',
         tipo: topic.tipo || '',
         children: [...subTemas, ...acts],
@@ -307,9 +308,18 @@ function pintarDetalle(root) {
         const partes = [];
         if (nSub)  partes.push(`${nSub} sub-tema${nSub === 1 ? '' : 's'}`);
         if (nActs) partes.push(`${nActs} actividad${nActs === 1 ? '' : 'es'}`);
+
+        // El detalle completo del tema vive en su propia página.
+        const esActual = Number(node.id) === Number(M.currentId);
+        const enlace = node.slug && !esActual
+            ? `<a class="nl-mapa__detail-link" href="tema.php?slug=${encodeURIComponent(node.slug)}">
+                   Ir a la página del tema →
+               </a>`
+            : '';
+
         cuerpo = `<p>${partes.length
             ? 'Este tema agrupa ' + partes.join(' y ') + '.'
-            : 'Este tema todavía no tiene sub-temas ni actividades asociadas.'}</p>`;
+            : 'Este tema todavía no tiene sub-temas ni actividades asociadas.'}</p>${enlace}`;
     }
 
     const etiqueta = node.kind === 'act'

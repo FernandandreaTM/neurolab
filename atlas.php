@@ -11,14 +11,13 @@ $active_page = 'atlas';
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/nav.css">
 <link rel="stylesheet" href="css/atlas.css">
-<link rel="stylesheet" href="css/mapa.css">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <style>
-/* Layout mínimo del atlas (paleta morada) — Fase 1 lo reemplaza por atlas.css */
+/* Layout mínimo del atlas (paleta morada) */
 .nl-atlas-header { padding: 6rem 0 2rem; text-align: center; }
 .nl-atlas-header h1 { margin-bottom: .5rem; }
 .nl-atlas-header p { max-width: 540px; margin: 0 auto 1.5rem; }
-.nl-atlas-tabs { display: flex; justify-content: center; gap: .5rem; margin-top: 1.5rem; }
+.nl-atlas-tabs { display: flex; justify-content: center; gap: .5rem; margin-top: 1.5rem; flex-wrap: wrap; }
 .nl-atlas-tab {
     padding: .5rem 1.1rem;
     border-radius: 100px;
@@ -47,36 +46,16 @@ $active_page = 'atlas';
     overflow-y: auto;
 }
 .nl-tree-panel h3 { font-size: .85rem; margin-bottom: 1rem; color: var(--gray-300); }
-.nl-act-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.nl-act-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--gray-700);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    text-decoration: none;
-    transition: border-color var(--t-base), transform var(--t-base);
+
+.nl-atlas-gridhead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
-.nl-act-card:hover {
-    border-color: rgba(139,92,246,.35);
-    transform: translateY(-3px);
-}
-.nl-act-card__tipo {
-    display: inline-block;
-    padding: .2rem .65rem;
-    border-radius: 100px;
-    font-size: .7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: .65rem;
-}
-.nl-act-card__tipo.lamina      { background: rgba(139,92,246,.15); color: var(--violet-light); }
-.nl-act-card__tipo.simulador  { background: rgba(236,72,153,.18); color: #F472B6; }
-.nl-act-card__tipo.comparador { background: rgba(109,40,217,.18); color: var(--violet-light); }
-.nl-act-card__tipo.labeling   { background: rgba(139,92,246,.15); color: var(--violet-light); }
-.nl-act-card__tipo.quiz       { background: rgba(236,72,153,.18); color: #F472B6; }
-.nl-act-card__title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .35rem; }
-.nl-act-card__desc { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
+.nl-atlas-gridhead h2 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--white); }
 
 @media (max-width: 800px) { .nl-tree-layout { grid-template-columns: 1fr; } }
 </style>
@@ -89,7 +68,7 @@ $active_page = 'atlas';
   <div class="container">
     <span class="label">Atlas de Actividades</span>
     <h1 class="mt-2">Explora el sistema nervioso</h1>
-    <p>Presiona un tema principal para desplegar sus subtemas y elige una actividad. Cada actividad tiene una descripción general y descripciones específicas para Fonoaudiología y Terapia Ocupacional.</p>
+    <p>Presiona el nombre de un tema o subtema para abrir su página, con el mapa conceptual, la descripción, los quices y el material del tema. El chevron de la derecha despliega los subtemas sin salir de aquí.</p>
     <div class="nl-atlas-tabs">
       <button class="nl-atlas-tab active" data-filtro="todos">Todos</button>
       <button class="nl-atlas-tab" data-filtro="estructura">🔬 Morfología</button>
@@ -111,9 +90,12 @@ $active_page = 'atlas';
         <div id="topic-tree"><p class="text-muted text-sm">Cargando…</p></div>
       </aside>
       <section>
-        <div id="mapa-conceptual"></div>
+        <div class="nl-atlas-gridhead">
+          <h2>Actividades</h2>
+          <span class="text-muted text-sm" id="act-count"></span>
+        </div>
         <div id="act-grid" class="nl-act-grid">
-          <p class="text-muted">Selecciona un tema para ver sus actividades.</p>
+          <p class="text-muted">Cargando actividades…</p>
         </div>
       </section>
     </div>

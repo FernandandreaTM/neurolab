@@ -403,7 +403,7 @@ if (file_exists($db_path)) {
   <div class="nl-bottom-row">
     <div class="nl-modules-row stagger">
       <?php foreach($root_topics as $t): ?>
-      <a href="atlas.php#topic-<?= $t['id'] ?>" class="nl-module-mini reveal">
+      <a href="tema.php?slug=<?= urlencode($t['slug']) ?>" class="nl-module-mini reveal">
         <div class="nl-module-mini__icon"><?= htmlspecialchars($t['icono']) ?></div>
         <div>
           <div class="nl-module-mini__name"><?= htmlspecialchars($t['nombre']) ?></div>

@@ -47,15 +47,42 @@ neurolab/
 ├── css/                         # base, nav, atlas, activity
 ├── js/                          # progress, quiz, activity (nuevo)
 ├── data/
-│   ├── schema.sql               # topics, actividades, recursos, carreras, quices
-│   ├── seed.sql                 # 2 carreras + 5 topics + 5 actividades demo
+│   ├── schema.sql               # topics, topic_recursos, actividades, recursos, carreras, quices
+│   ├── seed.sql                 # 2 carreras + 5 topics (con descripción) + 5 actividades demo
 │   ├── neurolab.db              # DB generada por migrate.php
 │   └── .htaccess                # Bloquea acceso web a la DB
 ├── img/                         # logo UACH, favicon, hero
 ├── index.php                    # Landing (logo UACH + título + descripción + cards)
-├── atlas.php                    # Árbol de temas (mismo patrón CellView)
+├── atlas.php                    # Índice: árbol de temas + grilla de actividades
+├── tema.php                     # Página propia de cada tema/subtema
 └── actividad.php                # Layout split: recurso | descripciones + quiz
 ```
+
+---
+
+## Página de tema (`tema.php`)
+
+Cada tema y subtema tiene su **propia URL**: `tema.php?slug=celulas-sn`.
+El árbol del atlas, las tarjetas del home y los nodos del mapa conceptual apuntan ahí.
+
+La página reúne, en este orden:
+
+| Sección | De dónde sale |
+|---------|---------------|
+| Descripción | `topics.descripcion` |
+| Mapa conceptual | `js/mapa.js`, con los datos de `api/topics.php` + `api/actividades.php` |
+| Subtemas | `topics` hijos, cada uno enlaza a su propia página |
+| Actividades | `actividades` del tema **y de sus subtemas** |
+| Quices | `quices` de esas actividades + actividades de tipo `quiz` |
+| Imágenes | `topic_recursos` con `tipo = 'imagen'` |
+| Recursos y material extra | `topic_recursos` con `tipo` `enlace`, `video`, `documento` o `texto_html` |
+
+Las dos últimas secciones se muestran vacías (con su mensaje) mientras no haya
+filas en `topic_recursos`: están pensadas para ir creciendo sin tocar el código.
+
+> Al agregar `tema.php` cambió el schema. Después de hacer `git pull`, correr
+> `admin/migrate.php` (agrega `topics.descripcion` y crea `topic_recursos`, es idempotente)
+> y luego `admin/seed.php` si se quieren las descripciones demo.
 
 ---
 
