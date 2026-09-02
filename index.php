@@ -27,7 +27,6 @@ if (file_exists($db_path)) {
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/nav.css">
 <style>
 /* --- Layout específico de la landing --- */
 .nl-hero {
@@ -35,7 +34,7 @@ if (file_exists($db_path)) {
     display: flex;
     align-items: center;
     overflow: clip;
-    padding-top: 5rem;
+    padding-top: 2rem;
     position: relative;
 }
 .nl-hero__bg {
@@ -295,7 +294,6 @@ if (file_exists($db_path)) {
 <body>
 <div class="bg-mesh"></div>
 
-<?php include '_partials/nav.php'; ?>
 
 <!-- ─── HERO ─────────────────────────────────────────── -->
 <section class="nl-hero">

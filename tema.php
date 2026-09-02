@@ -162,12 +162,10 @@ if (!$topic) {
     <title>Tema no encontrado — NeuroLab</title>
     <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/tema.css">
     </head>
     <body>
     <div class="bg-mesh"></div>
-    <?php include '_partials/nav.php'; ?>
     <div class="container nl-tema-vacio">
         <span class="label">Tema</span>
         <h1 class="mt-2">No encontramos ese tema</h1>
@@ -288,14 +286,12 @@ $active_page = 'atlas';
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/nav.css">
 <link rel="stylesheet" href="css/atlas.css">
 <link rel="stylesheet" href="css/mapa.css">
 <link rel="stylesheet" href="css/tema.css">
 </head>
 <body>
 <div class="bg-mesh"></div>
-<?php include '_partials/nav.php'; ?>
 
 <header class="nl-tema-header">
   <div class="container">

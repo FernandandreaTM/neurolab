@@ -5,7 +5,7 @@
 
 /* --- Cabecera --- */
 .nl-tema-header {
-    padding: 6.5rem 0 1.5rem;
+    padding: 3rem 0 1.5rem;
     border-bottom: 1px solid var(--gray-700);
 }
 
@@ -86,7 +86,7 @@
 .nl-tema-sec {
     padding: 1.75rem 0;
     border-bottom: 1px solid rgba(74,58,106,.5);
-    scroll-margin-top: 6rem;
+    scroll-margin-top: 2rem;
 }
 .nl-tema-sec:last-of-type { border-bottom: 0; }
 
@@ -281,10 +281,10 @@
 }
 
 /* --- Estado "tema no encontrado" --- */
-.nl-tema-vacio { padding: 8rem 0 5rem; text-align: center; }
+.nl-tema-vacio { padding: 5rem 0 5rem; text-align: center; }
 
 @media (max-width: 640px) {
-    .nl-tema-header { padding-top: 5.5rem; }
+    .nl-tema-header { padding-top: 2.5rem; }
     .nl-tema-sec { padding: 1.35rem 0; }
 }
 

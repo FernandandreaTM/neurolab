@@ -47,12 +47,10 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/activity.css">
     </head>
     <body>
     <div class="bg-mesh"></div>
-    <?php include '_partials/nav.php'; ?>
 
     <div class="nl-act-header container">
         <a href="atlas.php" class="nl-act-back">← Volver al atlas</a>
