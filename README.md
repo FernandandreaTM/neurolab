@@ -93,12 +93,44 @@ filas en `topic_recursos`: están pensadas para ir creciendo sin tocar el códig
 | `lamina` | Iframe histologyguide.com con hotspots opcionales | histologyguide.com |
 | `simulador` | Iframe PhET Colorado (membrane-channels, neuron) | phet.colorado.edu |
 | `comparador` | Tabla 2–3 columnas lado a lado (HTML puro) | — |
-| `labeling` | Imagen con hotspots + quiz de partes | — |
+| `labeling` | Imagen con rectángulos: el estudiante escribe el nombre de cada parte | — |
 | `quiz` | 20 preguntas selección múltiple + feedback inmediato | — |
 
 Cada actividad puede tener **dos descripciones** almacenadas:
 - `actividades.descripcion` — común a ambas carreras
 - `actividad_carrera.descripcion` — específica por carrera (Fono / TO)
+
+---
+
+## Actividad de identificación (`labeling`)
+
+Sobre la lámina hay un rectángulo por cada estructura. El estudiante escribe el
+nombre y presiona <kbd>Enter</kbd>:
+
+- **correcto** → el rectángulo queda verde, fijo y ya no se puede editar;
+- **incorrecto** → se pone rojo, muestra una pista (inicial y largo de la palabra)
+  y deja volver a intentarlo, sin límite de intentos.
+
+Piezas:
+
+| Archivo | Rol |
+|---------|-----|
+| `labeling_parts` | una fila por estructura: `nombre`, punto (`x_pct`,`y_pct`), rectángulo (`box_x_pct`,`box_y_pct`), `sinonimos` y `descripcion` (la retroalimentación al acertar) |
+| `api/labeling_check.php` | revisa cada intento **en el servidor**, para que las respuestas no queden escritas en el HTML |
+| `js/labeling.js` | dibuja los rectángulos, guarda el avance y bloquea lo acertado |
+
+Detalles que conviene saber al editar:
+
+- `sinonimos` acepta varias respuestas válidas separadas por `|`. La comparación
+  ignora mayúsculas, tildes, artículos y singular/plural, así que basta con listar
+  las variantes de fondo (`cuerpo celular`, `pericarion`, …).
+- Si `box_x_pct`/`box_y_pct` quedan en `NULL`, el rectángulo se dibuja justo sobre
+  el punto. Cuando difieren, se dibuja al lado y aparece una línea guía hacia la
+  estructura — que es lo que conviene para no tapar el dibujo.
+- Lo acertado se guarda en `localStorage` bajo `nl_labeling_<slug>`, así el avance
+  sobrevive a una recarga y queda disponible para la actividad siguiente.
+- En pantallas angostas (< 760 px) los rectángulos bajan a una lista numerada y
+  sobre la lámina quedan sólo los números.
 
 ---
 

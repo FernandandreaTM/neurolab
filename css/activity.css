@@ -178,3 +178,234 @@
     .nl-act-layout { grid-template-columns: 1fr; }
     .nl-act-carreras { grid-template-columns: 1fr; }
 }
+
+/* La identificación necesita todo el ancho: el diagrama es la actividad. */
+.nl-act-layout--ancho { grid-template-columns: 1fr; }
+.nl-act-layout--ancho .nl-act-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+/* ============================================================
+   Actividad de identificación (labeling)
+   Rectángulos sobre la imagen: se escribe el nombre de la parte.
+   ============================================================ */
+.nl-lab { padding: 1.1rem 1.25rem 1.25rem; }
+.nl-lab__head { margin-bottom: 1rem; }
+.nl-lab__instruccion {
+    font-size: .85rem;
+    line-height: 1.55;
+    color: var(--gray-300);
+    margin: 0 0 .65rem;
+    max-width: 62ch;
+}
+.nl-lab__estado {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+.nl-lab__contador {
+    padding: .2rem .7rem;
+    border-radius: 100px;
+    background: rgba(139,92,246,.15);
+    color: var(--violet-light);
+    font-size: .78rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.nl-lab.is-completa .nl-lab__contador {
+    background: rgba(34,197,94,.18);
+    color: #4ADE80;
+}
+.nl-lab__reset {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: color var(--t-fast);
+}
+.nl-lab__reset:hover { color: var(--violet-light); }
+
+/* --- Lienzo --- */
+.nl-lab__canvas {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;               /* la lámina viene con fondo blanco */
+    line-height: 0;
+    container-type: inline-size;    /* los rótulos escalan con la imagen */
+}
+.nl-lab__img { width: 100%; height: auto; display: block; }
+.nl-lab__lineas,
+.nl-lab__capa {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.nl-lab__lineas { pointer-events: none; }
+.nl-lab__capa {
+    pointer-events: none;
+    line-height: 1.2;
+    /* Todo lo de adentro va en em, así los rectángulos crecen y se achican
+       junto con la lámina y nunca se pisan entre ellos. */
+    font-size: clamp(8px, 1.12cqw, 14px);
+}
+.nl-lab__capa > * { pointer-events: auto; }
+
+.nl-lab__linea {
+    stroke: #7C3AED;
+    stroke-width: 1.6;
+    stroke-dasharray: 4 3;
+    opacity: .8;
+}
+.nl-lab__linea.is-ok { stroke: #16A34A; stroke-dasharray: none; opacity: .9; }
+
+/* Punto que marca la estructura exacta */
+.nl-lab__punto {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background: #7C3AED;
+    border: .15em solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.35);
+    color: #fff;
+    font-size: .8em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--t-fast);
+}
+.nl-lab__punto.is-ok { background: #16A34A; }
+
+/* --- Rectángulo de respuesta --- */
+.nl-lab__slot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+.nl-lab__campo {
+    display: flex;
+    align-items: center;
+    gap: .3em;
+    padding: .2em .35em .2em .25em;
+    border: .16em solid #7C3AED;
+    border-radius: .6em;
+    background: rgba(255,255,255,.9);
+    box-shadow: 0 2px 8px rgba(26,14,46,.22);
+    transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+}
+.nl-lab__num {
+    flex-shrink: 0;
+    min-width: 1.5em;
+    height: 1.5em;
+    border-radius: .35em;
+    background: rgba(124,58,237,.14);
+    color: #6D28D9;
+    font-size: .8em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.nl-lab__input {
+    width: 8em;
+    min-width: 0;
+    border: 0;
+    background: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 600;
+    color: #1A0E2E;
+    padding: .1em;
+}
+.nl-lab__input::placeholder { color: #9C8AB5; font-weight: 500; }
+
+.nl-lab__campo:focus-within {
+    background: #fff;
+    border-color: #6D28D9;
+    box-shadow: 0 0 0 .18em rgba(139,92,246,.3), 0 2px 8px rgba(26,14,46,.25);
+}
+.nl-lab__slot:focus-within { z-index: 5; }
+.nl-lab__campo.is-esperando { opacity: .65; }
+
+.nl-lab__campo.is-mal {
+    border-color: #DC2626;
+    background: rgba(254,226,226,.97);
+    animation: nlLabMal 320ms ease;
+}
+.nl-lab__campo.is-mal .nl-lab__num { background: rgba(220,38,38,.16); color: #B91C1C; }
+
+.nl-lab__campo.is-ok {
+    border-color: #16A34A;
+    background: rgba(220,252,231,.97);
+    box-shadow: 0 2px 8px rgba(22,163,74,.25);
+}
+.nl-lab__campo.is-ok .nl-lab__num { background: rgba(22,163,74,.18); color: #15803D; }
+.nl-lab__ok {
+    padding: .1em;
+    font-size: 1em;
+    font-weight: 800;
+    color: #14532D;
+    white-space: nowrap;
+}
+.nl-lab__ok::after { content: ' ✓'; }
+
+@keyframes nlLabMal {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-.35em); }
+    75%      { transform: translateX(.35em); }
+}
+
+/* --- Retroalimentación --- */
+.nl-lab__feedback {
+    /* Pegada al borde inferior de la pantalla: la lámina es alta y la
+       retroalimentación tiene que verse sin tener que buscarla. */
+    position: sticky;
+    bottom: .75rem;
+    z-index: 6;
+    margin: 1rem 0 0;
+    font-size: .84rem;
+    line-height: 1.55;
+    color: var(--gray-300);
+    padding: 0;
+    border-radius: var(--radius);
+    transition: background var(--t-fast);
+}
+.nl-lab__feedback.is-ok,
+.nl-lab__feedback.is-mal {
+    padding: .7rem .9rem;
+    box-shadow: 0 6px 20px rgba(26,14,46,.45);
+    backdrop-filter: blur(6px);
+}
+.nl-lab__feedback.is-ok  { background: rgba(21,89,48,.92);  color: #BBF7D0; }
+.nl-lab__feedback.is-mal { background: rgba(127,25,25,.92); color: #FECACA; }
+.nl-lab__feedback strong { color: var(--white); }
+
+/* --- Pantallas angostas: los campos bajan a una lista --- */
+.nl-lab__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: .6rem;
+    margin-top: 1rem;
+}
+.nl-lab__lista .nl-lab__campo { width: 100%; font-size: .9rem; }
+.nl-lab__lista .nl-lab__input { width: 100%; flex: 1; }
+.nl-lab.is-lista .nl-lab__capa { font-size: clamp(9px, 2.6cqw, 15px); }
+/* En modo lista los rectángulos ya no están sobre la lámina: las guías sobran. */
+.nl-lab.is-lista .nl-lab__lineas { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .nl-lab__campo.is-mal { animation: none; }
+    .nl-lab__campo, .nl-lab__punto, .nl-lab__reset { transition: none; }
+}

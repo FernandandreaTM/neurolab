@@ -34,6 +34,32 @@ try {
     $labels->execute([$act['id']]);
     $labelParts = $labels->fetchAll();
 
+    // --- Actividad de identificación: partes + imagen de fondo ---
+    $esLabeling = ($act['tipo'] === 'labeling') && !empty($labelParts);
+    $partesLab  = [];
+    $imgLab     = '';
+    if ($esLabeling) {
+        foreach ($recursos as $r) {
+            if ($r['tipo'] === 'imagen' && !empty($r['url'])) { $imgLab = $r['url']; break; }
+        }
+        if ($imgLab === '') { $esLabeling = false; }
+    }
+    if ($esLabeling) {
+        foreach ($labelParts as $i => $lp) {
+            // Ojo: acá NO va el nombre correcto. Lo valida api/labeling_check.php.
+            $partesLab[] = [
+                'id'    => (int)$lp['id'],
+                'n'     => $i + 1,
+                'x'     => (float)$lp['x_pct'],
+                'y'     => (float)$lp['y_pct'],
+                'bx'    => isset($lp['box_x_pct']) && $lp['box_x_pct'] !== null && $lp['box_x_pct'] !== ''
+                           ? (float)$lp['box_x_pct'] : (float)$lp['x_pct'],
+                'by'    => isset($lp['box_y_pct']) && $lp['box_y_pct'] !== null && $lp['box_y_pct'] !== ''
+                           ? (float)$lp['box_y_pct'] : (float)$lp['y_pct'],
+            ];
+        }
+    }
+
     $active_page = 'actividad';
     ?>
     <!DOCTYPE html>
@@ -63,9 +89,35 @@ try {
         <h1><?= htmlspecialchars($act['titulo']) ?></h1>
     </div>
 
-    <div class="nl-act-layout container">
+    <div class="nl-act-layout container<?= $esLabeling ? ' nl-act-layout--ancho' : '' ?>">
         <!-- IZQUIERDA: recurso (imagen / iframe / 3D) + tabs -->
         <div class="nl-act-stage">
+            <?php if ($esLabeling): ?>
+            <!-- Identificación: escribir el nombre de cada parte sobre la imagen -->
+            <div class="nl-lab" id="nl-lab"
+                 data-slug="<?= htmlspecialchars($act['slug']) ?>"
+                 data-partes="<?= htmlspecialchars(json_encode($partesLab, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+                <div class="nl-lab__head">
+                    <p class="nl-lab__instruccion">
+                        Escribe en cada rectángulo el nombre de la parte sobre la que está y presiona
+                        <kbd>Enter</kbd>. Si aciertas, el rectángulo queda verde y fijo; si no, se pone
+                        rojo, te damos una pista y puedes intentarlo de nuevo.
+                    </p>
+                    <div class="nl-lab__estado">
+                        <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
+                        <button type="button" class="nl-lab__reset" id="nl-lab-reset">Empezar de nuevo</button>
+                    </div>
+                </div>
+
+                <div class="nl-lab__canvas" id="nl-lab-canvas">
+                    <img src="<?= htmlspecialchars($imgLab) ?>" alt="Esquema de una neurona para identificar sus partes" class="nl-lab__img">
+                    <svg class="nl-lab__lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+                    <div class="nl-lab__capa" id="nl-lab-capa"></div>
+                </div>
+
+                <p class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></p>
+            </div>
+            <?php else: ?>
             <div class="nl-act-tabs" id="recursos-tabs">
                 <?php foreach ($recursos as $i => $r): ?>
                     <button class="nl-act-tab <?= $i === 0 ? 'active' : '' ?>" data-i="<?= $i ?>">
@@ -86,6 +138,7 @@ try {
                     </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
         </div>
 
         <!-- DERECHA: descripciones + quiz -->

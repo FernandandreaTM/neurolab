@@ -83,19 +83,41 @@ INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, 
   (3, 1, 'En Fonoaudiología interesa especialmente la neurona bipolar coclear y vestibular, relevante en la vía auditiva.', 1),
   (3, 2, 'En TO interesa la motoneurona multipolar (asta ventral) y las interneuronas de la médula espinal.', 2);
 
--- Actividad demo 4: LABELING (imagen con hotspots)
+-- Actividad demo 4: LABELING (escribir el nombre de cada parte sobre la imagen)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
   (4, 6, 'labeling-partes-neurona', 'Identificación: Partes de la Neurona',
-       'Haz clic en cada parte señalada de la neurona y selecciona el nombre correcto. Inmediato retroalimentación.',
+       'Escribe el nombre de la parte de la neurona sobre la que está cada rectángulo. Si aciertas, el rectángulo queda verde y fijo; si te equivocas, se pone rojo, te da una pista y puedes volver a intentarlo.',
        'labeling', 1);
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (4, 'imagen', 'img/neurona-labeling.svg', 'Esquema de neurona típica', 1);
-INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, orden) VALUES
-  (4, 'Dendritas',  35, 25, 'Prolongaciones que reciben señales de otras neuronas.', 1),
-  (4, 'Soma',       50, 50, 'Cuerpo celular que contiene el núcleo.', 2),
-  (4, 'Axón',       78, 50, 'Prolongación que conduce el potencial de acción.', 3),
-  (4, 'Botones terminales', 88, 70, 'Liberan neurotransmisores en la sinapsis.', 4),
-  (4, 'Vaina de mielina',   68, 35, 'Aísla el axón y acelera la conducción.', 5);
+  (4, 'imagen', 'img/neurona-partes.jpg', 'Esquema de una neurona multipolar mielinizada', 1);
+INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES
+  (4, 'Dendritas', 23.0, 21.0,
+      'Prolongaciones ramificadas que reciben las señales de otras neuronas y las llevan hacia el soma.',
+      'dendrita|arbol dendritico|árbol dendrítico|dendritas', 23.0, 13.5, 1),
+  (4, 'Núcleo', 24.3, 45.0,
+      'Contiene el material genético y dirige la síntesis de proteínas de la neurona.',
+      'nucleo|núcleo celular', 24.3, 33.5, 2),
+  (4, 'Soma', 32.0, 52.5,
+      'El cuerpo celular: integra las señales que llegan por las dendritas y contiene los organelos.',
+      'cuerpo celular|pericarion|soma neuronal|cuerpo neuronal', 31.0, 66.0, 3),
+  (4, 'Cono axónico', 38.3, 46.5,
+      'Zona donde el soma se estrecha para dar origen al axón. Aquí se genera el potencial de acción.',
+      'cono axonico|cono de implantacion|cono de implantación|segmento inicial', 36.0, 38.0, 4),
+  (4, 'Axón', 41.8, 47.3,
+      'Prolongación única que conduce el potencial de acción desde el soma hasta los terminales.',
+      'axon|fibra nerviosa', 44.0, 60.0, 5),
+  (4, 'Vaina de mielina', 56.0, 50.5,
+      'Envoltura aislante formada por células gliales. Permite la conducción saltatoria y la acelera.',
+      'mielina|vaina mielinica|vaina mielínica|vaina de mielina', 56.0, 39.5, 6),
+  (4, 'Nódulo de Ranvier', 71.4, 53.0,
+      'Espacio sin mielina entre dos segmentos. Ahí se regenera el impulso y salta al siguiente nódulo.',
+      'nodulo de ranvier|nodo de ranvier|nódulo|nodulo|ranvier', 71.4, 64.0, 7),
+  (4, 'Ramas terminales', 86.5, 58.0,
+      'Ramificación final del axón, que reparte la señal hacia varias células a la vez.',
+      'telodendron|telodendrón|arborizacion terminal|arborización terminal|terminal axonico|terminal axónico|ramas terminales', 80.0, 70.0, 8),
+  (4, 'Botón terminal', 90.5, 31.0,
+      'Ensanchamiento del extremo del axón que libera neurotransmisores hacia la siguiente célula.',
+      'boton terminal|botones terminales|boton sinaptico|botón sináptico|terminal presinaptico|terminal presináptico|botones sinapticos', 88.0, 20.0, 9);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (4, 1, 'Reconocer las partes es fundamental para entender los trastornos del lenguaje asociados a daño en áreas corticales específicas.', 1),
   (4, 2, 'Las lesiones en axón y mielina son la base de enfermedades desmielinizantes que afectan la función motora y sensorial.', 2);

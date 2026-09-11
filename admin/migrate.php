@@ -37,6 +37,11 @@ try {
     if (add_column_if_missing($pdo, 'topics', 'descripcion', 'TEXT')) {
         $aplicadas[] = 'topics.descripcion';
     }
+    foreach (['sinonimos' => 'TEXT', 'box_x_pct' => 'REAL', 'box_y_pct' => 'REAL'] as $col => $tipo) {
+        if (add_column_if_missing($pdo, 'labeling_parts', $col, $tipo)) {
+            $aplicadas[] = 'labeling_parts.' . $col;
+        }
+    }
 
     echo "<h2 style='font-family:sans-serif;color:#1A0E2E'>NeuroLab — migración OK</h2>";
     echo "<p style='font-family:sans-serif'>Base creada/actualizada en <code>{$dbPath}</code></p>";
