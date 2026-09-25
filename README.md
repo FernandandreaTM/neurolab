@@ -111,7 +111,7 @@ comparador de tipos de neurona:
 | Nivel | Qué hace | Estado |
 |-------|----------|--------|
 | 1 · Frases | Completar cada frase con el tipo de neurona (bipolar, pseudounipolar, multipolar) | activo |
-| 2 · Dibujo de neuronas | Reconocer el tipo por su forma | próximamente |
+| 2 · Dibujo de neuronas | Armar cada tipo sobre un soma con dendritas, axón o neurita en T | activo |
 | 3 · Subtipos de multipolares | Piramidal, Purkinje, estrellada, motoneurona | próximamente |
 
 - `practica_niveles` — un nivel por fila (`numero`, `titulo`, `instrucciones`, `activo`).
@@ -119,6 +119,11 @@ comparador de tipos de neurona:
 - `practica_items` — las frases. En `enunciado`, `{}` marca el espacio para escribir
   (si no hay `{}`, el espacio va al comienzo). `respuesta` + `sinonimos` (separados por `|`)
   son las formas aceptadas; `pista` se muestra al equivocarse y `explicacion` al acertar.
+- `practica_niveles.tipo` decide el ejercicio: `completar` (frase con espacio, `js/practica.js`)
+  o `armar` (armar la neurona, `js/armar-neurona.js`). En `armar`, `respuesta` es el tipo pedido
+  y las reglas de cada tipo están en `nl_prac_evalua_armado()` de `api/practica_check.php`:
+  bipolar = 1 dendrita + 1 axón en polos opuestos; pseudounipolar = 1 sola neurita en T;
+  multipolar = 1 axón + 2 o más dendritas.
 - Las respuestas **no** se mandan al navegador: se revisan en `api/practica_check.php`
   (ignora tildes, mayúsculas, artículos, "neurona" y singular/plural).
 - El avance se guarda en `localStorage` (`nl_practica_<nivel_id>`); al completar todos los

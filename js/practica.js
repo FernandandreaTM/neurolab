@@ -2,16 +2,17 @@
  * NeuroLab — practica.js
  * Práctica por niveles dentro de una actividad (sección #nl-prac de actividad.php).
  *
- * Nivel tipo "completar": cada frase tiene un espacio donde el estudiante escribe
- * la respuesta (p. ej. el tipo de neurona).
- *   · correcto   -> el espacio queda verde y fijo, con una explicación corta
- *   · incorrecto -> se pone rojo, muestra una pista y deja volver a intentarlo
+ * Tipos de nivel (practica_niveles.tipo):
+ *   · completar -> cada frase tiene un espacio donde se escribe la respuesta
+ *   · armar     -> se arma una neurona sobre un soma (js/armar-neurona.js)
+ * En ambos: correcto = verde y fijo; incorrecto = rojo + pista y reintento.
  *
  * Las respuestas no viajan al navegador: se revisan en api/practica_check.php.
  * El avance de cada nivel se guarda en localStorage (nl_practica_<nivelId>) y un
  * nivel se desbloquea cuando el anterior está completo.
  */
 import { markDone } from './progress.js';
+import { prepararArmar } from './armar-neurona.js';
 
 const RAIZ = document.getElementById('nl-prac');
 const KEY_BASE = 'nl_practica_';
@@ -111,34 +112,27 @@ function iniciar(raiz) {
     /* --- Cada nivel jugable --- */
     jugables.forEach(n => prepararNivel(n));
 
+    /**
+     * Parte común de todos los niveles: contador, mensaje final, reinicio,
+     * bloqueo y guardado. Lo propio de cada tipo de ejercicio (qué se dibuja y
+     * cómo se responde) lo pone un "motor": completar (acá abajo) o armar
+     * (js/armar-neurona.js).
+     */
     function prepararNivel(n) {
         const panel     = n.panel;
-        const lista     = panel.querySelector('.nl-prac__lista');
         const juego     = panel.querySelector('.nl-prac__juego');
         const aviso     = panel.querySelector('.nl-prac__bloqueo');
         const contador  = panel.querySelector('.nl-prac__contador');
         const final     = panel.querySelector('.nl-prac__final');
         const btnReset  = panel.querySelector('.nl-prac__reiniciar');
+        const lista     = panel.querySelector('.nl-prac__lista');
 
-        // Mezclamos el orden para que las frases de un mismo tipo no queden juntas.
+        // Mezclamos el orden para que los ítems de un mismo tipo no queden juntos.
         barajar(Array.from(lista.children)).forEach(li => lista.appendChild(li));
-
-        const items = Array.from(lista.querySelectorAll('.nl-prac__item'));
-        items.forEach(li => {
-            const inp = li.querySelector('.nl-prac__input');
-            li.dataset.label = inp ? inp.getAttribute('aria-label') : 'Respuesta';
-        });
 
         function resueltas() {
             if (!estados[n.id].resueltas) estados[n.id].resueltas = {};
             return estados[n.id].resueltas;
-        }
-
-        function fijar(li, respuesta) {
-            li.classList.remove('is-mal', 'is-esperando');
-            li.classList.add('is-ok');
-            const hueco = li.querySelector('.nl-prac__hueco');
-            hueco.innerHTML = `<span class="nl-prac__ok">${escapar(respuesta)}</span>`;
         }
 
         function refrescar() {
@@ -146,15 +140,13 @@ function iniciar(raiz) {
             aviso.hidden = !bloq;
             juego.hidden = bloq;
 
-            const total = items.length;
-            const listas = items.filter(li => li.classList.contains('is-ok')).length;
-            contador.textContent = listas + ' / ' + total;
-            if (listas === total) {
+            const listas = hechas(n);
+            contador.textContent = listas + ' / ' + n.total;
+            if (completo(n)) {
+                const e = estados[n.id].errores || 0;
                 final.className = 'nl-prac__final is-ok';
                 final.innerHTML = `🎉 <strong>¡Nivel completado!</strong> ` +
-                    (estados[n.id].errores
-                        ? `Tuviste ${estados[n.id].errores} ${estados[n.id].errores === 1 ? 'intento fallido' : 'intentos fallidos'}.`
-                        : 'Sin ningún error.');
+                    (e ? `Tuviste ${e} ${e === 1 ? 'intento fallido' : 'intentos fallidos'}.` : 'Sin ningún error.');
             } else {
                 final.className = 'nl-prac__final';
                 final.textContent = '';
@@ -172,92 +164,50 @@ function iniciar(raiz) {
             if (slug && jugables.every(completo)) markDone(slug);
         }
 
-        async function revisar(input) {
-            const li = input.closest('.nl-prac__item');
-            const fb = li.querySelector('.nl-prac__fb');
-            const texto = input.value.trim();
-            if (!texto || li.classList.contains('is-ok') || li.dataset.enviando) return;
-
-            li.dataset.enviando = '1';
-            li.classList.add('is-esperando');
-            let datos;
-            try {
-                const res = await fetch('api/practica_check.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                    body: 'item_id=' + encodeURIComponent(li.dataset.id) + '&respuesta=' + encodeURIComponent(texto),
+        /** Lo que cada motor recibe para hablar con la parte común. */
+        const ctx = {
+            panel,
+            lista,
+            escapar,
+            guardadas: () => resueltas(),
+            /** Manda un intento a api/practica_check.php y devuelve el JSON. */
+            async enviar(itemId, campos) {
+                let body = 'item_id=' + encodeURIComponent(itemId);
+                Object.keys(campos).forEach(k => {
+                    body += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(campos[k]);
                 });
-                datos = await res.json();
-            } catch {
-                datos = { correcto: false, feedback: 'No pudimos revisar la respuesta. ¿Hay conexión?' };
-            }
-            delete li.dataset.enviando;
-            li.classList.remove('is-esperando');
-
-            if (datos && datos.correcto) {
-                resueltas()[li.dataset.id] = datos.respuesta;
+                try {
+                    const res = await fetch('api/practica_check.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                        body,
+                    });
+                    return await res.json();
+                } catch {
+                    return { correcto: false, feedback: 'No pudimos revisar la respuesta. ¿Hay conexión?' };
+                }
+            },
+            acierto(itemId, valor) {
+                resueltas()[itemId] = valor;
                 escribir(n.id, estados[n.id]);
-                fijar(li, datos.respuesta);
-                fb.className = 'nl-prac__fb is-ok';
-                fb.textContent = '✓ ' + (datos.feedback || '¡Correcto!');
                 refrescar();
-                siguiente(li);
-            } else {
+            },
+            error() {
                 estados[n.id].errores = (estados[n.id].errores || 0) + 1;
                 escribir(n.id, estados[n.id]);
-                li.classList.remove('is-mal');
-                void li.offsetWidth;          // reinicia la animación
-                li.classList.add('is-mal');
-                fb.className = 'nl-prac__fb is-mal';
-                fb.textContent = '✗ ' + ((datos && datos.feedback) || 'Intenta de nuevo.');
-                input.select();
-            }
-        }
+            },
+        };
 
-        /** Tras acertar, deja el cursor en la siguiente frase pendiente. */
-        function siguiente(desde) {
-            const i = items.indexOf(desde);
-            const orden = items.slice(i + 1).concat(items.slice(0, i));
-            const prox = orden.find(li => !li.classList.contains('is-ok'));
-            if (prox) prox.querySelector('.nl-prac__input')?.focus();
-        }
-
-        function enlazar(li) {
-            const input = li.querySelector('.nl-prac__input');
-            if (!input) return;
-            input.addEventListener('keydown', ev => {
-                if (ev.key === 'Enter') { ev.preventDefault(); revisar(input); }
-            });
-            input.addEventListener('input', () => li.classList.remove('is-mal'));
-            input.addEventListener('blur', () => { if (input.value.trim()) revisar(input); });
-        }
-
-        // Restaurar lo ya acertado
-        const guardadas = resueltas();
-        items.forEach(li => {
-            const r = guardadas[li.dataset.id];
-            if (r) fijar(li, r);
-            else enlazar(li);
-        });
+        const tipo  = panel.dataset.tipo || 'completar';
+        const motor = tipo === 'armar' ? prepararArmar(ctx) : prepararCompletar(ctx);
 
         btnReset.addEventListener('click', () => {
             if (Object.keys(resueltas()).length &&
-                !confirm('Esto borra las frases que ya completaste en este nivel. ¿Seguro?')) return;
+                !confirm('Esto borra lo que ya completaste en este nivel. ¿Seguro?')) return;
             estados[n.id] = {};
             escribir(n.id, estados[n.id]);
-            // Volvemos a dibujar los espacios vacíos
-            items.forEach(li => {
-                li.classList.remove('is-ok', 'is-mal');
-                li.querySelector('.nl-prac__hueco').innerHTML =
-                    `<input type="text" class="nl-prac__input" aria-label="${escapar(li.dataset.label)}"
-                            placeholder="tipo de neurona" autocomplete="off" autocapitalize="off" spellcheck="false">`;
-                const fb = li.querySelector('.nl-prac__fb');
-                fb.className = 'nl-prac__fb';
-                fb.textContent = '';
-                enlazar(li);
-            });
-            barajar(items).forEach(li => lista.appendChild(li));
-            items.splice(0, items.length, ...Array.from(lista.querySelectorAll('.nl-prac__item')));
+            motor.reiniciar();
+            barajar(Array.from(lista.children)).forEach(li => lista.appendChild(li));
             refrescar();
         });
 
@@ -268,6 +218,96 @@ function iniciar(raiz) {
     // Abrimos el primer nivel jugable que no esté completo (o el primero).
     const inicial = jugables.find(n => !completo(n) && !bloqueado(n)) || jugables[0] || niveles[0];
     if (inicial) mostrar(inicial);
+}
+
+/* ---------------------------------------------------------------
+   Motor "completar": frase con un espacio para escribir la respuesta
+   --------------------------------------------------------------- */
+function prepararCompletar(ctx) {
+    const { lista, escapar: esc } = ctx;
+    const items = () => Array.from(lista.querySelectorAll('.nl-prac__item'));
+
+    items().forEach(li => {
+        const inp = li.querySelector('.nl-prac__input');
+        li.dataset.label = inp ? inp.getAttribute('aria-label') : 'Respuesta';
+    });
+
+    function fijar(li, respuesta) {
+        li.classList.remove('is-mal', 'is-esperando');
+        li.classList.add('is-ok');
+        li.querySelector('.nl-prac__hueco').innerHTML = `<span class="nl-prac__ok">${esc(respuesta)}</span>`;
+    }
+
+    async function revisar(input) {
+        const li = input.closest('.nl-prac__item');
+        const fb = li.querySelector('.nl-prac__fb');
+        const texto = input.value.trim();
+        if (!texto || li.classList.contains('is-ok') || li.dataset.enviando) return;
+
+        li.dataset.enviando = '1';
+        li.classList.add('is-esperando');
+        const datos = await ctx.enviar(li.dataset.id, { respuesta: texto });
+        delete li.dataset.enviando;
+        li.classList.remove('is-esperando');
+
+        if (datos && datos.correcto) {
+            fijar(li, datos.respuesta);
+            fb.className = 'nl-prac__fb is-ok';
+            fb.textContent = '✓ ' + (datos.feedback || '¡Correcto!');
+            ctx.acierto(li.dataset.id, datos.respuesta);
+            siguiente(li);
+        } else {
+            ctx.error();
+            li.classList.remove('is-mal');
+            void li.offsetWidth;          // reinicia la animación
+            li.classList.add('is-mal');
+            fb.className = 'nl-prac__fb is-mal';
+            fb.textContent = '✗ ' + ((datos && datos.feedback) || 'Intenta de nuevo.');
+            input.select();
+        }
+    }
+
+    /** Tras acertar, deja el cursor en la siguiente frase pendiente. */
+    function siguiente(desde) {
+        const todos = items();
+        const i = todos.indexOf(desde);
+        const orden = todos.slice(i + 1).concat(todos.slice(0, i));
+        const prox = orden.find(li => !li.classList.contains('is-ok'));
+        if (prox) prox.querySelector('.nl-prac__input')?.focus();
+    }
+
+    function enlazar(li) {
+        const input = li.querySelector('.nl-prac__input');
+        if (!input) return;
+        input.addEventListener('keydown', ev => {
+            if (ev.key === 'Enter') { ev.preventDefault(); revisar(input); }
+        });
+        input.addEventListener('input', () => li.classList.remove('is-mal'));
+        input.addEventListener('blur', () => { if (input.value.trim()) revisar(input); });
+    }
+
+    // Restaurar lo ya acertado
+    const guardadas = ctx.guardadas();
+    items().forEach(li => {
+        const r = guardadas[li.dataset.id];
+        if (r) fijar(li, r);
+        else enlazar(li);
+    });
+
+    return {
+        reiniciar() {
+            items().forEach(li => {
+                li.classList.remove('is-ok', 'is-mal');
+                li.querySelector('.nl-prac__hueco').innerHTML =
+                    `<input type="text" class="nl-prac__input" aria-label="${esc(li.dataset.label)}"
+                            placeholder="tipo de neurona" autocomplete="off" autocapitalize="off" spellcheck="false">`;
+                const fb = li.querySelector('.nl-prac__fb');
+                fb.className = 'nl-prac__fb';
+                fb.textContent = '';
+                enlazar(li);
+            });
+        },
+    };
 }
 
 if (RAIZ) iniciar(RAIZ);

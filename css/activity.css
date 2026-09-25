@@ -379,4 +379,117 @@
     .nl-prac__frase { line-height: 1.55; }
     .nl-prac__niveles { gap: .4rem; }
     .nl-prac__nivel { padding: .6rem .9rem; }
+    .nl-arm__pieza { font-size: .76rem; padding: .4rem .45rem; gap: .35rem; }
+    .nl-arm__pieza svg { width: 22px; }
+}
+
+/* ============================================================
+   Nivel "armar" (armar una neurona sobre el soma) — js/armar-neurona.js
+   ============================================================ */
+.nl-arm__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: .9rem;
+}
+.nl-prac__item.nl-arm__item {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+}
+.nl-arm__item::before { display: none; }       /* sin número: cada tarjeta ya dice qué armar */
+.nl-arm__pide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    flex-wrap: wrap;
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1rem;
+}
+.nl-arm__sello { font-size: .8rem; }
+
+/* Paleta de piezas */
+.nl-arm__paleta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .35rem;
+}
+.nl-arm__pieza {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .4rem .55rem;
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--gray-300);
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--gray-700);
+    border-radius: 9px;
+    transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast);
+}
+.nl-arm__pieza span { white-space: nowrap; }
+.nl-arm__pieza svg { width: 28px; height: 16px; flex: none; overflow: visible; }
+.nl-arm__pieza:hover:not(:disabled) { border-color: rgba(139,92,246,.5); color: var(--white); }
+.nl-arm__pieza.active {
+    color: var(--white);
+    border-color: var(--violet);
+    background: rgba(139,92,246,.18);
+}
+.nl-arm__pieza:disabled { opacity: .45; cursor: default; }
+.nl-arm__pieza:focus-visible { outline: 2px solid var(--violet-light); outline-offset: 2px; }
+
+/* Lienzo */
+.nl-arm__lienzo {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1;
+    margin: 0 auto;
+    background: radial-gradient(circle at 50% 50%, rgba(139,92,246,.10), transparent 70%);
+    border: 1px dashed var(--gray-700);
+    border-radius: var(--radius);
+    touch-action: manipulation;
+}
+.nl-arm__lienzo path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Colores de las piezas (también usados en los íconos de la paleta) */
+.p-dend  { stroke: #A78BFA; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.p-axon  { stroke: #F472B6; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.p-t     { stroke: #38BDF8; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.p-mielina { fill: #EEF1F8; opacity: .85; }
+.p-boton { fill: #F472B6; }
+.p-t ~ .p-boton { fill: #38BDF8; }
+.p-soma  { fill: #6D28D9; stroke: #A78BFA; stroke-width: 2.5; }
+.p-nucleo { fill: #1A0E2E; stroke: #C4B5FD; stroke-width: 1.5; }
+
+/* Puntos donde se agregan piezas */
+.punto { cursor: pointer; outline: none; }
+.punto__area { fill: transparent; }
+.punto__aro {
+    fill: rgba(26,14,46,.85);
+    stroke: var(--gray-500);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 2;
+    transition: stroke var(--t-fast), fill var(--t-fast);
+}
+.punto__mas { stroke: var(--gray-300); stroke-width: 1.8; stroke-linecap: round; }
+.punto.is-lleno .punto__aro { fill: rgba(26,14,46,.55); stroke-dasharray: none; stroke: rgba(255,255,255,.35); }
+.punto:hover .punto__aro,
+.punto:focus-visible .punto__aro { stroke: var(--white); stroke-dasharray: none; fill: rgba(139,92,246,.45); }
+.punto:focus-visible .punto__aro { stroke-width: 2.5; }
+
+.nl-arm__resumen { font-size: .82rem; color: var(--gray-300); text-align: center; min-height: 1.3em; }
+.nl-arm__acciones { display: flex; justify-content: center; gap: .5rem; }
+.nl-arm__item.is-ok .nl-arm__paleta,
+.nl-arm__item.is-ok .nl-arm__acciones { display: none; }
+.nl-arm__acciones .btn:disabled { opacity: .45; cursor: default; transform: none; }
+
+/* Estados */
+.nl-arm__item.is-mal .nl-arm__lienzo { border-color: #EF4444; border-style: solid; animation: nl-prac-temblor .35s ease; }
+.nl-arm__item.is-ok  .nl-arm__lienzo { border-color: #22C55E; border-style: solid; background: radial-gradient(circle at 50% 50%, rgba(34,197,94,.12), transparent 70%); }
+.nl-arm__item.is-esperando .nl-arm__lienzo { opacity: .6; }
+@media (prefers-reduced-motion: reduce) {
+    .nl-arm__item.is-mal .nl-arm__lienzo { animation: none; }
 }

@@ -178,7 +178,8 @@ try {
             <div class="nl-prac__panel" role="tabpanel" hidden
                  id="nl-prac-panel-<?= (int)$n['id'] ?>"
                  aria-labelledby="nl-prac-tab-<?= (int)$n['id'] ?>"
-                 data-nivel="<?= (int)$n['id'] ?>">
+                 data-nivel="<?= (int)$n['id'] ?>"
+                 data-tipo="<?= htmlspecialchars($n['tipo'] ?: 'completar') ?>">
                 <?php if (!(int)$n['activo'] || empty($n['items'])): ?>
                     <div class="nl-prac__pronto">
                         <strong>🔒 Próximamente</strong>
@@ -197,6 +198,19 @@ try {
                                 <button type="button" class="btn btn-ghost btn-sm nl-prac__reiniciar">↺ Reiniciar</button>
                             </div>
                         </div>
+                        <?php if ($n['tipo'] === 'armar'): ?>
+                        <!-- Nivel "armar": cada ítem es un soma donde el estudiante agrega
+                             prolongaciones. El constructor lo dibuja js/armar-neurona.js -->
+                        <ol class="nl-prac__lista nl-arm__lista">
+                            <?php foreach ($n['items'] as $it): ?>
+                                <li class="nl-prac__item nl-arm__item" data-id="<?= (int)$it['id'] ?>">
+                                    <p class="nl-arm__pide"><?= htmlspecialchars($it['enunciado']) ?></p>
+                                    <div class="nl-arm__mesa"></div>
+                                    <p class="nl-prac__fb" aria-live="polite"></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ol>
+                        <?php else: ?>
                         <ol class="nl-prac__lista">
                             <?php foreach ($n['items'] as $it): ?>
                                 <?php
@@ -219,6 +233,7 @@ try {
                                 </li>
                             <?php endforeach; ?>
                         </ol>
+                        <?php endif; ?>
                         <div class="nl-prac__final" role="status" aria-live="polite"></div>
                     </div>
                 <?php endif; ?>

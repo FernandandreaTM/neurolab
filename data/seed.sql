@@ -91,8 +91,8 @@ INSERT OR IGNORE INTO practica_niveles (id, actividad_id, numero, titulo, instru
       'Completa cada frase con el tipo de neurona que describe: bipolar, pseudounipolar o multipolar. Escribe y presiona Enter.',
       'completar', 1),
   (2, 3, 2, 'Dibujo de neuronas',
-      'Reconoce cada tipo de neurona por su forma.',
-      'completar', 0),
+      'Arma cada neurona: elige una pieza (dendrita, axón o neurita en T) y toca un punto alrededor del soma para agregarla. Tocar de nuevo la quita. Cuando esté lista, presiona Revisar.',
+      'armar', 1),
   (3, 3, 3, 'Subtipos de neuronas multipolares',
       'Piramidales, de Purkinje, estrelladas o granulares y motoneuronas espinales.',
       'completar', 0);
@@ -135,6 +135,16 @@ INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos,
       'Multipolar', NULL,
       'Es la que tiene muchas dendritas y un solo axón.',
       'Es el tipo celular más común y abundante del sistema nervioso humano.', 9);
+
+-- Nivel 2: armar la neurona. `respuesta` es el tipo pedido; las reglas de cada
+-- tipo están en api/practica_check.php (nl_prac_evalua_armado).
+INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos, pista, explicacion, orden) VALUES
+  (2, 'Arma una neurona bipolar.', 'Bipolar', NULL, NULL,
+      'Dos neuritas que nacen de polos opuestos del soma: una dendrita que recibe y un axón que transmite. Su soma suele ser fusiforme u ovoide.', 1),
+  (2, 'Arma una neurona pseudounipolar.', 'Pseudounipolar', NULL, NULL,
+      'Una sola neurita que se bifurca en «T»: una rama va hacia la periferia y la otra entra al sistema nervioso central.', 2),
+  (2, 'Arma una neurona multipolar.', 'Multipolar', NULL, NULL,
+      'Un único axón y múltiples dendritas que nacen de distintos puntos del soma: así integra información de miles de células a la vez.', 3);
 
 -- Actividad demo 4: LABELING (imagen con hotspots)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
