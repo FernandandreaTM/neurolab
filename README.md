@@ -102,6 +102,32 @@ Cada actividad puede tener **dos descripciones** almacenadas:
 
 ---
 
+## Práctica por niveles
+
+Cualquier actividad puede tener una sección **Práctica** debajo, con niveles que se
+juegan en orden (un nivel se desbloquea al completar el anterior). Hoy la usa el
+comparador de tipos de neurona:
+
+| Nivel | Qué hace | Estado |
+|-------|----------|--------|
+| 1 · Frases | Completar cada frase con el tipo de neurona (bipolar, pseudounipolar, multipolar) | activo |
+| 2 · Dibujo de neuronas | Reconocer el tipo por su forma | próximamente |
+| 3 · Subtipos de multipolares | Piramidal, Purkinje, estrellada, motoneurona | próximamente |
+
+- `practica_niveles` — un nivel por fila (`numero`, `titulo`, `instrucciones`, `activo`).
+  Con `activo = 0` se muestra como "Próximamente".
+- `practica_items` — las frases. En `enunciado`, `{}` marca el espacio para escribir
+  (si no hay `{}`, el espacio va al comienzo). `respuesta` + `sinonimos` (separados por `|`)
+  son las formas aceptadas; `pista` se muestra al equivocarse y `explicacion` al acertar.
+- Las respuestas **no** se mandan al navegador: se revisan en `api/practica_check.php`
+  (ignora tildes, mayúsculas, artículos, "neurona" y singular/plural).
+- El avance se guarda en `localStorage` (`nl_practica_<nivel_id>`); al completar todos los
+  niveles activos la actividad queda marcada como completada.
+
+> Agrega tablas nuevas: después de `git pull`, correr `admin/migrate.php` y luego `admin/seed.php`.
+
+---
+
 ## Instalación
 
 ```bash

@@ -34,6 +34,24 @@ try {
     $labels->execute([$act['id']]);
     $labelParts = $labels->fetchAll();
 
+    // Práctica por niveles. Si la BD todavía no tiene las tablas (falta correr
+    // admin/migrate.php), la página se muestra igual, sin la sección.
+    $niveles = [];
+    try {
+        $sn = $pdo->prepare("SELECT id, numero, titulo, instrucciones, tipo, activo
+                             FROM practica_niveles WHERE actividad_id = ? ORDER BY numero");
+        $sn->execute([$act['id']]);
+        $niveles = $sn->fetchAll();
+        // Ojo: la respuesta NO se selecciona; se revisa en api/practica_check.php
+        $si = $pdo->prepare("SELECT id, enunciado FROM practica_items WHERE nivel_id = ? ORDER BY orden, id");
+        foreach ($niveles as $k => $n) {
+            $si->execute([$n['id']]);
+            $niveles[$k]['items'] = $si->fetchAll();
+        }
+    } catch (Throwable $e) {
+        $niveles = [];
+    }
+
     $active_page = 'actividad';
     ?>
     <!DOCTYPE html>
@@ -134,8 +152,86 @@ try {
         </aside>
     </div>
 
+    <?php if (!empty($niveles)): ?>
+    <section class="nl-prac container" id="nl-prac" data-slug="<?= htmlspecialchars($act['slug']) ?>">
+        <div class="nl-prac__head">
+            <span class="label">Práctica</span>
+            <h2>Practica por niveles</h2>
+        </div>
+
+        <div class="nl-prac__niveles" role="tablist" aria-label="Niveles de práctica">
+            <?php foreach ($niveles as $i => $n): ?>
+                <button type="button" role="tab" class="nl-prac__nivel"
+                        id="nl-prac-tab-<?= (int)$n['id'] ?>"
+                        aria-controls="nl-prac-panel-<?= (int)$n['id'] ?>"
+                        data-nivel="<?= (int)$n['id'] ?>"
+                        data-activo="<?= (int)$n['activo'] ?>"
+                        data-total="<?= count($n['items']) ?>">
+                    <span class="nl-prac__nivel-num">Nivel <?= (int)$n['numero'] ?></span>
+                    <span class="nl-prac__nivel-titulo"><?= htmlspecialchars($n['titulo']) ?></span>
+                    <span class="nl-prac__nivel-estado"><?= (int)$n['activo'] ? '' : 'Próximamente' ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
+        <?php foreach ($niveles as $n): ?>
+            <div class="nl-prac__panel" role="tabpanel" hidden
+                 id="nl-prac-panel-<?= (int)$n['id'] ?>"
+                 aria-labelledby="nl-prac-tab-<?= (int)$n['id'] ?>"
+                 data-nivel="<?= (int)$n['id'] ?>">
+                <?php if (!(int)$n['activo'] || empty($n['items'])): ?>
+                    <div class="nl-prac__pronto">
+                        <strong>🔒 Próximamente</strong>
+                        <p><?= htmlspecialchars($n['instrucciones'] ?? '') ?></p>
+                    </div>
+                <?php else: ?>
+                    <div class="nl-prac__bloqueo" hidden>
+                        <strong>🔒 Nivel bloqueado</strong>
+                        <p>Termina el nivel anterior para desbloquear este.</p>
+                    </div>
+                    <div class="nl-prac__juego">
+                        <div class="nl-prac__barra">
+                            <p class="nl-prac__instr"><?= htmlspecialchars($n['instrucciones'] ?? '') ?></p>
+                            <div class="nl-prac__estado">
+                                <span class="nl-prac__contador" aria-live="polite"></span>
+                                <button type="button" class="btn btn-ghost btn-sm nl-prac__reiniciar">↺ Reiniciar</button>
+                            </div>
+                        </div>
+                        <ol class="nl-prac__lista">
+                            <?php foreach ($n['items'] as $it): ?>
+                                <?php
+                                    $partes = explode('{}', $it['enunciado'], 2);
+                                    if (count($partes) === 1) { $antes = ''; $despues = $partes[0]; }
+                                    else { $antes = $partes[0]; $despues = $partes[1]; }
+                                ?>
+                                <li class="nl-prac__item" data-id="<?= (int)$it['id'] ?>">
+                                    <p class="nl-prac__frase">
+                                        <?= htmlspecialchars($antes) ?>
+                                        <span class="nl-prac__hueco">
+                                            <input type="text" class="nl-prac__input"
+                                                   aria-label="Tipo de neurona: <?= htmlspecialchars(str_replace('{}', '…', $it['enunciado'])) ?>"
+                                                   placeholder="tipo de neurona"
+                                                   autocomplete="off" autocapitalize="off" spellcheck="false">
+                                        </span>
+                                        <?= htmlspecialchars($despues) ?>
+                                    </p>
+                                    <p class="nl-prac__fb" aria-live="polite"></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ol>
+                        <div class="nl-prac__final" role="status" aria-live="polite"></div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </section>
+    <?php endif; ?>
+
     <?php include '_partials/footer.php'; ?>
     <script type="module" src="js/activity.js"></script>
+    <?php if (!empty($niveles)): ?>
+    <script type="module" src="js/practica.js"></script>
+    <?php endif; ?>
     </body>
     </html>
     <?php
