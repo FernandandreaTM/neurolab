@@ -965,3 +965,17 @@ button.nl-lab__campo {
 .nl-eleg__op.is-esperando { opacity: .6; }
 .nl-eleg__item .nl-prac__fb { flex-basis: 100%; }
 .nl-eleg__op[hidden] { display: none; }
+
+/* --- Marcas sobre la imagen: puntos más grandes y formas de estructuras generales --- */
+.nl-lab__punto { width: 1.85em; height: 1.85em; font-size: .85em; border-width: .17em; }
+.nl-lab__forma {
+    fill: rgba(124,58,237,.08);
+    stroke: #7C3AED;
+    stroke-width: 2.4;
+    stroke-dasharray: 6 4;
+}
+.nl-lab__corchete { fill: none; stroke-width: 3; stroke-dasharray: none; stroke-linecap: round; opacity: .85; }
+.nl-lab__forma.is-ok      { stroke: #16A34A; fill: rgba(22,163,74,.08); stroke-dasharray: none; }
+.nl-lab__forma.is-repasar { stroke: #D97706; fill: rgba(217,119,6,.08); stroke-dasharray: none; }
+.nl-lab__forma.is-activa  { stroke: #F59E0B; fill: rgba(245,158,11,.12); stroke-dasharray: none; }
+.nl-lab__corchete.is-ok, .nl-lab__corchete.is-repasar, .nl-lab__corchete.is-activa { fill: none; }

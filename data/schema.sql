@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS labeling_parts (
     descripcion   TEXT,                      -- retroalimentación al acertar / pista al fallar
     sinonimos     TEXT,                      -- otras respuestas válidas, separadas por |
     funcion       TEXT,                      -- función breve (sin nombrar la parte): alternativa correcta del quiz
+    forma         TEXT,                      -- NULL = punto · elipse:cx,cy,rx,ry · corchete:x1,y1,x2,y2 · puntos:x,y;x,y (en %)
     box_x_pct     REAL,                      -- centro del rectángulo; NULL = sobre el punto
     box_y_pct     REAL,
     orden         INTEGER NOT NULL DEFAULT 0,

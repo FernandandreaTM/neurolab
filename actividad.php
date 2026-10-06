@@ -95,6 +95,7 @@ try {
                            ? (float)$lp['box_x_pct'] : (float)$lp['x_pct'],
                 'by'    => isset($lp['box_y_pct']) && $lp['box_y_pct'] !== null && $lp['box_y_pct'] !== ''
                            ? (float)$lp['box_y_pct'] : (float)$lp['y_pct'],
+                'f'     => nl_forma_lab($lp['forma'] ?? null),
             ];
         }
     }
@@ -391,6 +392,31 @@ function tipoLabel($t) {
 function nl_ver($rel) {
     $f = __DIR__ . '/' . $rel;
     return is_file($f) ? filemtime($f) : '1';
+}
+
+/**
+ * Forma con que se marca una estructura sobre la imagen (columna labeling_parts.forma):
+ *   NULL/''                  -> punto (estructura puntual)
+ *   elipse:cx,cy,rx,ry       -> contorno (estructura general: núcleo, soma…)
+ *   corchete:x1,y1,x2,y2     -> corchete a lo largo de la estructura (axón…)
+ *   puntos:x,y;x,y           -> puntos extra además de (x_pct, y_pct)
+ */
+function nl_forma_lab($txt) {
+    $txt = trim((string)$txt);
+    if ($txt === '' || strpos($txt, ':') === false) return null;
+    list($tipo, $datos) = explode(':', $txt, 2);
+    $tipo = strtolower(trim($tipo));
+    if ($tipo === 'puntos') {
+        $pts = [];
+        foreach (explode(';', $datos) as $par) {
+            $v = array_map('floatval', explode(',', $par));
+            if (count($v) === 2) $pts[] = $v;
+        }
+        return $pts ? ['t' => 'puntos', 'v' => $pts] : null;
+    }
+    $v = array_map('floatval', explode(',', $datos));
+    if (in_array($tipo, ['elipse', 'corchete'], true) && count($v) === 4) return ['t' => $tipo, 'v' => $v];
+    return null;
 }
 
 /** Import map: cada js/*.js con ?v=<fecha> para que los módulos importados tampoco queden en caché. */

@@ -87,13 +87,37 @@ function iniciar(raiz) {
         return s ? (s.nombreOk ? ' is-ok' : ' is-repasar') : '';
     }
 
+    /** Puntos donde termina la línea del recuadro: el principal y, si hay, los extra. */
+    function anclas(p) {
+        const extra = p.f && p.f.t === 'puntos' ? p.f.v : [];
+        return [[p.x, p.y]].concat(extra);
+    }
+
+    /** Contorno o corchete de una estructura general (SVG en % de la imagen). */
+    function formaSVG(p) {
+        if (!p.f) return '';
+        const c = 'nl-lab__forma' + clase(p.id);
+        const [a, b, cc, d] = p.f.v;
+        if (p.f.t === 'elipse') {
+            return `<ellipse cx="${a}" cy="${b}" rx="${cc}" ry="${d}" class="${c}" vector-effect="non-scaling-stroke"/>`;
+        }
+        if (p.f.t === 'corchete') {
+            // Línea a lo largo de la estructura con topes en ambos extremos: |———|
+            const dx = cc - a, dy = d - b, L = Math.hypot(dx, dy) || 1;
+            const nx = -dy / L * 1.6, ny = dx / L * 1.6;
+            return `<path d="M${a + nx} ${b + ny} L${a - nx} ${b - ny} M${a} ${b} L${cc} ${d} M${cc + nx} ${d + ny} L${cc - nx} ${d - ny}"
+                          class="${c} nl-lab__corchete" vector-effect="non-scaling-stroke"/>`;
+        }
+        return '';
+    }
+
     function pintarCanvas() {
-        capa.innerHTML = partes.map(p =>
-            `<span class="nl-lab__punto${clase(p.id)}" style="left:${p.x}%;top:${p.y}%" aria-hidden="true">${p.n}</span>`).join('');
-        svg.innerHTML = partes
-            .filter(p => p.bx !== p.x || p.by !== p.y)
-            .map(p => `<line x1="${p.bx}" y1="${p.by}" x2="${p.x}" y2="${p.y}"
-                             class="nl-lab__linea${clase(p.id)}" vector-effect="non-scaling-stroke" />`).join('');
+        capa.innerHTML = partes.map(p => anclas(p).map(([x, y]) =>
+            `<span class="nl-lab__punto${p.f ? ' es-' + p.f.t : ''}${clase(p.id)}" style="left:${x}%;top:${y}%" aria-hidden="true">${p.n}</span>`).join('')).join('');
+        svg.innerHTML = partes.map(formaSVG).join('') + partes.map(p => anclas(p)
+            .filter(([x, y]) => p.bx !== x || p.by !== y)
+            .map(([x, y]) => `<line x1="${p.bx}" y1="${p.by}" x2="${x}" y2="${y}"
+                             class="nl-lab__linea${clase(p.id)}" vector-effect="non-scaling-stroke" />`).join('')).join('');
     }
 
     function campoHTML(p) {

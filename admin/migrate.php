@@ -37,7 +37,7 @@ try {
     if (add_column_if_missing($pdo, 'topics', 'descripcion', 'TEXT')) {
         $aplicadas[] = 'topics.descripcion';
     }
-    foreach (['sinonimos' => 'TEXT', 'box_x_pct' => 'REAL', 'box_y_pct' => 'REAL', 'funcion' => 'TEXT'] as $col => $tipo) {
+    foreach (['sinonimos' => 'TEXT', 'box_x_pct' => 'REAL', 'box_y_pct' => 'REAL', 'funcion' => 'TEXT', 'forma' => 'TEXT'] as $col => $tipo) {
         if (add_column_if_missing($pdo, 'labeling_parts', $col, $tipo)) {
             $aplicadas[] = 'labeling_parts.' . $col;
         }
