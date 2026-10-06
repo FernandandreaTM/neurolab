@@ -84,10 +84,13 @@ CREATE TABLE IF NOT EXISTS quices (
 CREATE TABLE IF NOT EXISTS labeling_parts (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     actividad_id  INTEGER NOT NULL,
-    nombre        TEXT    NOT NULL,
-    x_pct         REAL    NOT NULL,          -- posición del hotspot en % (0-100)
-    y_pct         REAL    NOT NULL,
-    descripcion   TEXT,
+    nombre        TEXT    NOT NULL,          -- respuesta correcta (la que se muestra al acertar)
+    x_pct         REAL    NOT NULL,          -- punto de la estructura, en % del ancho (0-100)
+    y_pct         REAL    NOT NULL,          -- idem, en % del alto
+    descripcion   TEXT,                      -- retroalimentación al acertar / pista al fallar
+    sinonimos     TEXT,                      -- otras respuestas válidas, separadas por |
+    box_x_pct     REAL,                      -- centro del rectángulo; NULL = sobre el punto
+    box_y_pct     REAL,
     orden         INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (actividad_id) REFERENCES actividades(id)
 );

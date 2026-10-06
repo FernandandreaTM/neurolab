@@ -1,11 +1,13 @@
 /**
  * NeuroLab — activity.js
  * - Tabs de recursos (imagen / 3D / iframe)
+ * - Actividad de identificación (labeling.js)
  * - Botón "marcar completada"
  * - Inicia quiz al click
  */
 import { markDone, isDone } from './progress.js';
 import Quiz from './quiz.js';
+import './labeling.js';   // actividad de identificación (se activa sola si hay #nl-lab)
 
 // Tabs de recursos
 document.querySelectorAll('#recursos-tabs .nl-act-tab').forEach(tab => {
