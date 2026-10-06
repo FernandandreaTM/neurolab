@@ -94,7 +94,7 @@ if ($peligrosos) {
 
 Write-Host ""
 Write-Host "=== ARCHIVOS QUE NO SE SUBEN POR FTP (solo para tu Git local) ===" -ForegroundColor Magenta
-$noSubir = $archivos | Where-Object { $_ -match "^\.gitignore$" -or $_ -match "que-subir\.ps1$" -or $_ -match "README\.md$" -or $_ -match "PLAN\.md$" -or $_ -match "\.ps1$" }
+$noSubir = $archivos | Where-Object { $_ -match "^\.gitignore$" -or $_ -match "que-subir\.ps1$" -or $_ -match "README\.md$" -or $_ -match "PLAN\.md$" -or $_ -match "\.ps1$" -or $_ -match "^docs/" -or $_ -match "WORKFLOW\.md$" }
 if ($noSubir) {
     Write-Host "Estos viven en tu repo pero NO se suben al hosting:" -ForegroundColor Yellow
     $noSubir | ForEach-Object { Write-Host "  [-] $_" -ForegroundColor DarkGray }
@@ -124,7 +124,7 @@ foreach ($linea in $archivos) {
     $status = $partes[0]
     $file = $partes[1]
     # Filtrar archivos que no se suben
-    if ($file -match "\.db$|\.env$|\.gitignore$|que-subir\.ps1$|README\.md$|PLAN\.md$|\.ps1$") { continue }
+    if ($file -match "\.db$|\.env$|\.gitignore$|que-subir\.ps1$|README\.md$|PLAN\.md$|WORKFLOW\.md$|^docs/|\.ps1$") { continue }
     if ($status -eq "D") {
         $borrar += $file
     } else {
