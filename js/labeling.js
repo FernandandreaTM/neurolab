@@ -128,23 +128,23 @@ function iniciar(raiz) {
         });
     }
 
-    /* --- Pide la respuesta y abre la comparación --- */
-    async function revelar(id, texto) {
-        if (decidiendo || resueltas[id]) return;
-        if (texto === null) return;
-        const campo = raiz.querySelector(`.nl-lab__campo[data-id="${id}"]`);
-        campo?.classList.add('is-esperando');
-
-        let d;
+    async function pedirParte(id) {
         try {
             const res = await fetch('api/labeling_check.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
                 body: 'parte_id=' + encodeURIComponent(id),
             });
-            d = await res.json();
-        } catch { d = { ok: false, error: 'No pudimos traer la respuesta. ¿Hay conexión?' }; }
+            return await res.json();
+        } catch { return { ok: false, error: 'No pudimos traer la respuesta. ¿Hay conexión?' }; }
+    }
 
+    /* --- Pide la respuesta y abre la comparación --- */
+    async function revelar(id, texto) {
+        if (decidiendo || resueltas[id]) return;
+        const campo = raiz.querySelector(`.nl-lab__campo[data-id="${id}"]`);
+        campo?.classList.add('is-esperando');
+        const d = await pedirParte(id);
         campo?.classList.remove('is-esperando');
         if (!d || !d.ok) {
             panel.className = 'nl-lab__feedback is-aviso';
@@ -199,10 +199,18 @@ function iniciar(raiz) {
     }
 
     /** Muestra nombre, alternativas y función de una parte ya respondida. */
-    function mostrarFicha(id, encabezado) {
+    async function mostrarFicha(id, encabezado) {
         const s = resueltas[id];
         const p = partes.find(x => x.id === id);
         if (!s || !p) return;
+        // Respuestas guardadas por la versión anterior no traen función ni alternativos.
+        if (!s.f) {
+            const d = await pedirParte(id);
+            if (d && d.ok) {
+                s.n = d.nombre; s.a = d.alternativas || []; s.f = d.funcion || '';
+                guardar(slug, resueltas);
+            }
+        }
         panel.className = 'nl-lab__feedback ' + (s.e === 'ok' ? 'is-ok' : 'is-repasar');
         panel.innerHTML =
             `${encabezado ? encabezado + ' ' : ''}<strong>${p.n}. ${escapar(s.n)}</strong>${altHTML(s.a)}
