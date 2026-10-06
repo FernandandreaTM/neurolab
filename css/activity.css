@@ -707,6 +707,92 @@
 .nl-lab__feedback.is-mal { background: rgba(127,25,25,.92); color: #FECACA; }
 .nl-lab__feedback strong { color: var(--white); }
 
+/* --- Autoverificación: revelar, comparar y decidir --- */
+.nl-lab__nose {
+    flex-shrink: 0;
+    width: 1.5em;
+    height: 1.5em;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(124,58,237,.14);
+    color: #6D28D9;
+    font: inherit;
+    font-size: .85em;
+    font-weight: 800;
+    cursor: pointer;
+}
+.nl-lab__nose:hover:not(:disabled) { background: #7C3AED; color: #fff; }
+.nl-lab__input:disabled, .nl-lab__nose:disabled { opacity: .45; cursor: default; }
+
+button.nl-lab__campo {
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+.nl-lab__resp { padding: .1em; font-weight: 700; color: #78350F; white-space: nowrap; }
+
+.nl-lab__campo.is-revelada {
+    border-color: #D97706;
+    border-style: dashed;
+    background: rgba(254,243,199,.97);
+    box-shadow: 0 0 0 .18em rgba(217,119,6,.3);
+}
+.nl-lab__campo.is-repasar {
+    border-color: #D97706;
+    background: rgba(254,243,199,.97);
+    box-shadow: 0 2px 8px rgba(217,119,6,.25);
+}
+.nl-lab__campo.is-repasar .nl-lab__num,
+.nl-lab__campo.is-revelada .nl-lab__num { background: rgba(217,119,6,.18); color: #B45309; }
+.nl-lab__campo.is-repasar .nl-lab__ok { color: #78350F; }
+.nl-lab__ok::after { content: none; }
+.nl-lab__punto.is-repasar, .nl-lab__punto.is-revelada { background: #D97706; }
+.nl-lab__linea.is-repasar, .nl-lab__linea.is-revelada { stroke: #D97706; stroke-dasharray: none; opacity: .9; }
+
+.nl-lab__feedback.is-decidir,
+.nl-lab__feedback.is-repasar,
+.nl-lab__feedback.is-aviso {
+    padding: .8rem 1rem;
+    box-shadow: 0 6px 20px rgba(26,14,46,.45);
+    backdrop-filter: blur(6px);
+}
+.nl-lab__feedback.is-decidir { background: rgba(46,26,80,.96); border: 1px solid var(--violet); color: var(--gray-100); }
+.nl-lab__feedback.is-repasar { background: rgba(120,72,6,.94); color: #FDE68A; }
+.nl-lab__feedback.is-aviso   { background: rgba(127,25,25,.92); color: #FECACA; }
+
+.nl-lab__comp {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: .6rem 1.5rem;
+}
+.nl-lab__etq {
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--violet-light);
+    opacity: .9;
+}
+.nl-lab__suya { font-size: 1.05rem; font-weight: 700; color: #FDE68A; }
+.nl-lab__correcta { font-size: 1.05rem; }
+.nl-lab__alt, .nl-lab__tuya { display: block; font-size: .8rem; opacity: .9; margin-top: .15rem; }
+.nl-lab__funcion { margin: .55rem 0 0; font-size: .84rem; }
+.nl-lab__funcion .nl-lab__etq { display: inline; margin-right: .35rem; }
+.nl-lab__decision {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .75rem;
+    font-weight: 700;
+}
+.nl-lab__decision span { margin-right: .25rem; }
+.nl-lab__si { background: #16A34A; color: #fff; border: 0; }
+.nl-lab__no { background: #D97706; color: #fff; border: 0; }
+.nl-lab__si:hover { background: #15803D; }
+.nl-lab__no:hover { background: #B45309; }
+
 /* --- Pantallas angostas: los campos bajan a una lista --- */
 .nl-lab__lista {
     display: grid;
@@ -724,3 +810,6 @@
     .nl-lab__campo.is-mal { animation: none; }
     .nl-lab__campo, .nl-lab__punto, .nl-lab__reset { transition: none; }
 }
+
+/* En la identificación (layout ancho) las tarjetas de carrera van una sobre otra */
+.nl-act-layout--ancho .nl-act-carreras { grid-template-columns: 1fr; }

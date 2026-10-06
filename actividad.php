@@ -115,9 +115,9 @@ try {
                  data-partes="<?= htmlspecialchars(json_encode($partesLab, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
                 <div class="nl-lab__head">
                     <p class="nl-lab__instruccion">
-                        Escribe en cada rectángulo el nombre de la parte sobre la que está y presiona
-                        <kbd>Enter</kbd>. Si aciertas, el rectángulo queda verde y fijo; si no, se pone
-                        rojo, te damos una pista y puedes intentarlo de nuevo.
+                        Escribe en cada rectángulo el nombre de la parte y presiona <kbd>Enter</kbd>
+                        (o <kbd>?</kbd> si no lo sabes). Verás el nombre correcto, otros nombres válidos y su
+                        función: compáralo con tu respuesta y marca si coincide.
                     </p>
                     <div class="nl-lab__estado">
                         <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
@@ -131,7 +131,7 @@ try {
                     <div class="nl-lab__capa" id="nl-lab-capa"></div>
                 </div>
 
-                <p class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></p>
+                <div class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></div>
             </div>
             <?php else: ?>
             <div class="nl-act-tabs" id="recursos-tabs">

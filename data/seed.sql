@@ -149,8 +149,10 @@ INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos,
 -- Actividad demo 4: LABELING (escribir el nombre de cada parte sobre la imagen)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
   (4, 6, 'labeling-partes-neurona', 'Identificación: Partes de la Neurona',
-       'Escribe el nombre de la parte de la neurona sobre la que está cada rectángulo. Si aciertas, el rectángulo queda verde y fijo; si te equivocas, se pone rojo, te da una pista y puedes volver a intentarlo.',
+       'Escribe el nombre de cada parte de la neurona. Luego verás el nombre correcto, otros nombres válidos y su función: compáralo con tu respuesta y marca si coincide. Lo que no coincida queda marcado para repasar.',
        'labeling', 1);
+-- Texto vigente (actualiza también BD ya pobladas)
+UPDATE actividades SET descripcion = 'Escribe el nombre de cada parte de la neurona. Luego verás el nombre correcto, otros nombres válidos y su función: compáralo con tu respuesta y marca si coincide. Lo que no coincida queda marcado para repasar.' WHERE slug = 'labeling-partes-neurona';
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
   (4, 'imagen', 'img/neurona-partes.jpg', 'Esquema de una neurona multipolar mielinizada', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES

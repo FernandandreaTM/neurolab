@@ -132,33 +132,26 @@ comparador de tipos de neurona:
 > Agrega tablas nuevas: después de `git pull`, correr `admin/migrate.php` y luego `admin/seed.php`.
 ## Actividad de identificación (`labeling`)
 
-Sobre la lámina hay un rectángulo por cada estructura. El estudiante escribe el
-nombre y presiona <kbd>Enter</kbd>:
+Sobre la lámina hay un rectángulo por cada estructura. **No hay corrección automática**:
+el estudiante escribe el nombre y presiona <kbd>Enter</kbd> (o <kbd>?</kbd> si no lo sabe),
+se le muestra el nombre correcto, los nombres alternativos y la función, y él decide:
 
-- **correcto** → el rectángulo queda verde, fijo y ya no se puede editar;
-- **incorrecto** → se pone rojo, muestra una pista (inicial y largo de la palabra)
-  y deja volver a intentarlo, sin límite de intentos.
+- **Coincide** → verde.
+- **No coincide** o **No sé** → ámbar ("por repasar"), con el nombre correcto a la vista.
 
-Piezas:
+Cada rectángulo se responde una sola vez (sin reintentos) y al terminar aparece un resumen
+con las partes por repasar. Tocar un rectángulo resuelto vuelve a mostrar su función.
 
-| Archivo | Rol |
+| Pieza | Rol |
 |---------|-----|
-| `labeling_parts` | una fila por estructura: `nombre`, punto (`x_pct`,`y_pct`), rectángulo (`box_x_pct`,`box_y_pct`), `sinonimos` y `descripcion` (la retroalimentación al acertar) |
-| `api/labeling_check.php` | revisa cada intento **en el servidor**, para que las respuestas no queden escritas en el HTML |
-| `js/labeling.js` | dibuja los rectángulos, guarda el avance y bloquea lo acertado |
+| `labeling_parts` | una fila por estructura: `nombre`, punto (`x_pct`,`y_pct`), rectángulo (`box_x_pct`,`box_y_pct`), `sinonimos` (separados por `\|`) y `descripcion` (= la **función** que se muestra) |
+| `api/labeling_check.php` | devuelve nombre, alternativas y función de una parte, sólo cuando el estudiante ya respondió |
+| `js/labeling.js` | dibuja los rectángulos, muestra la comparación y guarda el avance en `localStorage` (`nl_labeling_<slug>`) |
 
-Detalles que conviene saber al editar:
-
-- `sinonimos` acepta varias respuestas válidas separadas por `|`. La comparación
-  ignora mayúsculas, tildes, artículos y singular/plural, así que basta con listar
-  las variantes de fondo (`cuerpo celular`, `pericarion`, …).
-- Si `box_x_pct`/`box_y_pct` quedan en `NULL`, el rectángulo se dibuja justo sobre
-  el punto. Cuando difieren, se dibuja al lado y aparece una línea guía hacia la
-  estructura — que es lo que conviene para no tapar el dibujo.
-- Lo acertado se guarda en `localStorage` bajo `nl_labeling_<slug>`, así el avance
-  sobrevive a una recarga y queda disponible para la actividad siguiente.
-- En pantallas angostas (< 760 px) los rectángulos bajan a una lista numerada y
-  sobre la lámina quedan sólo los números.
+- Los alternativos se muestran limpios: se ocultan variantes que sólo cambian tildes o plural
+  y fragmentos del propio nombre (p. ej. "nódulo" en "Nódulo de Ranvier").
+- Si `box_x_pct`/`box_y_pct` quedan en `NULL`, el rectángulo se dibuja sobre el punto.
+- En pantallas angostas (< 760 px) los rectángulos bajan a una lista numerada.
 
 ---
 

@@ -1,104 +1,104 @@
 /**
  * NeuroLab — labeling.js
- * Actividad de identificación: sobre la imagen hay un rectángulo por cada parte
- * y el estudiante escribe ahí el nombre de la estructura que tiene debajo.
+ * Actividad de identificación: sobre la imagen hay un rectángulo por cada parte.
+ * El estudiante escribe el nombre (o presiona "No sé"), se le muestra la
+ * respuesta correcta con sus nombres alternativos y su función, y él mismo
+ * decide si su respuesta coincidía.
  *
- *   · correcto  -> el rectángulo queda verde, fijo y ya no se puede editar
- *   · incorrecto-> se pone rojo, muestra una pista y deja volver a intentarlo
+ *   · "Coincide"     -> verde
+ *   · "No coincide" / "No sé" -> ámbar ("por repasar"), con el nombre correcto
  *
- * Las respuestas NO viajan al navegador: cada intento se revisa en
- * api/labeling_check.php. Lo acertado se guarda en localStorage, así el avance
- * sobrevive a una recarga y queda disponible para la actividad siguiente.
+ * La respuesta se pide a api/labeling_check.php sólo después de responder.
+ * El avance se guarda en localStorage (nl_labeling_<slug>).
  */
 import { markDone } from './progress.js';
 
 const RAIZ = document.getElementById('nl-lab');
-
-/* ---------------------------------------------------------------
-   Estado persistente
-   --------------------------------------------------------------- */
 const KEY_BASE = 'nl_labeling_';
 
+/** Estado por parte: { e: 'ok'|'repasar', n: nombre, r: lo que escribió, a: [alternativas], f: función } */
 export function getLabelingState(slug) {
-    try {
-        return JSON.parse(localStorage.getItem(KEY_BASE + slug) || '{}');
-    } catch { return {}; }
+    let est = {};
+    try { est = JSON.parse(localStorage.getItem(KEY_BASE + slug) || '{}'); } catch { est = {}; }
+    // Formato anterior: { id: "Nombre" } -> se considera acertada.
+    Object.keys(est).forEach(k => {
+        if (typeof est[k] === 'string') est[k] = { e: 'ok', n: est[k], r: est[k], a: [], f: '' };
+    });
+    return est;
 }
 
 function guardar(slug, estado) {
-    try {
-        localStorage.setItem(KEY_BASE + slug, JSON.stringify(estado));
-    } catch { /* modo privado: el avance sigue en memoria */ }
+    try { localStorage.setItem(KEY_BASE + slug, JSON.stringify(estado)); } catch { /* modo privado */ }
     document.dispatchEvent(new CustomEvent('nl:labeling', {
         detail: { slug, resueltas: Object.keys(estado).length },
     }));
 }
 
-/* ---------------------------------------------------------------
-   Componente
-   --------------------------------------------------------------- */
 function iniciar(raiz) {
     let partes = [];
     try { partes = JSON.parse(raiz.dataset.partes || '[]'); } catch { partes = []; }
     if (!partes.length) return;
 
-    const slug      = raiz.dataset.slug || '';
-    const capa      = raiz.querySelector('#nl-lab-capa');
-    const svg       = raiz.querySelector('.nl-lab__lineas');
-    const canvas    = raiz.querySelector('#nl-lab-canvas');
-    const feedback  = raiz.querySelector('#nl-lab-feedback');
-    const contador  = raiz.querySelector('#nl-lab-contador');
-    const btnReset  = raiz.querySelector('#nl-lab-reset');
+    const slug     = raiz.dataset.slug || '';
+    const capa     = raiz.querySelector('#nl-lab-capa');
+    const svg      = raiz.querySelector('.nl-lab__lineas');
+    const canvas   = raiz.querySelector('#nl-lab-canvas');
+    const panel    = raiz.querySelector('#nl-lab-feedback');
+    const contador = raiz.querySelector('#nl-lab-contador');
+    const btnReset = raiz.querySelector('#nl-lab-reset');
+    const angosto  = window.matchMedia('(max-width: 760px)');
 
     let resueltas = getLabelingState(slug);
-    let lista     = null;   // contenedor de los inputs en modo angosto
-    const angosto = window.matchMedia('(max-width: 760px)');
+    let decidiendo = null;   // { id, r, n, a, f } mientras el estudiante compara
+    let lista = null;
 
     /* --- Marcadores y líneas sobre la imagen --- */
-    function pintarCanvas() {
-        capa.innerHTML = partes.map(p => {
-            const ok = !!resueltas[p.id];
-            return `<span class="nl-lab__punto${ok ? ' is-ok' : ''}"
-                          style="left:${p.x}%;top:${p.y}%" data-n="${p.n}"
-                          aria-hidden="true">${p.n}</span>`;
-        }).join('');
+    function claseEstado(id) {
+        if (decidiendo && decidiendo.id === id) return ' is-revelada';
+        const s = resueltas[id];
+        return s ? (s.e === 'ok' ? ' is-ok' : ' is-repasar') : '';
+    }
 
+    function pintarCanvas() {
+        capa.innerHTML = partes.map(p =>
+            `<span class="nl-lab__punto${claseEstado(p.id)}" style="left:${p.x}%;top:${p.y}%"
+                   aria-hidden="true">${p.n}</span>`).join('');
         svg.innerHTML = partes
             .filter(p => p.bx !== p.x || p.by !== p.y)
             .map(p => `<line x1="${p.bx}" y1="${p.by}" x2="${p.x}" y2="${p.y}"
-                             class="nl-lab__linea${resueltas[p.id] ? ' is-ok' : ''}"
-                             vector-effect="non-scaling-stroke" />`)
+                             class="nl-lab__linea${claseEstado(p.id)}" vector-effect="non-scaling-stroke" />`)
             .join('');
     }
 
-    /* --- Un rectángulo (input o respuesta fija) --- */
+    /* --- Un rectángulo según su estado --- */
     function campoHTML(p) {
-        const nombre = resueltas[p.id];
-        if (nombre) {
-            return `<div class="nl-lab__campo is-ok" data-id="${p.id}">
-                        <span class="nl-lab__num">${p.n}</span>
-                        <span class="nl-lab__ok" title="Correcto">${escapar(nombre)}</span>
-                    </div>`;
+        const num = `<span class="nl-lab__num">${p.n}</span>`;
+        if (decidiendo && decidiendo.id === p.id) {
+            return `<div class="nl-lab__campo is-revelada" data-id="${p.id}">${num}
+                        <span class="nl-lab__resp">${escapar(decidiendo.r || '—')}</span></div>`;
         }
-        return `<div class="nl-lab__campo" data-id="${p.id}">
-                    <span class="nl-lab__num">${p.n}</span>
-                    <input type="text" class="nl-lab__input"
-                           id="nl-lab-in-${p.id}" data-id="${p.id}"
-                           placeholder="¿Qué parte es?"
-                           aria-label="Parte ${p.n}"
-                           autocomplete="off" autocapitalize="off" spellcheck="false">
+        const s = resueltas[p.id];
+        if (s) {
+            const marca = s.e === 'ok' ? '✓' : '↺';
+            return `<button type="button" class="nl-lab__campo nl-lab__ver${claseEstado(p.id)}" data-id="${p.id}"
+                            title="Ver nombre y función">${num}
+                        <span class="nl-lab__ok">${escapar(s.n)} ${marca}</span></button>`;
+        }
+        const bloqueado = decidiendo ? ' disabled' : '';
+        return `<div class="nl-lab__campo" data-id="${p.id}">${num}
+                    <input type="text" class="nl-lab__input" data-id="${p.id}"
+                           placeholder="¿Qué parte es?" aria-label="Parte ${p.n}"
+                           autocomplete="off" autocapitalize="off" spellcheck="false"${bloqueado}>
+                    <button type="button" class="nl-lab__nose" data-id="${p.id}"
+                            title="No sé: ver la respuesta"${bloqueado}>?</button>
                 </div>`;
     }
 
-    /* --- Dibuja todo según el ancho disponible --- */
     function render() {
         pintarCanvas();
-
         const enLista = angosto.matches;
         raiz.classList.toggle('is-lista', enLista);
-
-        // limpiamos los campos anteriores de ambos modos
-        capa.querySelectorAll('.nl-lab__campo').forEach(el => el.remove());
+        capa.querySelectorAll('.nl-lab__slot').forEach(el => el.remove());
         if (lista) { lista.remove(); lista = null; }
 
         if (enLista) {
@@ -108,10 +108,8 @@ function iniciar(raiz) {
             canvas.insertAdjacentElement('afterend', lista);
         } else {
             capa.insertAdjacentHTML('beforeend', partes.map(p =>
-                `<div class="nl-lab__slot" style="left:${p.bx}%;top:${p.by}%">${campoHTML(p)}</div>`
-            ).join(''));
+                `<div class="nl-lab__slot" style="left:${p.bx}%;top:${p.by}%">${campoHTML(p)}</div>`).join(''));
         }
-
         enlazar();
         actualizarContador();
     }
@@ -119,94 +117,142 @@ function iniciar(raiz) {
     function enlazar() {
         raiz.querySelectorAll('.nl-lab__input').forEach(input => {
             input.addEventListener('keydown', ev => {
-                if (ev.key === 'Enter') { ev.preventDefault(); revisar(input); }
+                if (ev.key === 'Enter') { ev.preventDefault(); revelar(Number(input.dataset.id), input.value.trim()); }
             });
-            input.addEventListener('input', () => {
-                const campo = input.closest('.nl-lab__campo');
-                campo.classList.remove('is-mal');
-            });
-            input.addEventListener('blur', () => {
-                if (input.value.trim()) revisar(input);
-            });
+        });
+        raiz.querySelectorAll('.nl-lab__nose').forEach(btn => {
+            btn.addEventListener('click', () => revelar(Number(btn.dataset.id), ''));
+        });
+        raiz.querySelectorAll('.nl-lab__ver').forEach(btn => {
+            btn.addEventListener('click', () => mostrarFicha(Number(btn.dataset.id)));
         });
     }
 
-    /* --- Revisión contra el servidor --- */
-    async function revisar(input) {
-        const id    = Number(input.dataset.id);
-        const campo = input.closest('.nl-lab__campo');
-        const texto = input.value.trim();
-        if (!texto || campo.classList.contains('is-ok') || campo.dataset.enviando) return;
+    /* --- Pide la respuesta y abre la comparación --- */
+    async function revelar(id, texto) {
+        if (decidiendo || resueltas[id]) return;
+        if (texto === null) return;
+        const campo = raiz.querySelector(`.nl-lab__campo[data-id="${id}"]`);
+        campo?.classList.add('is-esperando');
 
-        campo.dataset.enviando = '1';
-        campo.classList.add('is-esperando');
-
-        let datos;
+        let d;
         try {
             const res = await fetch('api/labeling_check.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                body: 'parte_id=' + encodeURIComponent(id) + '&respuesta=' + encodeURIComponent(texto),
+                body: 'parte_id=' + encodeURIComponent(id),
             });
-            datos = await res.json();
-        } catch {
-            datos = { correcto: false, feedback: 'No pudimos revisar la respuesta. ¿Hay conexión?' };
+            d = await res.json();
+        } catch { d = { ok: false, error: 'No pudimos traer la respuesta. ¿Hay conexión?' }; }
+
+        campo?.classList.remove('is-esperando');
+        if (!d || !d.ok) {
+            panel.className = 'nl-lab__feedback is-aviso';
+            panel.textContent = (d && d.error) || 'Intenta de nuevo.';
+            return;
         }
 
-        delete campo.dataset.enviando;
-        campo.classList.remove('is-esperando');
-
-        if (datos && datos.correcto) {
-            resueltas[id] = datos.nombre;
+        const p = partes.find(x => x.id === id);
+        if (texto === '') {
+            // "No sé": se muestra y queda por repasar, sin pedir decisión.
+            resueltas[id] = { e: 'repasar', n: d.nombre, r: '', a: d.alternativas || [], f: d.funcion || '' };
             guardar(slug, resueltas);
-            decir(datos.feedback, 'ok', datos.nombre);
             render();
+            mostrarFicha(id, 'Quedó <strong>por repasar</strong>.');
             enfocarSiguiente(id);
-        } else {
-            campo.classList.add('is-mal');
-            decir(datos ? datos.feedback : 'Intenta de nuevo.', 'mal');
-            input.select();
-            input.focus();
+            return;
         }
+
+        decidiendo = { id, r: texto, n: d.nombre, a: d.alternativas || [], f: d.funcion || '' };
+        render();
+        panel.className = 'nl-lab__feedback is-decidir';
+        panel.innerHTML =
+            `<div class="nl-lab__comp">
+                <div><span class="nl-lab__etq">Tu respuesta (${p ? p.n : ''})</span>
+                     <span class="nl-lab__suya">${escapar(texto)}</span></div>
+                <div><span class="nl-lab__etq">Respuesta correcta</span>
+                     <strong class="nl-lab__correcta">${escapar(d.nombre)}</strong>
+                     ${altHTML(decidiendo.a)}</div>
+             </div>
+             ${decidiendo.f ? `<p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(decidiendo.f)}</p>` : ''}
+             <div class="nl-lab__decision">
+                <span>¿Tu respuesta coincide?</span>
+                <button type="button" class="btn btn-sm nl-lab__si">✓ Coincide</button>
+                <button type="button" class="btn btn-sm nl-lab__no">✗ No coincide</button>
+             </div>`;
+        panel.querySelector('.nl-lab__si').addEventListener('click', () => decidir('ok'));
+        panel.querySelector('.nl-lab__no').addEventListener('click', () => decidir('repasar'));
+        panel.querySelector('.nl-lab__si').focus();
     }
 
-    /** Tras acertar, deja el cursor en el siguiente rectángulo pendiente. */
+    function decidir(estado) {
+        if (!decidiendo) return;
+        const { id, r, n, a, f } = decidiendo;
+        resueltas[id] = { e: estado, n, r, a, f };
+        decidiendo = null;
+        guardar(slug, resueltas);
+        render();
+        if (!completa()) {
+            mostrarFicha(id, estado === 'ok' ? '<strong>Coincide.</strong>' : 'Quedó <strong>por repasar</strong>.');
+        }
+        enfocarSiguiente(id);
+    }
+
+    /** Muestra nombre, alternativas y función de una parte ya respondida. */
+    function mostrarFicha(id, encabezado) {
+        const s = resueltas[id];
+        const p = partes.find(x => x.id === id);
+        if (!s || !p) return;
+        panel.className = 'nl-lab__feedback ' + (s.e === 'ok' ? 'is-ok' : 'is-repasar');
+        panel.innerHTML =
+            `${encabezado ? encabezado + ' ' : ''}<strong>${p.n}. ${escapar(s.n)}</strong>${altHTML(s.a)}
+             ${s.r && s.e !== 'ok' ? `<span class="nl-lab__tuya">Escribiste: ${escapar(s.r)}</span>` : ''}
+             ${s.f ? `<p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(s.f)}</p>` : ''}`;
+    }
+
+    function altHTML(a) {
+        return a && a.length ? `<span class="nl-lab__alt">También: ${a.map(escapar).join(' · ')}</span>` : '';
+    }
+
     function enfocarSiguiente(idResuelto) {
         const orden = partes.map(p => p.id);
         const desde = orden.indexOf(idResuelto);
         const resto = orden.slice(desde + 1).concat(orden.slice(0, desde + 1));
         for (const id of resto) {
             const el = raiz.querySelector(`.nl-lab__input[data-id="${id}"]`);
-            if (el) { el.focus(); return; }
+            if (el) { el.focus({ preventScroll: true }); return; }
         }
     }
 
-    function decir(texto, tono, nombre) {
-        feedback.className = 'nl-lab__feedback is-' + tono;
-        feedback.innerHTML = (tono === 'ok' ? '✓ ' : '✗ ') +
-            (nombre ? '<strong>' + escapar(nombre) + '.</strong> ' : '') + escapar(texto || '');
+    function completa() {
+        return partes.every(p => resueltas[p.id]);
     }
 
     function actualizarContador() {
-        const hechas = partes.filter(p => resueltas[p.id]).length;
+        const hechas  = partes.filter(p => resueltas[p.id]).length;
+        const okN     = partes.filter(p => resueltas[p.id] && resueltas[p.id].e === 'ok').length;
         if (contador) contador.textContent = hechas + ' / ' + partes.length;
         raiz.classList.toggle('is-completa', hechas === partes.length);
 
-        if (hechas === partes.length) {
-            feedback.className = 'nl-lab__feedback is-ok';
-            feedback.innerHTML = '🎉 <strong>¡Listo!</strong> Identificaste las ' +
-                partes.length + ' partes de la neurona.';
+        if (hechas === partes.length && !decidiendo) {
+            const repasar = partes.filter(p => resueltas[p.id].e !== 'ok');
+            panel.className = 'nl-lab__feedback ' + (repasar.length ? 'is-repasar' : 'is-ok');
+            panel.innerHTML = `🎉 <strong>¡Terminaste!</strong> ${okN} coinciden · ${repasar.length} por repasar.` +
+                (repasar.length
+                    ? `<span class="nl-lab__alt">Repasa: ${repasar.map(p => p.n + '. ' + escapar(resueltas[p.id].n)).join(' · ')}</span>`
+                    : '') +
+                `<span class="nl-lab__alt">Toca cualquier rectángulo para ver su función.</span>`;
             if (slug) markDone(slug);
         }
     }
 
     btnReset?.addEventListener('click', () => {
-        if (Object.keys(resueltas).length &&
-            !confirm('Esto borra las partes que ya acertaste. ¿Seguro?')) return;
+        if (Object.keys(resueltas).length && !confirm('Esto borra todas tus respuestas. ¿Seguro?')) return;
         resueltas = {};
+        decidiendo = null;
         guardar(slug, resueltas);
-        feedback.className = 'nl-lab__feedback';
-        feedback.textContent = '';
+        panel.className = 'nl-lab__feedback';
+        panel.textContent = '';
         render();
     });
 
