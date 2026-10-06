@@ -1,15 +1,15 @@
 <?php
 /**
  * NeuroLab — api/labeling_check.php
- * Revela la respuesta de una parte de la actividad de identificación (labeling).
+ * Corrige la actividad de identificación (labeling) en dos pasos, sin que las
+ * respuestas viajen en el HTML de la página.
  *
- * No corrige: el estudiante compara su respuesta con la correcta y decide.
- * Se pide al servidor (y no va en el HTML) para que la respuesta aparezca
- * sólo después de que el estudiante escribe o presiona "No sé".
- *
- * POST: parte_id
- * ->   { "ok": true, "nombre": "...", "alternativas": ["..."], "funcion": "..." }
- *      { "ok": false, "error": "..." }
+ * POST parte_id, accion=nombre,  respuesta=<nombre escrito, '' = no sé>
+ *   -> { ok, correcto, nombre, alternativas, opciones:[4 funciones] }
+ *      (correcto = coincide con el nombre o un sinónimo; si no, el estudiante compara)
+ * POST parte_id, accion=funcion, respuesta=<función elegida>
+ *   -> { ok, correcto:false } | { ok, correcto:true, nombre, funcion, detalle, alternativas }
+ * POST parte_id (sin accion): revela nombre, alternativas y función (versión anterior).
  */
 error_reporting(0);
 require_once __DIR__ . '/db.php';
@@ -69,19 +69,61 @@ function nl_alternativas($nombre, $sinonimos) {
 }
 
 $parteId = isset($_POST['parte_id']) ? (int)$_POST['parte_id'] : 0;
+$accion  = isset($_POST['accion'])   ? (string)$_POST['accion']   : '';
+$resp    = isset($_POST['respuesta']) ? (string)$_POST['respuesta'] : '';
 if ($parteId <= 0) {
     echo json_encode(['ok' => false, 'error' => 'Falta indicar la parte.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 try {
-    $st = get_db()->prepare("SELECT nombre, descripcion, sinonimos FROM labeling_parts WHERE id = ?");
+    $pdo = get_db();
+    $st  = $pdo->prepare("SELECT * FROM labeling_parts WHERE id = ?");
     $st->execute([$parteId]);
     $parte = $st->fetch();
     if (!$parte) {
         echo json_encode(['ok' => false, 'error' => 'No encontramos esa parte.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
+    $funcion = isset($parte['funcion']) && $parte['funcion'] !== null && $parte['funcion'] !== ''
+             ? (string)$parte['funcion'] : (string)$parte['descripcion'];
+
+    // Paso 1: el nombre escrito. Se revela el correcto y se entregan 4 funciones posibles
+    // (la correcta + 3 de otras partes de la misma actividad), en orden al azar.
+    if ($accion === 'nombre') {
+        $validas = [nl_raiz(nl_normaliza($parte['nombre']))];
+        foreach (explode('|', (string)$parte['sinonimos']) as $alt) {
+            $k = nl_raiz(nl_normaliza($alt));
+            if ($k !== '') $validas[] = $k;
+        }
+        $limpia   = nl_raiz(nl_normaliza($resp));
+        $correcto = $limpia !== '' && in_array($limpia, $validas, true);
+        $sd = $pdo->prepare("SELECT COALESCE(NULLIF(funcion, ''), descripcion) FROM labeling_parts
+                             WHERE actividad_id = ? AND id <> ? ORDER BY RANDOM() LIMIT 3");
+        $sd->execute([$parte['actividad_id'], $parteId]);
+        $opciones = array_merge([$funcion], $sd->fetchAll(PDO::FETCH_COLUMN));
+        shuffle($opciones);
+        echo json_encode(['ok' => true, 'correcto' => $correcto, 'nombre' => $parte['nombre'],
+                          'alternativas' => nl_alternativas($parte['nombre'], $parte['sinonimos']),
+                          'opciones' => $opciones], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // Paso 2: la función elegida entre las alternativas.
+    if ($accion === 'funcion') {
+        $correcto = trim($resp) === trim($funcion);
+        $out = ['ok' => true, 'correcto' => $correcto];
+        if ($correcto) {
+            $out['nombre']       = $parte['nombre'];
+            $out['funcion']      = $funcion;
+            $out['detalle']      = (string)$parte['descripcion'];
+            $out['alternativas'] = nl_alternativas($parte['nombre'], $parte['sinonimos']);
+        }
+        echo json_encode($out, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // Sin acción (versión anterior): revela nombre, alternativas y función.
     echo json_encode([
         'ok'           => true,
         'nombre'       => $parte['nombre'],
@@ -89,5 +131,5 @@ try {
         'funcion'      => (string)$parte['descripcion'],
     ], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-    echo json_encode(['ok' => false, 'error' => 'No pudimos traer la respuesta. Intenta de nuevo.'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['ok' => false, 'error' => 'No pudimos revisar la respuesta. Intenta de nuevo.'], JSON_UNESCAPED_UNICODE);
 }

@@ -93,14 +93,14 @@ INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, 
 -- Práctica por niveles del comparador (actividad 3)
 INSERT OR IGNORE INTO practica_niveles (id, actividad_id, numero, titulo, instrucciones, tipo, activo) VALUES
   (1, 3, 1, 'Frases',
-      'Completa cada frase con el tipo de neurona que describe: bipolar, pseudounipolar o multipolar. Escribe y presiona Enter.',
-      'completar', 1),
+      'Lee cada frase y toca el tipo de neurona que describe. Si te equivocas, verás una pista para volver a intentar.',
+      'elegir', 1),
   (2, 3, 2, 'Dibujo de neuronas',
       'Arma cada neurona: elige una pieza (dendrita, axón o neurita en T) y toca un punto alrededor del soma para agregarla. Tocar de nuevo la quita. Cuando esté lista, presiona Revisar.',
       'armar', 1),
   (3, 3, 3, 'Subtipos de neuronas multipolares',
-      'Escribe el subtipo de neurona multipolar que se describe: piramidal, Purkinje o motoneurona. Fíjate en la forma y en dónde se encuentra.',
-      'completar', 1);
+      'Toca el subtipo de neurona multipolar que se describe. Fíjate en la forma y en dónde se encuentra.',
+      'elegir', 1);
 
 -- Nivel 1: frases. {} marca el espacio; sin {} el espacio va al inicio.
 INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos, pista, explicacion, orden) VALUES
@@ -200,40 +200,49 @@ INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos,
 
 -- Actividad demo 4: LABELING (escribir el nombre de cada parte sobre la imagen)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
-  (4, 6, 'labeling-partes-neurona', 'Identificación: Partes de la Neurona',
-       'Escribe el nombre de cada parte de la neurona. Luego verás el nombre correcto, otros nombres válidos y su función: compáralo con tu respuesta y marca si coincide. Lo que no coincida queda marcado para repasar.',
+  (4, 6, 'labeling-partes-neurona', 'Partes de la neurona · Nivel I: estructura general',
+       'Nivel I: estructura general. Escribe de memoria el nombre de cada estructura, compáralo con la respuesta correcta y luego elige su función entre alternativas. Al completar todas, súmala a tu guía.',
        'labeling', 1);
 -- Texto vigente (actualiza también BD ya pobladas)
-UPDATE actividades SET descripcion = 'Escribe el nombre de cada parte de la neurona. Luego verás el nombre correcto, otros nombres válidos y su función: compáralo con tu respuesta y marca si coincide. Lo que no coincida queda marcado para repasar.' WHERE slug = 'labeling-partes-neurona';
+UPDATE actividades SET titulo = 'Partes de la neurona · Nivel I: estructura general', descripcion = 'Nivel I: estructura general. Escribe de memoria el nombre de cada estructura, compáralo con la respuesta correcta y luego elige su función entre alternativas. Al completar todas, súmala a tu guía.' WHERE slug = 'labeling-partes-neurona';
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
   (4, 'imagen', 'img/neurona-partes.jpg', 'Esquema de una neurona multipolar mielinizada', 1);
-INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES
+INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES
   (4, 'Dendritas', 23.0, 21.0,
       'Recepción: prolongaciones ramificadas que reciben señales de otras neuronas y las conducen hacia el soma. Sus espinas dendríticas aumentan la superficie de contacto sináptico.',
+      'Reciben las señales de otras neuronas y las conducen hacia el cuerpo celular.',
       'dendrita|arbol dendritico|árbol dendrítico|dendritas', 23.0, 13.5, 1),
   (4, 'Núcleo', 24.3, 45.0,
       'Contiene el material genético y dirige la síntesis de proteínas. La neurona es postmitótica: no se divide ni se reemplaza.',
+      'Contiene el material genético y dirige la síntesis de proteínas de la célula.',
       'nucleo|núcleo celular|nucleo celular', 24.3, 33.5, 2),
   (4, 'Soma', 32.0, 52.5,
       'Cuerpo celular o pericarion: "centro metabólico" que produce las macromoléculas de la neurona. Sus cuerpos de Nissl (RER) reflejan la alta síntesis proteica. También recibe señales.',
+      'Centro metabólico: produce las macromoléculas y contiene la mayoría de los organelos.',
       'cuerpo celular|pericarion|pericarión|soma neuronal|cuerpo neuronal', 31.0, 66.0, 3),
   (4, 'Cono axónico', 38.3, 46.5,
       'Integración: zona donde nace el axón (montículo axonal). Es la zona gatillo, donde se genera el potencial de acción.',
+      'Zona gatillo: integra las señales recibidas y allí se genera el potencial de acción.',
       'cono axonico|cono de implantacion|cono de implantación|monticulo axonal|montículo axonal|zona gatillo|segmento inicial', 36.0, 38.0, 4),
   (4, 'Axón', 41.8, 47.3,
       'Conducción: prolongación única que lleva el impulso desde el soma hasta los terminales (1 mm a 1 m). Por sus microtúbulos ocurre el transporte axonal anterógrado y retrógrado.',
+      'Conduce el impulso nervioso desde el cuerpo celular hacia los terminales.',
       'axon|fibra nerviosa|cilindroeje', 44.0, 60.0, 5),
   (4, 'Vaina de mielina', 56.0, 50.5,
       'Envoltura aislante formada por glía: célula de Schwann en el SNP, oligodendrocito en el SNC. Aumenta la velocidad de conducción (conducción saltatoria).',
+      'Aísla la prolongación y aumenta la velocidad de conducción del impulso.',
       'mielina|vaina mielinica|vaina mielínica|vaina de mielina|celula de schwann|célula de schwann|celulas de schwann', 56.0, 39.5, 6),
   (4, 'Nódulo de Ranvier', 71.4, 53.0,
       'Espacio sin mielina entre dos segmentos. Ahí se regenera el impulso, que "salta" de nódulo en nódulo.',
+      'Interrupción del aislante donde se regenera el impulso, que salta de una a otra.',
       'nodulo de ranvier|nodo de ranvier|nódulo|nodulo|ranvier|nodulos de ranvier', 71.4, 64.0, 7),
   (4, 'Ramas terminales', 86.5, 58.0,
       'Telodendrón: ramificación final del axón que reparte la señal hacia varias células a la vez.',
+      'Reparten la señal hacia varias células blanco a la vez.',
       'telodendron|telodendrón|arborizacion terminal|arborización terminal|terminal axonico|terminal axónico|ramas terminales', 80.0, 70.0, 8),
   (4, 'Botón terminal', 90.5, 31.0,
       'Transmisión: terminal sináptico con vesículas de neurotransmisor, que se liberan cuando llega el potencial de acción.',
+      'Libera neurotransmisores hacia la siguiente célula.',
       'boton terminal|botones terminales|boton sinaptico|botón sináptico|terminal presinaptico|terminal presináptico|botones sinapticos|terminal sinaptico|terminal sináptico', 88.0, 20.0, 9);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (4, 1, 'Reconocer las partes es fundamental para entender los trastornos del lenguaje asociados a daño en áreas corticales específicas.', 1),
@@ -257,3 +266,66 @@ INSERT OR IGNORE INTO quices (actividad_id, titulo, datos_json, activo) VALUES
   (6, 'Células nerviosas I', '[{"pregunta": "¿Cuál es la función principal del soma neuronal?", "opciones": ["Producir macromoléculas y contener los organelos (centro metabólico)", "Formar la vaina de mielina del axón", "Recibir información de otras neuronas exclusivamente", "Transmitir impulsos eléctricos hacia otras células"], "correcta": 0, "feedback": "El soma es el centro metabólico: sus cuerpos de Nissl (RER) reflejan la alta síntesis de proteínas."}, {"pregunta": "Los cuerpos de Nissl, que dan el aspecto basófilo al soma, corresponden a:", "opciones": ["Mitocondrias agrupadas", "Neurofilamentos", "Vesículas sinápticas", "Retículo endoplásmico rugoso y polirribosomas"], "correcta": 3, "feedback": "Son RER y polirribosomas: reflejan la intensa síntesis proteica de la neurona."}, {"pregunta": "¿Cuál es la función de las espinas dendríticas?", "opciones": ["Aumentar la velocidad de conducción", "Producir neurotransmisores", "Aumentar la superficie de contacto sináptico", "Formar la barrera hematoencefálica"], "correcta": 2, "feedback": "Las espinas multiplican los puntos de contacto con otras neuronas."}, {"pregunta": "¿Dónde se genera el potencial de acción (zona gatillo)?", "opciones": ["En el botón terminal", "En el cono axónico (montículo axonal)", "En las dendritas", "En el núcleo"], "correcta": 1, "feedback": "El cono axónico integra las señales y ahí se dispara el impulso."}, {"pregunta": "Ordena el flujo de información en la neurona:", "opciones": ["Integración → recepción → conducción → transmisión", "Transmisión → conducción → integración → recepción", "Recepción (dendritas y soma) → integración (cono axónico) → conducción (axón) → transmisión (terminal)", "Conducción → recepción → transmisión → integración"], "correcta": 2, "feedback": "El flujo es unidireccional: recepción, integración, conducción y transmisión."}, {"pregunta": "¿Qué tipo de transporte axonal lleva vesículas sinápticas desde el soma hacia las terminaciones?", "opciones": ["Pasivo", "Anterógrado", "Retrógrado", "Lateral"], "correcta": 1, "feedback": "Anterógrado: del soma a los terminales, sobre microtúbulos, con gasto de ATP."}, {"pregunta": "¿Cuál es la dirección del transporte axonal que lleva materiales desde las terminaciones hacia el soma?", "opciones": ["Lateral", "Retrógrado", "Anterógrado", "Bidireccional"], "correcta": 1, "feedback": "Retrógrado: recicla membranas y lleva material endocitado al soma."}, {"pregunta": "¿Cuál es la relación entre diámetro axonal y velocidad de conducción?", "opciones": ["A menor diámetro, mayor velocidad", "Sólo importa la longitud", "No existe relación", "A mayor diámetro, mayor velocidad"], "correcta": 3, "feedback": "Los neurofilamentos determinan el calibre: mayor calibre, mayor velocidad."}, {"pregunta": "La vaina de mielina tiene como función principal:", "opciones": ["Aumentar la velocidad de conducción", "Nutrir al axón", "Producir neurotransmisores", "Filtrar sustancias tóxicas"], "correcta": 0, "feedback": "Aísla el axón y permite la conducción saltatoria entre nódulos de Ranvier."}, {"pregunta": "En el sistema nervioso central, los cuerpos celulares neuronales se agrupan en:", "opciones": ["Tractos", "Núcleos", "Ganglios", "Fascículos"], "correcta": 1, "feedback": "En el SNC forman núcleos; en el SNP, ganglios."}, {"pregunta": "¿Cuál es la característica morfológica de las neuronas pseudounipolares?", "opciones": ["Dos axones paralelos", "Múltiples dendritas desde el soma", "Una dendrita y un axón en polos opuestos", "Una prolongación que se divide en T"], "correcta": 3, "feedback": "Una sola neurita que se bifurca: rama periférica y rama central."}, {"pregunta": "Las neuronas multipolares se caracterizan por tener:", "opciones": ["Dos axones principales", "Una prolongación dividida", "Una dendrita principal y un axón", "Un axón y múltiples dendritas"], "correcta": 3, "feedback": "Un único axón y muchas dendritas: integran información de muchas células."}, {"pregunta": "¿Qué función cumplen principalmente las neuronas bipolares?", "opciones": ["Motoras voluntarias", "Control autónomo", "Integración en la corteza", "Sensoriales especiales (retina, cóclea, olfato)"], "correcta": 3, "feedback": "Están en la retina, el epitelio olfatorio y los ganglios coclear y vestibular."}, {"pregunta": "¿Dónde se encuentran los somas de las neuronas pseudounipolares que llevan el tacto del cuerpo?", "opciones": ["Retina", "Corteza cerebelosa", "Ganglio de la raíz dorsal", "Asta ventral de la médula"], "correcta": 2, "feedback": "En los ganglios de la raíz dorsal (y en ganglios sensitivos de nervios craneales)."}, {"pregunta": "¿Qué tipo de neurona conduce información desde los receptores hacia el SNC?", "opciones": ["De asociación", "Interneuronas", "Sensoriales (aferentes)", "Motoras"], "correcta": 2, "feedback": "Aferente = hacia el SNC."}, {"pregunta": "¿Cuál es la diferencia funcional entre neuronas aferentes y eferentes?", "opciones": ["Las aferentes son motoras y las eferentes sensitivas", "Las aferentes conducen hacia el SNC y las eferentes desde el SNC", "Las aferentes son mielinizadas y las eferentes no", "Las aferentes son multipolares y las eferentes bipolares"], "correcta": 1, "feedback": "Aferente llega al SNC; eferente sale del SNC hacia músculos o glándulas."}, {"pregunta": "Una motoneurona del asta ventral de la médula es:", "opciones": ["Bipolar y aferente", "Pseudounipolar y aferente", "Multipolar y eferente", "Multipolar y de asociación"], "correcta": 2, "feedback": "Multipolar; su axón sale por la raíz ventral hacia el músculo esquelético."}, {"pregunta": "¿Qué tipo de neurona es más común en la corteza cerebral?", "opciones": ["Pseudounipolar", "Unipolar", "Multipolar", "Bipolar"], "correcta": 2, "feedback": "La gran mayoría son multipolares (piramidales y otras)."}, {"pregunta": "Una neurona con soma triangular y una larga dendrita apical hacia la superficie de la corteza es una:", "opciones": ["Motoneurona espinal", "Neurona bipolar", "Célula de Purkinje", "Neurona piramidal"], "correcta": 3, "feedback": "La piramidal: principal neurona de proyección de la corteza cerebral."}, {"pregunta": "Las células de Purkinje se localizan en:", "opciones": ["La corteza del cerebelo", "La corteza cerebral motora", "El asta ventral de la médula", "Los ganglios de la raíz dorsal"], "correcta": 0, "feedback": "Forman una hilera entre la capa molecular y la granular del cerebelo."}, {"pregunta": "¿Qué relación hay entre la forma de la célula de Purkinje y su función?", "opciones": ["Su enorme árbol dendrítico recibe muchísimas sinapsis para integrar y coordinar el movimiento", "No tiene dendritas, por eso sólo transmite", "Su axón corto le permite conducir muy rápido", "Su soma pequeño le permite dividirse"], "correcta": 0, "feedback": "Recibe cientos de miles de sinapsis y es la única salida de la corteza cerebelosa."}, {"pregunta": "Una neurona dopaminérgica se clasifica según:", "opciones": ["Su morfología", "Su función", "Su neurotransmisor", "Su ubicación"], "correcta": 2, "feedback": "Se nombra por el neurotransmisor que libera (dopamina)."}, {"pregunta": "¿Por qué una lesión neuronal en el SNC suele dejar secuelas permanentes?", "opciones": ["Porque las neuronas son postmitóticas y no se reemplazan", "Porque la glía no existe en el SNC", "Porque los axones no tienen mielina", "Porque las neuronas se dividen demasiado"], "correcta": 0, "feedback": "La neurona es postmitótica: el SN se adapta por plasticidad, no por reemplazo."}]', 1);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (6, 2, 'Responde solo/a, sin apuntes. Al terminar revisa el resumen: las preguntas falladas son las que conviene repasar antes de Células II.', 1);
+
+-- Actividad 7: LABELING nivel II (ultraestructura). Inactiva hasta tener la imagen
+-- img/neurona-nivel2.png; las coordenadas x/y y box son provisionales (calibrar con ?calibrar=1).
+INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
+  (7, 6, 'labeling-neurona-nivel-2', 'Partes de la neurona · Nivel II: estructura específica',
+       'Nivel II: estructura específica. Reconoce estructuras finas de la neurona (citoesqueleto, organelos, transporte axonal, crecimiento) y su función. Desbloquéalo completando el nivel I.', 'labeling', 0);
+INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
+  (7, 'imagen', 'img/neurona-nivel2.png', 'Neurona: ultraestructura, transporte axonal y cono de crecimiento', 1);
+INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES
+  (7, 'Espinas dendríticas', 5, 15,
+      'Protrusiones de la dendrita sostenidas por actina. Reciben la mayoría de las sinapsis excitatorias y cambian de forma y número con la experiencia (plasticidad).',
+      'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
+      'espina dendritica|espinas|espina', 5, 15, 1),
+  (7, 'Cuerpos de Nissl', 25, 15,
+      'Acúmulos de retículo endoplásmico rugoso y polirribosomas. Dan el aspecto basófilo al soma y reflejan su alta síntesis proteica; no entran al axón.',
+      'Fabrican en gran cantidad las proteínas que la neurona necesita.',
+      'sustancia de nissl|grumos de nissl|nissl|retículo endoplásmico rugoso|reticulo endoplasmico rugoso|rer', 25, 15, 2),
+  (7, 'Aparato de Golgi', 45, 15,
+      'Recibe las proteínas del RER, las modifica y las empaqueta en vesículas que viajan hacia las dendritas y el axón.',
+      'Modifica, empaqueta y distribuye las proteínas en vesículas.',
+      'golgi|complejo de golgi', 45, 15, 3),
+  (7, 'Mitocondria', 65, 15,
+      'Abundan en el soma, a lo largo del axón y en los terminales, donde la demanda de energía es mayor.',
+      'Produce el ATP que consumen las bombas iónicas y el transporte axonal.',
+      'mitocondrias', 65, 15, 4),
+  (7, 'Segmento inicial del axón', 85, 15,
+      'Tramo sin mielina que sigue al cono axónico. Su alta densidad de canales de Na⁺ dependientes de voltaje lo convierte en la zona gatillo.',
+      'Primer tramo del axón, rico en canales de sodio: allí se dispara el potencial de acción.',
+      'segmento inicial|zona gatillo', 85, 15, 5),
+  (7, 'Microtúbulos', 5, 45,
+      'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
+      'Forman los rieles por los que se mueve el transporte axonal.',
+      'microtubulo|microtúbulo|tubulina', 5, 45, 6),
+  (7, 'Neurofilamentos', 25, 45,
+      'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
+      'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
+      'neurofilamento|filamentos intermedios', 25, 45, 7),
+  (7, 'Kinesina', 45, 45,
+      'Transporte anterógrado: lleva vesículas, mitocondrias y proteínas nuevas hacia los terminales, caminando sobre los microtúbulos.',
+      'Proteína motora que lleva carga desde el soma hacia el terminal.',
+      'kinesinas|cinesina|transporte anterogrado|transporte anterógrado', 45, 45, 8),
+  (7, 'Dineína', 65, 45,
+      'Transporte retrógrado: devuelve membranas para reciclar, mitocondrias viejas y material endocitado (incluidos factores tróficos y algunos virus).',
+      'Proteína motora que lleva material desde el terminal hacia el soma.',
+      'dineinas|dineína|transporte retrogrado|transporte retrógrado', 65, 45, 9),
+  (7, 'Colateral axónica', 85, 45,
+      'Un axón puede formar muchas colaterales (hasta 200 o más) y comunicarse así con varios blancos a la vez.',
+      'Rama lateral del axón que lleva la misma señal hacia otra célula.',
+      'colateral|rama colateral|colaterales', 85, 45, 10),
+  (7, 'Célula de Schwann', 5, 75,
+      'Cada célula de Schwann envuelve un solo internodo; en el SNC esta función la cumple el oligodendrocito. También favorece la regeneración del axón periférico.',
+      'Forma la mielina alrededor de un tramo del axón en el sistema nervioso periférico.',
+      'celula de schwann|schwann|neurolemocito', 5, 75, 11),
+  (7, 'Cono de crecimiento', 25, 75,
+      'Rico en actina, con filopodios y lamelipodios. Dirige el crecimiento del axón durante el desarrollo y en la regeneración.',
+      'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
+      'cono de crecimiento axonal', 25, 75, 12),
+  (7, 'Vesículas sinápticas', 45, 75,
+      'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
+      'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 45, 75, 13);
+INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
+  (7, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);

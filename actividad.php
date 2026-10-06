@@ -1,6 +1,7 @@
 <?php
 error_reporting(0);
 require_once __DIR__ . '/api/db.php';
+require_once __DIR__ . '/_partials/iconos_neurona.php';
 
 $slug = $_GET['slug'] ?? '';
 $ruta = isset($_GET['ruta']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['ruta']) : '';
@@ -45,9 +46,16 @@ try {
         $niveles = $sn->fetchAll();
         // Ojo: la respuesta NO se selecciona; se revisa en api/practica_check.php
         $si = $pdo->prepare("SELECT id, enunciado FROM practica_items WHERE nivel_id = ? ORDER BY orden, id");
+        // Nivel "elegir": los botones son todas las respuestas posibles del nivel (sin decir cuál va en cada ítem)
+        $so = $pdo->prepare("SELECT DISTINCT respuesta FROM practica_items WHERE nivel_id = ? ORDER BY respuesta");
         foreach ($niveles as $k => $n) {
             $si->execute([$n['id']]);
             $niveles[$k]['items'] = $si->fetchAll();
+            $niveles[$k]['opciones'] = [];
+            if ($n['tipo'] === 'elegir') {
+                $so->execute([$n['id']]);
+                $niveles[$k]['opciones'] = $so->fetchAll(PDO::FETCH_COLUMN);
+            }
         }
     } catch (Throwable $e) {
         $niveles = [];
@@ -62,6 +70,18 @@ try {
             if ($r['tipo'] === 'imagen' && !empty($r['url'])) { $imgLab = $r['url']; break; }
         }
         if ($imgLab === '') { $esLabeling = false; }
+    }
+    $nivelesLab = [];   // otras actividades de identificación del mismo tema (niveles)
+    $requiereLab = '';
+    if ($esLabeling) {
+        $sv = $pdo->prepare("SELECT slug, titulo, activo FROM actividades
+                             WHERE tipo = 'labeling' AND topic_id IS ? ORDER BY id");
+        $sv->execute([$act['topic_id']]);
+        $nivelesLab = $sv->fetchAll();
+        foreach ($nivelesLab as $k => $nv) {
+            if ($nv['slug'] === $act['slug'] && $k > 0) { $requiereLab = $nivelesLab[$k - 1]['slug']; }
+        }
+        if (count($nivelesLab) < 2) { $nivelesLab = []; }
     }
     if ($esLabeling) {
         foreach ($labelParts as $i => $lp) {
@@ -94,6 +114,7 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+    <script type="importmap"><?= nl_importmap() ?></script>
     <link rel="stylesheet" href="css/base.css?v=<?= nl_ver('css/base.css') ?>">
     <link rel="stylesheet" href="css/activity.css?v=<?= nl_ver('css/activity.css') ?>">
     <?php if (!empty($quicesData)): ?>
@@ -121,17 +142,42 @@ try {
         <div class="nl-act-stage">
             <?php if ($esLabeling): ?>
             <!-- Identificación: escribir el nombre de cada parte sobre la imagen -->
+            <?php if ($nivelesLab): ?>
+            <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
+                <?php foreach ($nivelesLab as $k => $nv):
+                    $esta = $nv['slug'] === $act['slug'];
+                    $partesT = explode('·', $nv['titulo'], 2);
+                    $etq = trim(end($partesT));
+                ?>
+                    <?php if ($esta): ?>
+                        <span class="nl-lab__nivel is-actual" aria-current="page"><?= htmlspecialchars($etq) ?></span>
+                    <?php elseif ((int)$nv['activo']): ?>
+                        <a class="nl-lab__nivel" href="actividad.php?slug=<?= rawurlencode($nv['slug']) ?><?= $ruta !== '' ? '&amp;ruta=' . rawurlencode($ruta) : '' ?>"><?= htmlspecialchars($etq) ?></a>
+                    <?php else: ?>
+                        <span class="nl-lab__nivel is-pronto"><?= htmlspecialchars($etq) ?> · próximamente</span>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </nav>
+            <?php endif; ?>
             <div class="nl-lab" id="nl-lab"
                  data-slug="<?= htmlspecialchars($act['slug']) ?>"
+                 data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
+                 data-requiere="<?= htmlspecialchars($requiereLab) ?>"
                  data-partes="<?= htmlspecialchars(json_encode($partesLab, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+                <div class="nl-lab__candado" hidden>
+                    <strong>🔒 Nivel bloqueado</strong>
+                    <p>Completa primero el nivel anterior para desbloquear este.</p>
+                </div>
                 <div class="nl-lab__head">
                     <p class="nl-lab__instruccion">
-                        Escribe en cada rectángulo el nombre de la parte y presiona <kbd>Enter</kbd>
-                        (o <kbd>?</kbd> si no lo sabes). Verás el nombre correcto, otros nombres válidos y su
-                        función: compáralo con tu respuesta y marca si coincide.
+                        <strong>1.</strong> Escribe de memoria el nombre de cada estructura y presiona <kbd>Enter</kbd>
+                        (o <kbd>?</kbd> si no lo recuerdas): verás la respuesta correcta.
+                        <strong>2.</strong> Luego elige su <strong>función</strong> entre las alternativas.
+                        Queda <span class="nl-lab__verde">verde</span> si acertaste ambas; si el nombre falló, queda por repasar.
                     </p>
                     <div class="nl-lab__estado">
                         <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
+                        <span class="nl-lab__errores" id="nl-lab-errores"></span>
                         <button type="button" class="nl-lab__reset" id="nl-lab-reset">Empezar de nuevo</button>
                     </div>
                 </div>
@@ -143,6 +189,7 @@ try {
                 </div>
 
                 <div class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></div>
+                <div id="nl-lab-guia" hidden></div>
             </div>
             <?php elseif ($quizEnStage): ?>
             <div class="nl-act-quiz-stage">
@@ -222,6 +269,7 @@ try {
                         id="nl-prac-tab-<?= (int)$n['id'] ?>"
                         aria-controls="nl-prac-panel-<?= (int)$n['id'] ?>"
                         data-nivel="<?= (int)$n['id'] ?>"
+                        data-numero="<?= (int)$n['numero'] ?>"
                         data-activo="<?= (int)$n['activo'] ?>"
                         data-total="<?= count($n['items']) ?>">
                     <span class="nl-prac__nivel-num">Nivel <?= (int)$n['numero'] ?></span>
@@ -263,6 +311,23 @@ try {
                                 <li class="nl-prac__item nl-arm__item" data-id="<?= (int)$it['id'] ?>">
                                     <p class="nl-arm__pide"><?= htmlspecialchars($it['enunciado']) ?></p>
                                     <div class="nl-arm__mesa"></div>
+                                    <p class="nl-prac__fb" aria-live="polite"></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ol>
+                        <?php elseif ($n['tipo'] === 'elegir'): ?>
+                        <!-- Nivel "elegir": se responde tocando el botón (con dibujo) del tipo de neurona -->
+                        <ol class="nl-prac__lista nl-eleg__lista">
+                            <?php foreach ($n['items'] as $it): ?>
+                                <li class="nl-prac__item nl-eleg__item" data-id="<?= (int)$it['id'] ?>">
+                                    <p class="nl-prac__frase nl-eleg__frase"><?= htmlspecialchars(str_replace('{}', '____', $it['enunciado'])) ?></p>
+                                    <div class="nl-eleg__opciones" role="group" aria-label="Elige la respuesta">
+                                        <?php foreach ($n['opciones'] as $op): ?>
+                                            <button type="button" class="nl-eleg__op" data-valor="<?= htmlspecialchars($op) ?>">
+                                                <?= nl_icono_neurona($op) ?><span><?= htmlspecialchars($op) ?></span>
+                                            </button>
+                                        <?php endforeach; ?>
+                                    </div>
                                     <p class="nl-prac__fb" aria-live="polite"></p>
                                 </li>
                             <?php endforeach; ?>
@@ -326,6 +391,15 @@ function tipoLabel($t) {
 function nl_ver($rel) {
     $f = __DIR__ . '/' . $rel;
     return is_file($f) ? filemtime($f) : '1';
+}
+
+/** Import map: cada js/*.js con ?v=<fecha> para que los módulos importados tampoco queden en caché. */
+function nl_importmap() {
+    $map = [];
+    foreach (glob(__DIR__ . '/js/*.js') as $f) {
+        $map['./js/' . basename($f)] = './js/' . basename($f) . '?v=' . filemtime($f);
+    }
+    return json_encode(['imports' => $map], JSON_UNESCAPED_SLASHES);
 }
 
 function renderQuiz($q) {

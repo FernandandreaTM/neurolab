@@ -1,40 +1,41 @@
 <?php
 /**
  * NeuroLab — data/practicos.php
- * Rutas de práctico que muestra practico.php?p=<clave>.
- * Cada paso: modo 'solo' (actividad en NeuroLab, con enlace) o 'docente' (se ve en sala).
+ * Rutas de práctico (practico.php?p=<clave>) y su guía de estudio (guia.php?p=<clave>).
+ * Cada paso enlaza una actividad y declara qué secciones de "Mi guía" desbloquea:
+ *   'guia' => [ '<clave de sección>' => 'Nombre de la sección' ]
+ * Claves: slug de la actividad (identificación, quiz) o slug:número de nivel (práctica por niveles).
  * Editar aquí no requiere migrate.php ni seed.php: basta subir este archivo.
  */
 return [
     'celulas-1' => [
-        'titulo'     => 'Práctico: Células nerviosas I',
+        'titulo'     => 'Células nerviosas I: la neurona',
         'asignatura' => 'ETMP097 Neurobiología · Terapia Ocupacional',
         'objetivo'   => 'Relacionar la morfología de la neurona con su función y su localización en el sistema nervioso.',
-        'intro'      => 'Sigue los pasos en orden. Los pasos "En NeuroLab" los haces a tu ritmo; en los pasos "Con la docente" detente y espera la puesta en común. Al terminar cada actividad presiona "Marcar actividad como completada" y vuelve a esta página.',
+        'intro'      => 'Avanza a tu ritmo, en orden. Cada actividad se corrige sola: cuando la completes, súmala a tu guía de estudio. Al final descarga tu guía en PDF con todo lo que trabajaste.',
         'pasos' => [
-            ['modo' => 'docente', 'min' => 5,  'titulo' => 'Encuadre',
-             'tarea' => 'Objetivo del práctico, cómo se usa NeuroLab y qué registrar en la guía.'],
-            ['modo' => 'solo', 'min' => 15, 'slug' => 'labeling-partes-neurona',
-             'titulo' => 'Partes de la neurona y su función',
-             'tarea' => 'Identifica las 9 estructuras y anota en tu guía (parte I) el nombre y la función de cada una.'],
-            ['modo' => 'docente', 'min' => 5,  'titulo' => 'Flujo de información',
-             'tarea' => 'Recepción (dendritas y soma) → integración (cono axónico) → conducción (axón) → transmisión (terminal).'],
-            ['modo' => 'solo', 'min' => 20, 'slug' => 'comparador-tipos-neurona',
-             'titulo' => 'Tipos de neurona: niveles 1 y 2',
-             'tarea' => 'Resuelve las frases (nivel 1) y arma las tres neuronas (nivel 2). Luego abre el cuadro resumen y completa el cuadro de la guía (parte II): dibujo con flecha de dirección del impulso, morfología, función y ejemplo.'],
-            ['modo' => 'solo', 'min' => 10, 'slug' => 'comparador-tipos-neurona',
-             'titulo' => 'Subtipos multipolares: nivel 3',
-             'tarea' => 'En la misma actividad, resuelve el nivel 3: neurona piramidal, célula de Purkinje y motoneurona.'],
-            ['modo' => 'solo', 'min' => 25, 'slug' => 'lamina-neurona-piramidal',
+            ['slug' => 'labeling-partes-neurona',
+             'titulo' => 'Partes de la neurona · Nivel I',
+             'tarea' => 'Escribe de memoria el nombre de cada estructura y luego elige su función. Lo que no recuerdes queda marcado para repasar.',
+             'guia' => ['labeling-partes-neurona' => 'Estructuras de la neurona y su función']],
+            ['slug' => 'labeling-neurona-nivel-2',
+             'titulo' => 'Partes de la neurona · Nivel II',
+             'tarea' => 'Un paso más fino: citoesqueleto, organelos, transporte axonal y crecimiento del axón.',
+             'guia' => ['labeling-neurona-nivel-2' => 'Estructura específica de la neurona']],
+            ['slug' => 'comparador-tipos-neurona',
+             'titulo' => 'Tipos de neurona',
+             'tarea' => 'Tres niveles: reconoce cada tipo por su descripción, arma las neuronas y distingue los subtipos multipolares. Cada nivel suma una sección a tu guía.',
+             'guia' => ['comparador-tipos-neurona:1' => 'Tipos de neurona: forma, función y localización',
+                        'comparador-tipos-neurona:2' => 'Dibujos de neuronas y cuadro comparativo',
+                        'comparador-tipos-neurona:3' => 'Subtipos de neuronas multipolares']],
+            ['slug' => 'lamina-neurona-piramidal',
              'titulo' => 'Lámina Golgi: piramidal y Purkinje',
-             'tarea' => 'Sigue la Guía de observación: localiza una neurona piramidal y una célula de Purkinje, reconoce soma, dendritas y axón, y responde las preguntas (guía, parte III-1). Muéstrale tu captura a la docente.'],
-            ['modo' => 'docente', 'min' => 10, 'titulo' => 'Morfología ↔ función ↔ localización',
-             'tarea' => 'Puesta en común: ¿por qué cada tipo tiene la forma que tiene y por qué está donde está?'],
-            ['modo' => 'solo', 'min' => 15, 'slug' => 'quiz-celulas-nerviosas-1',
+             'tarea' => 'Observa neuronas reales: localiza una neurona piramidal y una célula de Purkinje y relaciona su forma con su función.',
+             'guia' => []],
+            ['slug' => 'quiz-celulas-nerviosas-1',
              'titulo' => 'Quiz de cierre',
-             'tarea' => 'Responde sin apuntes. Revisa el resumen final y anota las preguntas falladas.'],
-            ['modo' => 'docente', 'min' => 10, 'titulo' => 'Cierre y dudas',
-             'tarea' => 'Revisión de las preguntas más falladas. Próximo práctico: Células nerviosas II (circuitos y glía).'],
+             'tarea' => 'Comprueba lo que aprendiste. Tu resultado y las explicaciones de cada pregunta quedan en tu guía.',
+             'guia' => ['quiz-celulas-nerviosas-1' => 'Quiz de cierre']],
         ],
     ],
 ];

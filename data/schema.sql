@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS labeling_parts (
     y_pct         REAL    NOT NULL,          -- idem, en % del alto
     descripcion   TEXT,                      -- retroalimentación al acertar / pista al fallar
     sinonimos     TEXT,                      -- otras respuestas válidas, separadas por |
+    funcion       TEXT,                      -- función breve (sin nombrar la parte): alternativa correcta del quiz
     box_x_pct     REAL,                      -- centro del rectángulo; NULL = sobre el punto
     box_y_pct     REAL,
     orden         INTEGER NOT NULL DEFAULT 0,

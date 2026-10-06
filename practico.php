@@ -1,38 +1,17 @@
 <?php
 /**
  * NeuroLab — practico.php
- * Ruta guiada de un práctico presencial: pasos en orden, tiempos y modo
- * (en NeuroLab / con la docente). Las rutas están en data/practicos.php.
- * URL: practico.php?p=celulas-1
+ * Ruta de un práctico: por dónde partir y en qué orden avanzar. Cada paso enlaza
+ * una actividad y muestra qué secciones de "Mi guía" desbloquea.
+ * Las rutas están en data/practicos.php.   URL: practico.php?p=celulas-1
  */
 error_reporting(0);
-require_once __DIR__ . '/api/db.php';
+require_once __DIR__ . '/_partials/rutas.php';
 
-$rutas = require __DIR__ . '/data/practicos.php';
-$clave = isset($_GET['p']) ? (string)$_GET['p'] : '';
-$ruta  = isset($rutas[$clave]) ? $rutas[$clave] : null;
-
-// Títulos de las actividades enlazadas (si la BD no responde, se usa el título del paso)
-$titulos = [];
-if ($ruta) {
-    try {
-        $st = get_db()->prepare("SELECT titulo FROM actividades WHERE slug = ? AND activo = 1");
-        foreach ($ruta['pasos'] as $p) {
-            if (!empty($p['slug']) && !isset($titulos[$p['slug']])) {
-                $st->execute([$p['slug']]);
-                $t = $st->fetchColumn();
-                $titulos[$p['slug']] = $t === false ? null : $t;
-            }
-        }
-    } catch (Throwable $e) { $titulos = []; }
-}
-
-function nl_v($rel) {
-    $f = __DIR__ . '/' . $rel;
-    return is_file($f) ? filemtime($f) : '1';
-}
-$total = 0;
-if ($ruta) foreach ($ruta['pasos'] as $p) $total += (int)$p['min'];
+$clave = isset($_GET['p']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['p']) : '';
+$ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
+$secciones = $ruta ? nl_secciones_ruta($ruta) : [];
+$seccionesActivas = array_values(array_filter($secciones, function ($s) { return $s['activo']; }));
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -60,53 +39,82 @@ if ($ruta) foreach ($ruta['pasos'] as $p) $total += (int)$p['min'];
         <h1><?= htmlspecialchars($ruta['titulo']) ?></h1>
         <p class="nl-ruta__obj"><strong>Objetivo:</strong> <?= htmlspecialchars($ruta['objetivo']) ?></p>
         <p class="nl-ruta__intro"><?= htmlspecialchars($ruta['intro']) ?></p>
-        <div class="nl-ruta__meta">
-            <span>⏱ <?= $total ?> min</span>
-            <span class="nl-ruta__leyenda nl-ruta__leyenda--solo">En NeuroLab</span>
-            <span class="nl-ruta__leyenda nl-ruta__leyenda--docente">Con la docente</span>
-            <span class="nl-ruta__avance" id="nl-ruta-avance" aria-live="polite"></span>
-        </div>
     </header>
+
+    <div class="nl-ruta__guia" id="nl-ruta-guia">
+        <div class="nl-ruta__guia-txt">
+            <strong>📘 Mi guía de estudio</strong>
+            <span id="nl-ruta-guia-n">0 / <?= count($seccionesActivas) ?> secciones desbloqueadas</span>
+            <div class="nl-ruta__barra"><div class="nl-ruta__barra-fill" id="nl-ruta-barra"></div></div>
+        </div>
+        <a class="btn btn-primary btn-sm" href="guia.php?p=<?= rawurlencode($clave) ?>">Ver y descargar mi guía →</a>
+    </div>
 
     <ol class="nl-ruta__pasos">
     <?php foreach ($ruta['pasos'] as $i => $p):
-        $solo = $p['modo'] === 'solo' && !empty($p['slug']);
-        $href = $solo ? 'actividad.php?slug=' . rawurlencode($p['slug']) . '&ruta=' . rawurlencode($clave) : '';
-        $actTitulo = $solo && !empty($titulos[$p['slug']]) ? $titulos[$p['slug']] : '';
+        $href = 'actividad.php?slug=' . rawurlencode($p['slug']) . '&ruta=' . rawurlencode($clave);
+        $guia = $p['guia'] ?? [];
     ?>
-        <li class="nl-paso nl-paso--<?= $solo ? 'solo' : 'docente' ?>"<?= $solo ? ' data-slug="' . htmlspecialchars($p['slug']) . '"' : '' ?>>
+        <li class="nl-paso<?= $p['activo'] ? '' : ' is-pronto' ?>" data-slug="<?= htmlspecialchars($p['slug']) ?>">
             <div class="nl-paso__num"><?= $i + 1 ?></div>
             <div class="nl-paso__cuerpo">
                 <div class="nl-paso__top">
                     <h2><?= htmlspecialchars($p['titulo']) ?></h2>
-                    <span class="nl-paso__min"><?= (int)$p['min'] ?> min</span>
-                </div>
-                <p class="nl-paso__modo"><?= $solo ? '💻 En NeuroLab' : '👩‍🏫 Con la docente' ?><?= $actTitulo ? ' · ' . htmlspecialchars($actTitulo) : '' ?></p>
-                <p class="nl-paso__tarea"><?= htmlspecialchars($p['tarea']) ?></p>
-                <?php if ($solo): ?>
-                    <a class="btn btn-primary btn-sm nl-paso__ir" href="<?= htmlspecialchars($href) ?>">Ir a la actividad →</a>
                     <span class="nl-paso__hecho" hidden>✓ Completada</span>
+                </div>
+                <p class="nl-paso__tarea"><?= htmlspecialchars($p['tarea']) ?></p>
+                <?php if ($guia): ?>
+                    <ul class="nl-paso__secciones" aria-label="Secciones de tu guía que desbloquea">
+                        <?php foreach ($guia as $cl => $nom): ?>
+                            <li class="nl-paso__sec" data-clave="<?= htmlspecialchars($cl) ?>"><span class="nl-paso__sec-ico">🔒</span> <?= htmlspecialchars($nom) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php elseif ($p['activo']): ?>
+                    <p class="nl-paso__nota">Actividad de observación: aún no suma una sección a tu guía.</p>
+                <?php endif; ?>
+                <?php if ($p['activo']): ?>
+                    <a class="btn btn-primary btn-sm nl-paso__ir" href="<?= htmlspecialchars($href) ?>">Ir a la actividad →</a>
+                <?php else: ?>
+                    <span class="nl-paso__pronto">🔒 Próximamente</span>
                 <?php endif; ?>
             </div>
         </li>
     <?php endforeach; ?>
+        <li class="nl-paso nl-paso--final">
+            <div class="nl-paso__num">★</div>
+            <div class="nl-paso__cuerpo">
+                <div class="nl-paso__top"><h2>Descarga tu guía de estudio</h2></div>
+                <p class="nl-paso__tarea">Revisa tu guía, anota los integrantes del grupo y descárgala en PDF para estudiar.</p>
+                <a class="btn btn-primary btn-sm" href="guia.php?p=<?= rawurlencode($clave) ?>">📘 Abrir mi guía</a>
+            </div>
+        </li>
     </ol>
 <?php endif; ?>
 </main>
 
 <?php include '_partials/footer.php'; ?>
 <script type="module">
-import { isDone } from './js/progress.js';
-const pasos = [...document.querySelectorAll('.nl-paso--solo')];
-const slugs = [...new Set(pasos.map(p => p.dataset.slug))];
-pasos.forEach(p => {
-    if (isDone(p.dataset.slug)) {
-        p.classList.add('is-hecho');
-        p.querySelector('.nl-paso__hecho').hidden = false;
-    }
-});
-const av = document.getElementById('nl-ruta-avance');
-if (av && slugs.length) av.textContent = `${slugs.filter(isDone).length} / ${slugs.length} actividades completadas`;
+import { isDone } from './js/progress.js?v=<?= nl_v('js/progress.js') ?>';
+import { leerGuia } from './js/guia.js?v=<?= nl_v('js/guia.js') ?>';
+const activas = <?= json_encode(array_column($seccionesActivas, 'clave')) ?>;
+function pintar() {
+    const g = leerGuia().secciones;
+    document.querySelectorAll('.nl-paso[data-slug]').forEach(p => {
+        const hecho = isDone(p.dataset.slug);
+        p.classList.toggle('is-hecho', hecho);
+        const h = p.querySelector('.nl-paso__hecho'); if (h) h.hidden = !hecho;
+    });
+    document.querySelectorAll('.nl-paso__sec').forEach(li => {
+        const ok = !!g[li.dataset.clave];
+        li.classList.toggle('is-ok', ok);
+        li.querySelector('.nl-paso__sec-ico').textContent = ok ? '📘' : '🔒';
+    });
+    const n = activas.filter(c => g[c]).length;
+    document.getElementById('nl-ruta-guia-n').textContent = `${n} / ${activas.length} secciones desbloqueadas`;
+    document.getElementById('nl-ruta-barra').style.width = (activas.length ? n * 100 / activas.length : 0) + '%';
+}
+pintar();
+window.addEventListener('pageshow', pintar);
 </script>
 </body>
 </html>

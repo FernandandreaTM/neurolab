@@ -845,3 +845,123 @@ button.nl-lab__campo {
 
 /* En la identificación (layout ancho) las tarjetas de carrera van una sobre otra */
 .nl-act-layout--ancho .nl-act-carreras { grid-template-columns: 1fr; }
+
+/* ===============================================================
+   Identificación v2: nombre por lista + función por alternativas
+   =============================================================== */
+.nl-lab__select {
+    width: 9.5em;
+    min-width: 0;
+    border: 0;
+    background: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 600;
+    color: #1A0E2E;
+    padding: .1em 0;
+    cursor: pointer;
+}
+.nl-lab__select:disabled { opacity: .45; cursor: default; }
+.nl-lab__select option { color: #1A0E2E; }
+.nl-lab__campo.is-activa {
+    border-color: #F59E0B;
+    background: rgba(254,243,199,.98);
+    box-shadow: 0 0 0 .18em rgba(245,158,11,.35), 0 2px 8px rgba(26,14,46,.25);
+    cursor: pointer;
+}
+.nl-lab__campo.is-activa .nl-lab__num { background: rgba(245,158,11,.22); color: #B45309; }
+.nl-lab__campo.is-activa .nl-lab__ok { color: #78350F; }
+.nl-lab__falta {
+    font-size: .72em; font-weight: 800; color: #fff;
+    background: #F59E0B; border-radius: 99px; padding: .05em .5em; white-space: nowrap;
+}
+.nl-lab__punto.is-activa { background: #F59E0B; }
+.nl-lab__linea.is-activa { stroke: #F59E0B; stroke-dasharray: none; opacity: .95; }
+
+.nl-lab__feedback.is-pregunta {
+    padding: .8rem .9rem;
+    background: rgba(36,20,64,.97);
+    border: 1.5px solid #F59E0B;
+    color: var(--gray-100);
+    box-shadow: 0 6px 24px rgba(26,14,46,.55);
+}
+.nl-lab__q { margin: 0 0 .6rem; font-size: .95rem; }
+.nl-lab__q .nl-lab__etq { display: block; color: #FCD34D; margin-bottom: .15rem; }
+.nl-lab__alts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .45rem; }
+.nl-lab__alt-btn {
+    display: flex; align-items: flex-start; gap: .55rem;
+    text-align: left; font: inherit; font-size: .86rem; line-height: 1.4;
+    padding: .55rem .7rem;
+    color: var(--gray-100);
+    background: rgba(255,255,255,.05);
+    border: 1.5px solid var(--gray-700);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+.nl-lab__alt-btn:hover:not(:disabled) { border-color: #F59E0B; background: rgba(245,158,11,.1); }
+.nl-lab__alt-btn.is-mal { border-color: #EF4444; background: rgba(239,68,68,.12); opacity: .7; cursor: default; }
+.nl-lab__alt-btn.is-esperando { opacity: .6; }
+.nl-lab__alt-letra {
+    flex: 0 0 1.5rem; height: 1.5rem; border-radius: 50%;
+    display: grid; place-items: center; font-size: .75rem; font-weight: 800;
+    background: rgba(245,158,11,.2); color: #FCD34D;
+}
+.nl-lab__alt-btn.is-mal .nl-lab__alt-letra { background: #EF4444; color: #fff; }
+.nl-lab__q-fb { margin: .55rem 0 0; color: #FECACA; font-size: .84rem; }
+.nl-lab__detalle { margin: .35rem 0 0; font-size: .82rem; opacity: .9; }
+.nl-lab__errores { font-size: .8rem; font-weight: 700; color: #FCA5A5; }
+.nl-lab__verde { color: #4ADE80; font-weight: 700; }
+
+.nl-lab__niveles { display: flex; flex-wrap: wrap; gap: .4rem; padding: .9rem 1.25rem 0; }
+.nl-lab__nivel {
+    font-size: .82rem; font-weight: 700; padding: .35rem .8rem; border-radius: 99px;
+    border: 1.5px solid var(--gray-700); color: var(--gray-300); text-decoration: none;
+}
+.nl-lab__nivel:hover { border-color: var(--violet); color: var(--violet-light); }
+.nl-lab__nivel.is-actual { background: var(--violet); border-color: var(--violet); color: #fff; }
+.nl-lab__nivel.is-pronto { opacity: .55; }
+.nl-lab__candado { padding: 2rem 1rem; text-align: center; color: var(--gray-300); }
+.nl-lab.is-bloqueada > :not(.nl-lab__candado) { display: none; }
+
+.nl-lab__calibrar {
+    margin: .8rem 0 0; padding: .7rem; font-size: .8rem; white-space: pre-wrap;
+    background: #0B0616; color: #A7F3D0; border-radius: 8px; max-height: 14rem; overflow: auto;
+}
+
+/* --- Llamado "Sumar a mi guía" (todas las actividades) --- */
+.nl-guia-cta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem;
+    margin-top: 1rem; padding: .9rem 1rem;
+    border: 1.5px dashed var(--violet);
+    border-radius: 12px;
+    background: rgba(139,92,246,.1);
+    animation: nlGuiaAparece .35s ease;
+}
+.nl-guia-cta.is-sumada { border-style: solid; border-color: rgba(34,197,94,.55); background: rgba(34,197,94,.08); }
+.nl-guia-cta__txt { flex: 1 1 220px; color: var(--gray-100); }
+@keyframes nlGuiaAparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* --- Nivel "elegir": botones con dibujo --- */
+.nl-eleg__item { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.nl-eleg__frase { flex: 1 1 260px; margin: 0; }
+.nl-eleg__opciones { display: flex; flex-wrap: wrap; gap: .4rem; }
+.nl-eleg__op {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .3rem .7rem .3rem .35rem;
+    font: inherit; font-size: .85rem; font-weight: 700;
+    color: var(--gray-100);
+    background: rgba(255,255,255,.04);
+    border: 1.5px solid var(--gray-700);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .1s;
+}
+.nl-eleg__op:hover:not(:disabled) { border-color: var(--violet); background: rgba(139,92,246,.12); transform: translateY(-1px); }
+.nl-eleg__op .nl-ico { width: 40px; height: 40px; flex: none; border-radius: 8px; background: #fff; padding: 2px; object-fit: contain; }
+.nl-eleg__op.is-mal { border-color: #EF4444; background: rgba(239,68,68,.12); opacity: .55; cursor: default; }
+.nl-eleg__op.is-ok { border-color: #22C55E; background: rgba(34,197,94,.14); color: #BBF7D0; cursor: default; opacity: 1; }
+.nl-eleg__op.is-esperando { opacity: .6; }
+.nl-eleg__item .nl-prac__fb { flex-basis: 100%; }
+.nl-eleg__op[hidden] { display: none; }

@@ -226,7 +226,7 @@ export function prepararArmar(ctx) {
             fijar(t, datos.respuesta, true);
             t.fb.className = 'nl-prac__fb is-ok';
             t.fb.textContent = '✓ ' + (datos.feedback || '¡Correcto!');
-            ctx.acierto(t.li.dataset.id, { respuesta: datos.respuesta, piezas: t.piezas.slice() });
+            ctx.acierto(t.li.dataset.id, { respuesta: datos.respuesta, piezas: t.piezas.slice(), exp: datos.feedback || '' });
         } else {
             ctx.error();
             t.li.classList.remove('is-mal');

@@ -1,0 +1,76 @@
+/* NeuroLab — guia.css: "Mi guía de estudio" (pantalla e impresión/PDF) */
+.nl-guia-pag { padding-top: 2rem; padding-bottom: 3rem; max-width: 980px; }
+.nl-guia-pag__nav { margin-bottom: 1rem; font-size: .9rem; }
+
+.nl-guia-doc {
+    background: #FDFCFF; color: #1A0E2E;
+    border-radius: 16px; padding: 2rem 2.2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+.nl-guia-doc a { color: #6D28D9; }
+.nl-guia-doc__kicker { margin: 0; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #7C3AED; }
+.nl-guia-doc h1 { color: #1A0E2E; margin: .3rem 0 .6rem; font-size: clamp(1.5rem, 3.5vw, 2.1rem); }
+.nl-guia-doc__obj { margin: 0 0 1rem; color: #4A3A6A; line-height: 1.55; }
+.nl-guia-doc__grupo { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; font-weight: 700; color: #6D28D9; }
+.nl-guia-doc__grupo input {
+    font: inherit; font-size: .95rem; font-weight: 500; color: #1A0E2E;
+    padding: .55rem .7rem; border: 1.5px solid #C4B5FD; border-radius: 8px; background: #fff;
+}
+.nl-guia-doc__grupo-print, .nl-guia-doc__fecha { display: none; margin: .2rem 0; font-size: .9rem; color: #1A0E2E; }
+.nl-guia-acciones { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin: 1.4rem 0 .3rem; font-weight: 700; color: #6D28D9; }
+.nl-guia-ayuda { margin: 0 0 1.2rem; font-size: .8rem; color: #6B5B86; }
+
+.nl-g-sec { padding: 1.2rem 0; border-top: 2px solid #EDE9FE; }
+.nl-g-sec h2 { margin: 0; font-size: 1.15rem; color: #4C1D95; }
+.nl-g-sec__sub { margin: .25rem 0 0; font-size: .85rem; color: #6B5B86; }
+.nl-g-sec__nota { margin: .6rem 0 0; font-size: .75rem; color: #8B7BA6; }
+.nl-g-sec--bloq { opacity: .75; }
+.nl-g-sec--bloq h2 { color: #8B7BA6; }
+.nl-g-sec--bloq p { font-size: .88rem; color: #6B5B86; margin: .3rem 0 0; }
+.nl-g-vacia { color: #6B5B86; padding: 1rem 0; }
+
+.nl-g-tabla-wrap { overflow-x: auto; }
+.nl-g-tabla { width: 100%; border-collapse: collapse; margin-top: .8rem; font-size: .85rem; }
+.nl-g-tabla th, .nl-g-tabla td { border: 1px solid #DDD6FE; padding: .45rem .6rem; text-align: left; vertical-align: top; line-height: 1.45; }
+.nl-g-tabla th { background: #F5F3FF; color: #4C1D95; font-weight: 800; }
+.nl-g-tabla tr:nth-child(even) td { background: #FAF8FF; }
+.nl-g-lista { margin: .8rem 0 0; padding-left: 1.2rem; line-height: 1.55; }
+.nl-g-texto { margin: .8rem 0 0; line-height: 1.55; }
+
+.nl-g-figuras { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .8rem; margin-top: .8rem; }
+.nl-g-fig { margin: 0; border: 1px solid #DDD6FE; border-radius: 10px; padding: .5rem; background: #fff; break-inside: avoid; }
+.nl-g-fig svg { width: 100%; height: auto; display: block; }
+.nl-g-fig figcaption { font-size: .8rem; line-height: 1.45; color: #4A3A6A; margin-top: .3rem; }
+.nl-g-fig figcaption strong { display: block; color: #4C1D95; }
+/* Piezas del dibujo "armar neurona" sobre fondo blanco */
+.nl-g-fig .p-dend  { stroke: #7C3AED; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.nl-g-fig .p-axon  { stroke: #DB2777; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.nl-g-fig .p-t     { stroke: #0284C7; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.nl-g-fig .p-mielina { fill: #E0E7FF; stroke: #818CF8; stroke-width: 1; }
+.nl-g-fig .p-boton { fill: #DB2777; }
+.nl-g-fig .p-t ~ .p-boton { fill: #0284C7; }
+.nl-g-fig .p-soma  { fill: #8B5CF6; stroke: #5B21B6; stroke-width: 2.5; }
+.nl-g-fig .p-nucleo { fill: #2E1065; stroke: #DDD6FE; stroke-width: 1.5; }
+
+.nl-guia-borrar { text-align: center; margin-top: 1.5rem; }
+
+@media (max-width: 640px) {
+    .nl-guia-doc { padding: 1.2rem 1rem; border-radius: 12px; }
+    .nl-g-tabla { font-size: .78rem; }
+    .nl-g-tabla th, .nl-g-tabla td { padding: .35rem .4rem; }
+}
+
+@media print {
+    @page { margin: 14mm 12mm; }
+    body { background: #fff !important; }
+    .bg-mesh, .nl-guia-pag__nav, .nl-guia-acciones, .nl-guia-ayuda, .nl-guia-borrar,
+    .nl-g-sec--bloq, .nl-guia-doc__grupo, footer, .footer, .nl-footer { display: none !important; }
+    .nl-guia-pag { padding: 0; max-width: none; }
+    .nl-guia-doc { box-shadow: none; padding: 0; border-radius: 0; background: #fff; }
+    .nl-guia-doc__grupo-print, .nl-guia-doc__fecha { display: block; }
+    .nl-g-sec { break-inside: auto; }
+    .nl-g-sec h2 { break-after: avoid; }
+    .nl-g-tabla tr { break-inside: avoid; }
+    .nl-g-tabla-wrap { overflow: visible; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

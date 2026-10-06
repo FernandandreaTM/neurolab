@@ -4,6 +4,7 @@
  *
  * Tipos de nivel (practica_niveles.tipo):
  *   · completar -> cada frase tiene un espacio donde se escribe la respuesta
+ *   · elegir    -> cada frase se responde tocando un botón (con dibujo) del tipo
  *   · armar     -> se arma una neurona sobre un soma (js/armar-neurona.js)
  * En ambos: correcto = verde y fijo; incorrecto = rojo + pista y reintento.
  *
@@ -13,6 +14,7 @@
  */
 import { markDone } from './progress.js';
 import { prepararArmar } from './armar-neurona.js';
+import { botonGuia } from './guia.js';
 
 const RAIZ = document.getElementById('nl-prac');
 const KEY_BASE = 'nl_practica_';
@@ -54,6 +56,8 @@ function iniciar(raiz) {
         activo: t.dataset.activo === '1',
         total: Number(t.dataset.total) || 0,
         tab: t,
+        numero: t.dataset.numero || '',
+        titulo: (t.querySelector('.nl-prac__nivel-titulo')?.textContent || '').trim(),
         panel: raiz.querySelector(`.nl-prac__panel[data-nivel="${t.dataset.nivel}"]`),
     }));
     const estados = Object.fromEntries(niveles.map(n => [n.id, leer(n.id)]));
@@ -126,6 +130,9 @@ function iniciar(raiz) {
         const final     = panel.querySelector('.nl-prac__final');
         const btnReset  = panel.querySelector('.nl-prac__reiniciar');
         const lista     = panel.querySelector('.nl-prac__lista');
+        const guiaBox   = document.createElement('div');
+        guiaBox.hidden = true;
+        final.insertAdjacentElement('afterend', guiaBox);
 
         // Mezclamos el orden para que los ítems de un mismo tipo no queden juntos.
         barajar(Array.from(lista.children)).forEach(li => lista.appendChild(li));
@@ -147,9 +154,12 @@ function iniciar(raiz) {
                 final.className = 'nl-prac__final is-ok';
                 final.innerHTML = `🎉 <strong>¡Nivel completado!</strong> ` +
                     (e ? `Tuviste ${e} ${e === 1 ? 'intento fallido' : 'intentos fallidos'}.` : 'Sin ningún error.');
+                guiaBox.hidden = false;
+                botonGuia(guiaBox, slug + ':' + n.numero, () => seccionGuia(n, panel, estados[n.id]));
             } else {
                 final.className = 'nl-prac__final';
                 final.textContent = '';
+                guiaBox.hidden = true;
             }
             pintarPestanas();
             // Los niveles siguientes pueden haberse desbloqueado
@@ -187,6 +197,12 @@ function iniciar(raiz) {
                     return { correcto: false, feedback: 'No pudimos revisar la respuesta. ¿Hay conexión?' };
                 }
             },
+            /** Guarda la explicación de un acierto para la guía de estudio. */
+            explicar(itemId, texto) {
+                if (!estados[n.id].exp) estados[n.id].exp = {};
+                estados[n.id].exp[itemId] = texto;
+                escribir(n.id, estados[n.id]);
+            },
             acierto(itemId, valor) {
                 resueltas()[itemId] = valor;
                 escribir(n.id, estados[n.id]);
@@ -199,7 +215,9 @@ function iniciar(raiz) {
         };
 
         const tipo  = panel.dataset.tipo || 'completar';
-        const motor = tipo === 'armar' ? prepararArmar(ctx) : prepararCompletar(ctx);
+        const motor = tipo === 'armar' ? prepararArmar(ctx)
+                    : tipo === 'elegir' ? prepararElegir(ctx)
+                    : prepararCompletar(ctx);
 
         btnReset.addEventListener('click', () => {
             if (Object.keys(resueltas()).length &&
@@ -218,6 +236,54 @@ function iniciar(raiz) {
     // Abrimos el primer nivel jugable que no esté completo (o el primero).
     const inicial = jugables.find(n => !completo(n) && !bloqueado(n)) || jugables[0] || niveles[0];
     if (inicial) mostrar(inicial);
+}
+
+/* ---------------------------------------------------------------
+   Sección para "Mi guía de estudio"
+   --------------------------------------------------------------- */
+function seccionGuia(n, panel, estado) {
+    const titAct = (document.querySelector('.nl-act-header h1')?.textContent || 'Práctica').trim();
+    const res = estado.resueltas || {};
+    const exp = estado.exp || {};
+    const e = estado.errores || 0;
+    const items = Array.from(panel.querySelectorAll('.nl-prac__item'))
+        .sort((a, b) => Number(a.dataset.id) - Number(b.dataset.id));
+    const sec = {
+        titulo: `${titAct} — Nivel ${n.numero}: ${n.titulo}`,
+        subtitulo: (panel.querySelector('.nl-prac__instr')?.textContent || '').trim(),
+        nota: `${items.length} ejercicios · ${e} ${e === 1 ? 'intento fallido' : 'intentos fallidos'}`,
+        bloques: [],
+    };
+    if ((panel.dataset.tipo || '') === 'armar') {
+        sec.bloques.push({ t: 'figuras', items: items.map(li => {
+            const r = res[li.dataset.id] || {};
+            const lienzo = li.querySelector('.nl-arm__lienzo')?.cloneNode(true);
+            let svg = '';
+            if (lienzo) {
+                lienzo.querySelector('.nl-arm__puntos')?.remove();
+                ['role', 'aria-labelledby', 'aria-describedby'].forEach(a => lienzo.removeAttribute(a));
+                lienzo.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                svg = lienzo.outerHTML;
+            }
+            return { svg, titulo: r.respuesta || '', pie: r.exp || '' };
+        }) });
+        // El cuadro resumen de la actividad (si existe) completa esta sección
+        const tabla = document.querySelector('.nl-comp-resumen table');
+        if (tabla) {
+            const filas = Array.from(tabla.querySelectorAll('tr')).map(tr =>
+                Array.from(tr.children).map(c => c.textContent.trim()));
+            sec.bloques.push({ t: 'texto', txt: 'Cuadro comparativo de los tipos de neurona:' });
+            sec.bloques.push({ t: 'tabla', cab: filas[0], filas: filas.slice(1) });
+        }
+    } else {
+        sec.bloques.push({ t: 'tabla', cab: ['Enunciado', 'Respuesta', 'Explicación'], filas: items.map(li => {
+            const frase = li.querySelector('.nl-prac__frase')?.cloneNode(true);
+            frase?.querySelector('.nl-prac__hueco')?.replaceWith('____');
+            const txt = (frase ? frase.textContent : '').replace(/\s+/g, ' ').trim();
+            return [txt, res[li.dataset.id] || '', exp[li.dataset.id] || ''];
+        }) });
+    }
+    return sec;
 }
 
 /* ---------------------------------------------------------------
@@ -254,6 +320,7 @@ function prepararCompletar(ctx) {
             fijar(li, datos.respuesta);
             fb.className = 'nl-prac__fb is-ok';
             fb.textContent = '✓ ' + (datos.feedback || '¡Correcto!');
+            ctx.explicar(li.dataset.id, datos.feedback || '');
             ctx.acierto(li.dataset.id, datos.respuesta);
             siguiente(li);
         } else {
@@ -311,3 +378,71 @@ function prepararCompletar(ctx) {
 }
 
 if (RAIZ) iniciar(RAIZ);
+
+/* ---------------------------------------------------------------
+   Motor "elegir": frase + botones con el dibujo de cada opción
+   --------------------------------------------------------------- */
+function prepararElegir(ctx) {
+    const { lista } = ctx;
+    const items = () => Array.from(lista.querySelectorAll('.nl-eleg__item'));
+
+    function fijar(li, respuesta) {
+        li.classList.remove('is-mal', 'is-esperando');
+        li.classList.add('is-ok');
+        li.querySelectorAll('.nl-eleg__op').forEach(b => {
+            const es = b.dataset.valor === respuesta;
+            b.classList.toggle('is-ok', es);
+            b.classList.remove('is-mal');
+            b.disabled = true;
+            b.hidden = !es;
+        });
+    }
+
+    async function elegir(li, btn) {
+        if (li.classList.contains('is-ok') || li.dataset.enviando || btn.disabled) return;
+        const fb = li.querySelector('.nl-prac__fb');
+        li.dataset.enviando = '1';
+        btn.classList.add('is-esperando');
+        const datos = await ctx.enviar(li.dataset.id, { respuesta: btn.dataset.valor });
+        delete li.dataset.enviando;
+        btn.classList.remove('is-esperando');
+
+        if (datos && datos.correcto) {
+            fijar(li, btn.dataset.valor);
+            fb.className = 'nl-prac__fb is-ok';
+            fb.textContent = '✓ ' + (datos.feedback || '¡Correcto!');
+            ctx.explicar(li.dataset.id, datos.feedback || '');
+            ctx.acierto(li.dataset.id, btn.dataset.valor);
+        } else {
+            ctx.error();
+            btn.classList.add('is-mal');
+            btn.disabled = true;
+            li.classList.remove('is-mal');
+            void li.offsetWidth;
+            li.classList.add('is-mal');
+            fb.className = 'nl-prac__fb is-mal';
+            fb.textContent = '✗ ' + ((datos && datos.feedback) || 'Intenta de nuevo.');
+        }
+    }
+
+    const guardadas = ctx.guardadas();
+    items().forEach(li => {
+        li.querySelectorAll('.nl-eleg__op').forEach(b => b.addEventListener('click', () => elegir(li, b)));
+        const r = guardadas[li.dataset.id];
+        if (r) fijar(li, r);
+    });
+
+    return {
+        reiniciar() {
+            items().forEach(li => {
+                li.classList.remove('is-ok', 'is-mal');
+                li.querySelectorAll('.nl-eleg__op').forEach(b => {
+                    b.disabled = false; b.hidden = false; b.classList.remove('is-ok', 'is-mal');
+                });
+                const fb = li.querySelector('.nl-prac__fb');
+                fb.className = 'nl-prac__fb';
+                fb.textContent = '';
+            });
+        },
+    };
+}

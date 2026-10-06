@@ -7,7 +7,8 @@
  */
 import { markDone, isDone } from './progress.js';
 import Quiz from './quiz.js';
-import './labeling.js';   // actividad de identificación (se activa sola si hay #nl-lab)
+import './labeling.js';
+import { botonGuia } from './guia.js';   // actividad de identificación (se activa sola si hay #nl-lab)
 
 // Tabs de recursos
 document.querySelectorAll('#recursos-tabs .nl-act-tab').forEach(tab => {
@@ -46,9 +47,35 @@ document.querySelectorAll('.nl-act-quiz').forEach(box => {
         }
         btnStart.style.display = 'none';
         body.style.display = 'block';
-        new Quiz(body, preguntas, { shuffle: true, onComplete: () => {
-            // Al responder todas las preguntas, la actividad queda completada
+        let guiaBox = box.querySelector('.nl-guia-box');
+        if (!guiaBox) { guiaBox = document.createElement('div'); guiaBox.className = 'nl-guia-box'; box.appendChild(guiaBox); }
+        guiaBox.hidden = true;
+        const quiz = new Quiz(body, preguntas, { shuffle: true, onComplete: () => {
+            // Al responder todas las preguntas, la actividad queda completada y se puede sumar a la guía
             if (slug) { markDone(slug); if (btnComplete) btnComplete.textContent = '✓ Completada'; }
-        } }).render();
+            guiaBox.hidden = false;
+            botonGuia(guiaBox, slug, () => seccionQuiz(quiz, box.dataset.titulo || 'Quiz'));
+        } });
+        quiz.render();
     });
 });
+
+/** Sección de "Mi guía" con el resultado del quiz: cada pregunta, su respuesta correcta y la explicación. */
+function seccionQuiz(quiz, titulo) {
+    const { correct, total, pct } = quiz.getScore();
+    const limpio = t => { const d = document.createElement('div'); d.innerHTML = t; return d.textContent; };
+    return {
+        titulo: 'Quiz: ' + titulo,
+        subtitulo: `Puntaje: ${correct} / ${total} (${pct}%)`,
+        nota: (total - correct) ? `${total - correct} preguntas para repasar (marcadas con ✗)` : 'Todas correctas',
+        bloques: [{
+            t: 'tabla',
+            cab: ['', 'Pregunta', 'Respuesta correcta', 'Explicación'],
+            filas: quiz.preguntas.map((q, i) => {
+                const ok = quiz._answers[i] === q.correcta;
+                return [ok ? '✓' : '✗', limpio(q.pregunta),
+                        limpio(q.opciones[q.correcta]), limpio(q.feedback || '')];
+            }),
+        }],
+    };
+}

@@ -1,37 +1,51 @@
 /**
  * NeuroLab — labeling.js
- * Actividad de identificación: sobre la imagen hay un rectángulo por cada parte.
- * El estudiante escribe el nombre (o presiona "No sé"), se le muestra la
- * respuesta correcta con sus nombres alternativos y su función, y él mismo
- * decide si su respuesta coincidía.
+ * Actividad de identificación sobre una imagen, en dos pasos por estructura:
+ *   1. Nombre: se escribe de memoria (o "?" si no lo sabe). Se revela el correcto;
+ *      si no coincide con un sinónimo conocido, el estudiante decide si era lo mismo.
+ *   2. Función: pregunta de alternativas (la correcta + 3 de otras estructuras),
+ *      que se repite hasta acertar.
+ * Verde = nombre y función bien; ámbar = función bien pero el nombre quedó por repasar.
+ * Al completar todas, se puede sumar la tabla Estructura | Función a "Mi guía".
  *
- *   · "Coincide"     -> verde
- *   · "No coincide" / "No sé" -> ámbar ("por repasar"), con el nombre correcto
- *
- * La respuesta se pide a api/labeling_check.php sólo después de responder.
- * El avance se guarda en localStorage (nl_labeling_<slug>).
+ * Las respuestas se revisan en api/labeling_check.php (no van en el HTML).
+ * Avance en localStorage (nl_lab2_<slug>).
+ * Con ?calibrar=1 en la URL, un clic sobre la imagen muestra sus coordenadas en %.
  */
-import { markDone } from './progress.js';
+import { markDone, isDone } from './progress.js';
+import { botonGuia } from './guia.js';
 
 const RAIZ = document.getElementById('nl-lab');
-const KEY_BASE = 'nl_labeling_';
+const KEY_BASE = 'nl_lab2_';
 
-/** Estado por parte: { e: 'ok'|'repasar', n: nombre, r: lo que escribió, a: [alternativas], f: función } */
-export function getLabelingState(slug) {
-    let est = {};
-    try { est = JSON.parse(localStorage.getItem(KEY_BASE + slug) || '{}'); } catch { est = {}; }
-    // Formato anterior: { id: "Nombre" } -> se considera acertada.
-    Object.keys(est).forEach(k => {
-        if (typeof est[k] === 'string') est[k] = { e: 'ok', n: est[k], r: est[k], a: [], f: '' };
-    });
-    return est;
+function leer(slug) {
+    let e = null;
+    try { e = JSON.parse(localStorage.getItem(KEY_BASE + slug) || 'null'); } catch { e = null; }
+    if (!e || typeof e !== 'object') e = {};
+    if (!e.partes) e.partes = {};
+    if (!e.err) e.err = 0;
+    return e;
 }
 
-function guardar(slug, estado) {
+function escribir(slug, estado) {
     try { localStorage.setItem(KEY_BASE + slug, JSON.stringify(estado)); } catch { /* modo privado */ }
-    document.dispatchEvent(new CustomEvent('nl:labeling', {
-        detail: { slug, resueltas: Object.keys(estado).length },
-    }));
+}
+
+function escapar(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function consultar(datos) {
+    const body = Object.keys(datos).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(datos[k])).join('&');
+    try {
+        const res = await fetch('api/labeling_check.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body,
+        });
+        return await res.json();
+    } catch { return { ok: false, error: 'No pudimos revisar tu respuesta. ¿Hay conexión?' }; }
 }
 
 function iniciar(raiz) {
@@ -40,57 +54,66 @@ function iniciar(raiz) {
     if (!partes.length) return;
 
     const slug     = raiz.dataset.slug || '';
+    const titulo   = raiz.dataset.titulo || 'Partes de la neurona';
     const capa     = raiz.querySelector('#nl-lab-capa');
     const svg      = raiz.querySelector('.nl-lab__lineas');
     const canvas   = raiz.querySelector('#nl-lab-canvas');
     const panel    = raiz.querySelector('#nl-lab-feedback');
     const contador = raiz.querySelector('#nl-lab-contador');
+    const errores  = raiz.querySelector('#nl-lab-errores');
     const btnReset = raiz.querySelector('#nl-lab-reset');
+    const guiaBox  = raiz.querySelector('#nl-lab-guia');
     const angosto  = window.matchMedia('(max-width: 760px)');
 
-    let resueltas = getLabelingState(slug);
-    let decidiendo = null;   // { id, r, n, a, f } mientras el estudiante compara
+    // Nivel que exige completar otro antes
+    const requiere = raiz.dataset.requiere || '';
+    if (requiere && !isDone(requiere)) {
+        raiz.classList.add('is-bloqueada');
+        raiz.querySelector('.nl-lab__candado')?.removeAttribute('hidden');
+        return;
+    }
+
+    let est = leer(slug);
+    // est.activa = { id, n, a, r, nombreOk, opciones, mal } mientras se responde una estructura
     let lista = null;
 
-    /* --- Marcadores y líneas sobre la imagen --- */
-    function claseEstado(id) {
-        if (decidiendo && decidiendo.id === id) return ' is-revelada';
-        const s = resueltas[id];
-        return s ? (s.e === 'ok' ? ' is-ok' : ' is-repasar') : '';
+    const guardar = () => escribir(slug, est);
+    const lista_ok = () => partes.filter(p => est.partes[p.id]);
+
+    /* --- Marcadores y líneas --- */
+    function clase(id) {
+        if (est.activa && est.activa.id === id) return ' is-activa';
+        const s = est.partes[id];
+        return s ? (s.nombreOk ? ' is-ok' : ' is-repasar') : '';
     }
 
     function pintarCanvas() {
         capa.innerHTML = partes.map(p =>
-            `<span class="nl-lab__punto${claseEstado(p.id)}" style="left:${p.x}%;top:${p.y}%"
-                   aria-hidden="true">${p.n}</span>`).join('');
+            `<span class="nl-lab__punto${clase(p.id)}" style="left:${p.x}%;top:${p.y}%" aria-hidden="true">${p.n}</span>`).join('');
         svg.innerHTML = partes
             .filter(p => p.bx !== p.x || p.by !== p.y)
             .map(p => `<line x1="${p.bx}" y1="${p.by}" x2="${p.x}" y2="${p.y}"
-                             class="nl-lab__linea${claseEstado(p.id)}" vector-effect="non-scaling-stroke" />`)
-            .join('');
+                             class="nl-lab__linea${clase(p.id)}" vector-effect="non-scaling-stroke" />`).join('');
     }
 
-    /* --- Un rectángulo según su estado --- */
     function campoHTML(p) {
         const num = `<span class="nl-lab__num">${p.n}</span>`;
-        if (decidiendo && decidiendo.id === p.id) {
-            return `<div class="nl-lab__campo is-revelada" data-id="${p.id}">${num}
-                        <span class="nl-lab__resp">${escapar(decidiendo.r || '—')}</span></div>`;
-        }
-        const s = resueltas[p.id];
+        const s = est.partes[p.id];
         if (s) {
-            const marca = s.e === 'ok' ? '✓' : '↺';
-            return `<button type="button" class="nl-lab__campo nl-lab__ver${claseEstado(p.id)}" data-id="${p.id}"
-                            title="Ver nombre y función">${num}
-                        <span class="nl-lab__ok">${escapar(s.n)} ${marca}</span></button>`;
+            return `<button type="button" class="nl-lab__campo nl-lab__ver${clase(p.id)}" data-id="${p.id}"
+                            title="Ver su función">${num}<span class="nl-lab__ok">${escapar(s.n)} ${s.nombreOk ? '✓' : '↺'}</span></button>`;
         }
-        const bloqueado = decidiendo ? ' disabled' : '';
+        if (est.activa && est.activa.id === p.id) {
+            return `<button type="button" class="nl-lab__campo nl-lab__ver is-activa" data-id="${p.id}"
+                            title="Continuar">${num}<span class="nl-lab__ok">${escapar(est.activa.n)}</span>
+                            <span class="nl-lab__falta">¿función?</span></button>`;
+        }
+        const bloq = est.activa ? ' disabled' : '';
         return `<div class="nl-lab__campo" data-id="${p.id}">${num}
                     <input type="text" class="nl-lab__input" data-id="${p.id}"
-                           placeholder="¿Qué parte es?" aria-label="Parte ${p.n}"
-                           autocomplete="off" autocapitalize="off" spellcheck="false"${bloqueado}>
-                    <button type="button" class="nl-lab__nose" data-id="${p.id}"
-                            title="No sé: ver la respuesta"${bloqueado}>?</button>
+                           placeholder="¿Qué es?" aria-label="Estructura ${p.n}"
+                           autocomplete="off" autocapitalize="off" spellcheck="false"${bloq}>
+                    <button type="button" class="nl-lab__nose" data-id="${p.id}" title="No sé"${bloq}>?</button>
                 </div>`;
     }
 
@@ -100,7 +123,6 @@ function iniciar(raiz) {
         raiz.classList.toggle('is-lista', enLista);
         capa.querySelectorAll('.nl-lab__slot').forEach(el => el.remove());
         if (lista) { lista.remove(); lista = null; }
-
         if (enLista) {
             lista = document.createElement('div');
             lista.className = 'nl-lab__lista';
@@ -110,116 +132,141 @@ function iniciar(raiz) {
             capa.insertAdjacentHTML('beforeend', partes.map(p =>
                 `<div class="nl-lab__slot" style="left:${p.bx}%;top:${p.by}%">${campoHTML(p)}</div>`).join(''));
         }
-        enlazar();
-        actualizarContador();
+        raiz.querySelectorAll('.nl-lab__input').forEach(inp =>
+            inp.addEventListener('keydown', ev => {
+                if (ev.key === 'Enter' && inp.value.trim()) { ev.preventDefault(); probarNombre(Number(inp.dataset.id), inp.value.trim(), inp); }
+            }));
+        raiz.querySelectorAll('.nl-lab__nose').forEach(btn =>
+            btn.addEventListener('click', () => probarNombre(Number(btn.dataset.id), '', btn)));
+        raiz.querySelectorAll('.nl-lab__ver').forEach(btn =>
+            btn.addEventListener('click', () => {
+                const id = Number(btn.dataset.id);
+                if (est.activa && est.activa.id === id) siguientePaso();
+                else mostrarFicha(id);
+            }));
+        actualizar();
     }
 
-    function enlazar() {
-        raiz.querySelectorAll('.nl-lab__input').forEach(input => {
-            input.addEventListener('keydown', ev => {
-                if (ev.key === 'Enter') { ev.preventDefault(); revelar(Number(input.dataset.id), input.value.trim()); }
-            });
-        });
-        raiz.querySelectorAll('.nl-lab__nose').forEach(btn => {
-            btn.addEventListener('click', () => revelar(Number(btn.dataset.id), ''));
-        });
-        raiz.querySelectorAll('.nl-lab__ver').forEach(btn => {
-            btn.addEventListener('click', () => mostrarFicha(Number(btn.dataset.id)));
-        });
-    }
-
-    async function pedirParte(id) {
-        try {
-            const res = await fetch('api/labeling_check.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                body: 'parte_id=' + encodeURIComponent(id),
-            });
-            return await res.json();
-        } catch { return { ok: false, error: 'No pudimos traer la respuesta. ¿Hay conexión?' }; }
-    }
-
-    /* --- Pide la respuesta y abre la comparación --- */
-    async function revelar(id, texto) {
-        if (decidiendo || resueltas[id]) return;
-        const campo = raiz.querySelector(`.nl-lab__campo[data-id="${id}"]`);
+    /* --- Paso 1: nombre escrito de memoria --- */
+    async function probarNombre(id, texto, el) {
+        if (est.activa || est.partes[id]) return;
+        const campo = el.closest('.nl-lab__campo');
         campo?.classList.add('is-esperando');
-        const d = await pedirParte(id);
+        const d = await consultar({ parte_id: id, accion: 'nombre', respuesta: texto });
         campo?.classList.remove('is-esperando');
-        if (!d || !d.ok) {
-            panel.className = 'nl-lab__feedback is-aviso';
-            panel.textContent = (d && d.error) || 'Intenta de nuevo.';
-            return;
-        }
+        if (!d || !d.ok) { aviso((d && d.error) || 'Intenta de nuevo.'); return; }
 
-        const p = partes.find(x => x.id === id);
-        if (texto === '') {
-            // "No sé": se muestra y queda por repasar, sin pedir decisión.
-            resueltas[id] = { e: 'repasar', n: d.nombre, r: '', a: d.alternativas || [], f: d.funcion || '' };
-            guardar(slug, resueltas);
-            render();
-            mostrarFicha(id, 'Quedó <strong>por repasar</strong>.');
-            enfocarSiguiente(id);
-            return;
-        }
-
-        decidiendo = { id, r: texto, n: d.nombre, a: d.alternativas || [], f: d.funcion || '' };
+        // nombreOk: true = coincide · false = no sabía · null = el estudiante debe comparar
+        let nombreOk = d.correcto ? true : (texto === '' ? false : null);
+        if (nombreOk === false) est.err++;
+        est.activa = { id, n: d.nombre, a: d.alternativas || [], r: texto, nombreOk, opciones: d.opciones || [], mal: [] };
+        guardar();
         render();
-        panel.className = 'nl-lab__feedback is-decidir';
+        siguientePaso();
+    }
+
+    /** Muestra lo que corresponde a la estructura activa: comparar el nombre o la pregunta de función. */
+    function siguientePaso() {
+        const a = est.activa;
+        if (!a) return;
+        if (a.nombreOk === null) compararNombre();
+        else preguntarFuncion();
+    }
+
+    function compararNombre() {
+        const a = est.activa;
+        const p = partes.find(x => x.id === a.id);
+        panel.className = 'nl-lab__feedback is-pregunta';
         panel.innerHTML =
             `<div class="nl-lab__comp">
-                <div><span class="nl-lab__etq">Tu respuesta (${p ? p.n : ''})</span>
-                     <span class="nl-lab__suya">${escapar(texto)}</span></div>
+                <div><span class="nl-lab__etq">Tu respuesta (${p.n})</span>
+                     <span class="nl-lab__suya">${escapar(a.r)}</span></div>
                 <div><span class="nl-lab__etq">Respuesta correcta</span>
-                     <strong class="nl-lab__correcta">${escapar(d.nombre)}</strong>
-                     ${altHTML(decidiendo.a)}</div>
+                     <strong class="nl-lab__correcta">${escapar(a.n)}</strong>
+                     ${a.a.length ? `<span class="nl-lab__alt">También: ${a.a.map(escapar).join(' · ')}</span>` : ''}</div>
              </div>
-             ${decidiendo.f ? `<p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(decidiendo.f)}</p>` : ''}
              <div class="nl-lab__decision">
-                <span>¿Tu respuesta coincide?</span>
-                <button type="button" class="btn btn-sm nl-lab__si">✓ Coincide</button>
-                <button type="button" class="btn btn-sm nl-lab__no">✗ No coincide</button>
+                <span>¿Era lo mismo?</span>
+                <button type="button" class="btn btn-sm nl-lab__si">✓ Sí, con otras palabras</button>
+                <button type="button" class="btn btn-sm nl-lab__no">✗ No, me equivoqué</button>
              </div>`;
-        panel.querySelector('.nl-lab__si').addEventListener('click', () => decidir('ok'));
-        panel.querySelector('.nl-lab__no').addEventListener('click', () => decidir('repasar'));
-        panel.querySelector('.nl-lab__si').focus();
+        panel.querySelector('.nl-lab__si').addEventListener('click', () => decidirNombre(true));
+        panel.querySelector('.nl-lab__no').addEventListener('click', () => decidirNombre(false));
+        panel.querySelector('.nl-lab__si').focus({ preventScroll: true });
     }
 
-    function decidir(estado) {
-        if (!decidiendo) return;
-        const { id, r, n, a, f } = decidiendo;
-        resueltas[id] = { e: estado, n, r, a, f };
-        decidiendo = null;
-        guardar(slug, resueltas);
-        render();
-        if (!completa()) {
-            mostrarFicha(id, estado === 'ok' ? '<strong>Coincide.</strong>' : 'Quedó <strong>por repasar</strong>.');
+    function decidirNombre(ok) {
+        if (!est.activa) return;
+        est.activa.nombreOk = ok;
+        if (!ok) est.err++;
+        guardar();
+        actualizar();
+        preguntarFuncion();
+    }
+
+    /* --- Paso 2: función --- */
+    function preguntarFuncion() {
+        const a = est.activa;
+        if (!a) return;
+        const p = partes.find(x => x.id === a.id);
+        panel.className = 'nl-lab__feedback is-pregunta';
+        panel.innerHTML =
+            `<p class="nl-lab__q"><span class="nl-lab__etq">${a.nombreOk ? '✓ ¡Bien! Es' : '↺ Era'} · ${p.n}. ${escapar(a.n)}</span>
+                Ahora, ¿cuál es su <strong>función</strong>?</p>
+             <div class="nl-lab__alts">
+               ${a.opciones.map((o, i) => `
+                 <button type="button" class="nl-lab__alt-btn${a.mal.includes(i) ? ' is-mal' : ''}" data-i="${i}"${a.mal.includes(i) ? ' disabled' : ''}>
+                   <span class="nl-lab__alt-letra">${String.fromCharCode(65 + i)}</span><span>${escapar(o)}</span>
+                 </button>`).join('')}
+             </div>`;
+        panel.querySelectorAll('.nl-lab__alt-btn').forEach(b =>
+            b.addEventListener('click', () => probarFuncion(Number(b.dataset.i), b)));
+        panel.querySelector('.nl-lab__alt-btn:not([disabled])')?.focus({ preventScroll: true });
+        if (angosto.matches) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function probarFuncion(i, btn) {
+        const a = est.activa;
+        if (!a || btn.disabled) return;
+        btn.classList.add('is-esperando');
+        const d = await consultar({ parte_id: a.id, accion: 'funcion', respuesta: a.opciones[i] });
+        btn.classList.remove('is-esperando');
+        if (!d || !d.ok) { aviso((d && d.error) || 'Intenta de nuevo.'); return; }
+        if (!d.correcto) {
+            est.err++;
+            a.mal.push(i);
+            guardar();
+            actualizar();
+            btn.classList.add('is-mal');
+            btn.disabled = true;
+            const fb = panel.querySelector('.nl-lab__q-fb') || panel.appendChild(Object.assign(document.createElement('p'), { className: 'nl-lab__q-fb' }));
+            fb.textContent = '✗ Esa función corresponde a otra estructura. Piensa en qué hace esta parte e intenta de nuevo.';
+            return;
         }
-        enfocarSiguiente(id);
+        est.partes[a.id] = { n: d.nombre, f: d.funcion, d: d.detalle, a: d.alternativas || [], nombreOk: !!a.nombreOk, r: a.r, errF: a.mal.length };
+        est.activa = null;
+        guardar();
+        render();
+        if (!completa()) mostrarFicha(a.id, '🎯 <strong>¡Función correcta!</strong>');
+        enfocarSiguiente(a.id);
     }
 
-    /** Muestra nombre, alternativas y función de una parte ya respondida. */
-    async function mostrarFicha(id, encabezado) {
-        const s = resueltas[id];
+    function mostrarFicha(id, encabezado) {
+        const s = est.partes[id];
         const p = partes.find(x => x.id === id);
         if (!s || !p) return;
-        // Respuestas guardadas por la versión anterior no traen función ni alternativos.
-        if (!s.f) {
-            const d = await pedirParte(id);
-            if (d && d.ok) {
-                s.n = d.nombre; s.a = d.alternativas || []; s.f = d.funcion || '';
-                guardar(slug, resueltas);
-            }
-        }
-        panel.className = 'nl-lab__feedback ' + (s.e === 'ok' ? 'is-ok' : 'is-repasar');
+        panel.className = 'nl-lab__feedback ' + (s.nombreOk ? 'is-ok' : 'is-repasar');
         panel.innerHTML =
-            `${encabezado ? encabezado + ' ' : ''}<strong>${p.n}. ${escapar(s.n)}</strong>${altHTML(s.a)}
-             ${s.r && s.e !== 'ok' ? `<span class="nl-lab__tuya">Escribiste: ${escapar(s.r)}</span>` : ''}
-             ${s.f ? `<p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(s.f)}</p>` : ''}`;
+            `${encabezado ? encabezado + ' ' : ''}<strong>${p.n}. ${escapar(s.n)}</strong>
+             ${!s.nombreOk ? `<span class="nl-lab__tuya">Nombre por repasar${s.r ? ' (escribiste: ' + escapar(s.r) + ')' : ''}</span>` : ''}
+             ${s.a && s.a.length ? `<span class="nl-lab__alt">También: ${s.a.map(escapar).join(' · ')}</span>` : ''}
+             <p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(s.f)}</p>
+             ${s.d && s.d !== s.f ? `<p class="nl-lab__detalle">${escapar(s.d)}</p>` : ''}`;
     }
 
-    function altHTML(a) {
-        return a && a.length ? `<span class="nl-lab__alt">También: ${a.map(escapar).join(' · ')}</span>` : '';
+    function aviso(txt) {
+        panel.className = 'nl-lab__feedback is-aviso';
+        panel.textContent = txt;
     }
 
     function enfocarSiguiente(idResuelto) {
@@ -232,33 +279,52 @@ function iniciar(raiz) {
         }
     }
 
-    function completa() {
-        return partes.every(p => resueltas[p.id]);
+    function completa() { return partes.every(p => est.partes[p.id]); }
+
+    function seccionGuia() {
+        return {
+            titulo,
+            subtitulo: 'Identificación de estructuras y su función',
+            slug,
+            nota: `${partes.length} estructuras · ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}`,
+            bloques: [{
+                t: 'tabla',
+                cab: ['Nº', 'Estructura', 'Función', 'Para recordar'],
+                filas: partes.map(p => {
+                    const s = est.partes[p.id];
+                    return [String(p.n) + (s.nombreOk ? '' : ' ↺'), s.n, s.f, s.d && s.d !== s.f ? s.d : ''];
+                }),
+            }].concat(porRepasar().length ? [{ t: 'texto',
+                txt: '↺ Nombres por repasar: ' + porRepasar().map(p => est.partes[p.id].n).join(', ') + '.' }] : []),
+        };
     }
 
-    function actualizarContador() {
-        const hechas  = partes.filter(p => resueltas[p.id]).length;
-        const okN     = partes.filter(p => resueltas[p.id] && resueltas[p.id].e === 'ok').length;
+    function porRepasar() { return partes.filter(p => est.partes[p.id] && !est.partes[p.id].nombreOk); }
+
+    function actualizar() {
+        const hechas = lista_ok().length;
         if (contador) contador.textContent = hechas + ' / ' + partes.length;
+        if (errores) errores.textContent = est.err ? `${est.err} ${est.err === 1 ? 'error' : 'errores'}` : '';
         raiz.classList.toggle('is-completa', hechas === partes.length);
 
-        if (hechas === partes.length && !decidiendo) {
-            const repasar = partes.filter(p => resueltas[p.id].e !== 'ok');
-            panel.className = 'nl-lab__feedback ' + (repasar.length ? 'is-repasar' : 'is-ok');
-            panel.innerHTML = `🎉 <strong>¡Terminaste!</strong> ${okN} coinciden · ${repasar.length} por repasar.` +
-                (repasar.length
-                    ? `<span class="nl-lab__alt">Repasa: ${repasar.map(p => p.n + '. ' + escapar(resueltas[p.id].n)).join(' · ')}</span>`
-                    : '') +
-                `<span class="nl-lab__alt">Toca cualquier rectángulo para ver su función.</span>`;
+        if (hechas === partes.length) {
+            panel.className = 'nl-lab__feedback is-ok';
+            const rep = porRepasar();
+            panel.innerHTML = `🎉 <strong>¡Completaste las ${partes.length} estructuras!</strong> ` +
+                (est.err ? `Tuviste ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}.` : 'Sin ningún error.') +
+                (rep.length ? `<span class="nl-lab__alt">Nombres por repasar: ${rep.map(p => p.n + '. ' + escapar(est.partes[p.id].n)).join(' · ')}</span>` : '') +
+                `<span class="nl-lab__alt">Toca cualquier estructura para repasar su función.</span>`;
             if (slug) markDone(slug);
+            if (guiaBox) { guiaBox.hidden = false; botonGuia(guiaBox, slug, seccionGuia); }
+        } else if (guiaBox) {
+            guiaBox.hidden = true;
         }
     }
 
     btnReset?.addEventListener('click', () => {
-        if (Object.keys(resueltas).length && !confirm('Esto borra todas tus respuestas. ¿Seguro?')) return;
-        resueltas = {};
-        decidiendo = null;
-        guardar(slug, resueltas);
+        if ((lista_ok().length || est.activa) && !confirm('Esto borra todas tus respuestas de esta actividad. ¿Seguro?')) return;
+        est = { partes: {}, err: 0 };
+        guardar();
         panel.className = 'nl-lab__feedback';
         panel.textContent = '';
         render();
@@ -266,11 +332,26 @@ function iniciar(raiz) {
 
     angosto.addEventListener('change', render);
     render();
+    if (est.activa) siguientePaso();
+
+    if (new URLSearchParams(location.search).get('calibrar') === '1') calibrar(canvas, panel);
 }
 
-function escapar(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/** Modo docente: clic sobre la imagen -> coordenadas en % para labeling_parts. */
+function calibrar(canvas, panel) {
+    const caja = document.createElement('pre');
+    caja.className = 'nl-lab__calibrar';
+    caja.textContent = 'Modo calibrar: haz clic sobre la estructura (x_pct, y_pct) y luego donde va su recuadro (box_x_pct, box_y_pct).\n';
+    panel.insertAdjacentElement('afterend', caja);
+    let n = 0;
+    canvas.addEventListener('click', ev => {
+        if (ev.target.closest('.nl-lab__campo')) return;
+        const r = canvas.getBoundingClientRect();
+        const x = ((ev.clientX - r.left) / r.width * 100).toFixed(1);
+        const y = ((ev.clientY - r.top) / r.height * 100).toFixed(1);
+        n++;
+        caja.textContent += (n % 2 ? `\nPunto: ${x}, ${y}` : `   Recuadro: ${x}, ${y}`);
+    });
 }
 
 if (RAIZ) iniciar(RAIZ);
