@@ -267,65 +267,65 @@ INSERT OR IGNORE INTO quices (actividad_id, titulo, datos_json, activo) VALUES
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (6, 2, 'Responde solo/a, sin apuntes. Al terminar revisa el resumen: las preguntas falladas son las que conviene repasar antes de Células II.', 1);
 
--- Actividad 7: LABELING nivel II (ultraestructura). Inactiva hasta tener la imagen
--- img/neurona-nivel2.png; las coordenadas x/y y box son provisionales (calibrar con ?calibrar=1).
+-- Actividad 7: LABELING nivel II (ultraestructura). Imagen img/neurona-nivel2.jpg (1536×1024).
+-- Ajustar coordenadas con actividad.php?slug=labeling-neurona-nivel-2&calibrar=1
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
   (7, 6, 'labeling-neurona-nivel-2', 'Partes de la neurona · Nivel II: estructura específica',
-       'Nivel II: estructura específica. Reconoce estructuras finas de la neurona (citoesqueleto, organelos, transporte axonal, crecimiento) y su función. Desbloquéalo completando el nivel I.', 'labeling', 0);
+       'Nivel II: estructura específica. Reconoce estructuras finas de la neurona (citoesqueleto, organelos, transporte axonal, crecimiento) y su función. Desbloquéalo completando el nivel I.', 'labeling', 1);
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (7, 'imagen', 'img/neurona-nivel2.png', 'Neurona: ultraestructura, transporte axonal y cono de crecimiento', 1);
+  (7, 'imagen', 'img/neurona-nivel2.jpg', 'Neurona: ultraestructura, transporte axonal y cono de crecimiento', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden) VALUES
-  (7, 'Espinas dendríticas', 5, 15,
+  (7, 'Espinas dendríticas', 32.6, 20.0,
       'Protrusiones de la dendrita sostenidas por actina. Reciben la mayoría de las sinapsis excitatorias y cambian de forma y número con la experiencia (plasticidad).',
       'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
-      'espina dendritica|espinas|espina', 5, 15, 1),
-  (7, 'Cuerpos de Nissl', 25, 15,
+      'espina dendritica|espinas|espina', 40, 6, 1),
+  (7, 'Cuerpos de Nissl', 17.1, 43.5,
       'Acúmulos de retículo endoplásmico rugoso y polirribosomas. Dan el aspecto basófilo al soma y reflejan su alta síntesis proteica; no entran al axón.',
       'Fabrican en gran cantidad las proteínas que la neurona necesita.',
-      'sustancia de nissl|grumos de nissl|nissl|retículo endoplásmico rugoso|reticulo endoplasmico rugoso|rer', 25, 15, 2),
-  (7, 'Aparato de Golgi', 45, 15,
+      'sustancia de nissl|grumos de nissl|nissl|retículo endoplásmico rugoso|reticulo endoplasmico rugoso|rer', 10, 36, 2),
+  (7, 'Aparato de Golgi', 24.7, 36.1,
       'Recibe las proteínas del RER, las modifica y las empaqueta en vesículas que viajan hacia las dendritas y el axón.',
       'Modifica, empaqueta y distribuye las proteínas en vesículas.',
-      'golgi|complejo de golgi', 45, 15, 3),
-  (7, 'Mitocondria', 65, 15,
+      'golgi|complejo de golgi', 22, 8, 3),
+  (7, 'Mitocondria', 30.6, 40.0,
       'Abundan en el soma, a lo largo del axón y en los terminales, donde la demanda de energía es mayor.',
       'Produce el ATP que consumen las bombas iónicas y el transporte axonal.',
-      'mitocondrias', 65, 15, 4),
-  (7, 'Segmento inicial del axón', 85, 15,
+      'mitocondrias', 41, 30, 4),
+  (7, 'Segmento inicial del axón', 37.8, 45.4,
       'Tramo sin mielina que sigue al cono axónico. Su alta densidad de canales de Na⁺ dependientes de voltaje lo convierte en la zona gatillo.',
       'Primer tramo del axón, rico en canales de sodio: allí se dispara el potencial de acción.',
-      'segmento inicial|zona gatillo', 85, 15, 5),
-  (7, 'Microtúbulos', 5, 45,
+      'segmento inicial|zona gatillo', 46, 62, 5),
+  (7, 'Microtúbulos', 61.8, 27.8,
       'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
       'Forman los rieles por los que se mueve el transporte axonal.',
-      'microtubulo|microtúbulo|tubulina', 5, 45, 6),
-  (7, 'Neurofilamentos', 25, 45,
+      'microtubulo|microtúbulo|tubulina', 47, 41, 6),
+  (7, 'Neurofilamentos', 65.1, 32.2,
       'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
       'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
-      'neurofilamento|filamentos intermedios', 25, 45, 7),
-  (7, 'Kinesina', 45, 45,
+      'neurofilamento|filamentos intermedios', 80, 30, 7),
+  (7, 'Kinesina', 70.5, 21.5,
       'Transporte anterógrado: lleva vesículas, mitocondrias y proteínas nuevas hacia los terminales, caminando sobre los microtúbulos.',
       'Proteína motora que lleva carga desde el soma hacia el terminal.',
-      'kinesinas|cinesina|transporte anterogrado|transporte anterógrado', 45, 45, 8),
-  (7, 'Dineína', 65, 45,
+      'kinesinas|cinesina|transporte anterogrado|transporte anterógrado', 84, 12, 8),
+  (7, 'Dineína', 55.9, 24.2,
       'Transporte retrógrado: devuelve membranas para reciclar, mitocondrias viejas y material endocitado (incluidos factores tróficos y algunos virus).',
       'Proteína motora que lleva material desde el terminal hacia el soma.',
-      'dineinas|dineína|transporte retrogrado|transporte retrógrado', 65, 45, 9),
-  (7, 'Colateral axónica', 85, 45,
+      'dineinas|dineína|transporte retrogrado|transporte retrógrado', 44, 18, 9),
+  (7, 'Colateral axónica', 60.2, 54.7,
       'Un axón puede formar muchas colaterales (hasta 200 o más) y comunicarse así con varios blancos a la vez.',
       'Rama lateral del axón que lleva la misma señal hacia otra célula.',
-      'colateral|rama colateral|colaterales', 85, 45, 10),
-  (7, 'Célula de Schwann', 5, 75,
+      'colateral|rama colateral|colaterales', 52, 74, 10),
+  (7, 'Célula de Schwann', 64.8, 52.0,
       'Cada célula de Schwann envuelve un solo internodo; en el SNC esta función la cumple el oligodendrocito. También favorece la regeneración del axón periférico.',
       'Forma la mielina alrededor de un tramo del axón en el sistema nervioso periférico.',
-      'celula de schwann|schwann|neurolemocito', 5, 75, 11),
-  (7, 'Cono de crecimiento', 25, 75,
+      'celula de schwann|schwann|neurolemocito', 72, 62, 11),
+  (7, 'Cono de crecimiento', 67.0, 70.3,
       'Rico en actina, con filopodios y lamelipodios. Dirige el crecimiento del axón durante el desarrollo y en la regeneración.',
       'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
-      'cono de crecimiento axonal', 25, 75, 12),
-  (7, 'Vesículas sinápticas', 45, 75,
+      'cono de crecimiento axonal', 66, 88, 12),
+  (7, 'Vesículas sinápticas', 82.7, 78.1,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 45, 75, 13);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 73, 96, 13);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (7, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);

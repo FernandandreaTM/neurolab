@@ -25,3 +25,6 @@ desktop.ini
 *.bak
 *~
 *.tmp
+
+# Imágenes originales (alta resolución) antes de optimizar
+img/_fuentes/
