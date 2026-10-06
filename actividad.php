@@ -83,13 +83,16 @@ try {
     }
     $nivelesLab = [];   // otras actividades de identificación del mismo tema (niveles)
     $requiereLab = '';
+    $siguienteLab = '';
     if ($esLabeling) {
         $sv = $pdo->prepare("SELECT slug, titulo, activo FROM actividades
                              WHERE tipo = 'labeling' AND topic_id IS ? ORDER BY id");
         $sv->execute([$act['topic_id']]);
         $nivelesLab = $sv->fetchAll();
         foreach ($nivelesLab as $k => $nv) {
-            if ($nv['slug'] === $act['slug'] && $k > 0) { $requiereLab = $nivelesLab[$k - 1]['slug']; }
+            if ($nv['slug'] !== $act['slug']) continue;
+            if ($k > 0) { $requiereLab = $nivelesLab[$k - 1]['slug']; }
+            if (isset($nivelesLab[$k + 1]) && (int)$nivelesLab[$k + 1]['activo']) { $siguienteLab = $nivelesLab[$k + 1]['slug']; }
         }
         if (count($nivelesLab) < 2) { $nivelesLab = []; }
     }
@@ -113,6 +116,11 @@ try {
     // Quiz sin recurso visual: se muestra en el panel principal (no en la columna lateral)
     $quizEnStage = ($act['tipo'] === 'quiz') && empty($recursos) && !empty($quicesData);
 
+    // Mesa de trabajo (vista + panel): identificación, o lámina con tareas
+    $tieneIframe = false;
+    foreach ($recursos as $r) { if ($r['tipo'] === 'iframe_url') { $tieneIframe = true; break; } }
+    $modoMesa = $esLabeling || (is_array($tareas) && $tieneIframe);
+
     $active_page = 'actividad';
     ?>
     <!DOCTYPE html>
@@ -128,6 +136,7 @@ try {
     <script type="importmap"><?= nl_importmap() ?></script>
     <link rel="stylesheet" href="css/base.css?v=<?= nl_ver('css/base.css') ?>">
     <link rel="stylesheet" href="css/activity.css?v=<?= nl_ver('css/activity.css') ?>">
+    <?php if ($modoMesa): ?><link rel="stylesheet" href="css/mesa.css?v=<?= nl_ver('css/mesa.css') ?>"><?php endif; ?>
     <?php if (!empty($quicesData)): ?>
     <link rel="stylesheet" href="css/quiz.css?v=<?= nl_ver('css/quiz.css') ?>">
     <?php endif; ?>
@@ -135,6 +144,9 @@ try {
     <body>
     <div class="bg-mesh"></div>
 
+    <?php if ($modoMesa): ?>
+    <?php include __DIR__ . '/_partials/mesa.php'; ?>
+    <?php else: ?>
     <div class="nl-act-header container">
         <?php if ($ruta !== ''): ?>
         <a href="practico.php?p=<?= htmlspecialchars(rawurlencode($ruta)) ?>" class="nl-act-back">← Volver a la ruta del práctico</a>
@@ -148,61 +160,10 @@ try {
         <h1><?= htmlspecialchars($act['titulo']) ?></h1>
     </div>
 
-    <div class="nl-act-layout container<?= $esLabeling ? ' nl-act-layout--ancho' : '' ?>">
+    <div class="nl-act-layout container">
         <!-- IZQUIERDA: recurso (imagen / iframe / 3D) + tabs -->
         <div class="nl-act-stage">
-            <?php if ($esLabeling): ?>
-            <!-- Identificación: escribir el nombre de cada parte sobre la imagen -->
-            <?php if ($nivelesLab): ?>
-            <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
-                <?php foreach ($nivelesLab as $k => $nv):
-                    $esta = $nv['slug'] === $act['slug'];
-                    $partesT = explode('·', $nv['titulo'], 2);
-                    $etq = trim(end($partesT));
-                ?>
-                    <?php if ($esta): ?>
-                        <span class="nl-lab__nivel is-actual" aria-current="page"><?= htmlspecialchars($etq) ?></span>
-                    <?php elseif ((int)$nv['activo']): ?>
-                        <a class="nl-lab__nivel" href="actividad.php?slug=<?= rawurlencode($nv['slug']) ?><?= $ruta !== '' ? '&amp;ruta=' . rawurlencode($ruta) : '' ?>"><?= htmlspecialchars($etq) ?></a>
-                    <?php else: ?>
-                        <span class="nl-lab__nivel is-pronto"><?= htmlspecialchars($etq) ?> · próximamente</span>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </nav>
-            <?php endif; ?>
-            <div class="nl-lab" id="nl-lab"
-                 data-slug="<?= htmlspecialchars($act['slug']) ?>"
-                 data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
-                 data-requiere="<?= htmlspecialchars($requiereLab) ?>"
-                 data-partes="<?= htmlspecialchars(json_encode($partesLab, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
-                <div class="nl-lab__candado" hidden>
-                    <strong>🔒 Nivel bloqueado</strong>
-                    <p>Completa primero el nivel anterior para desbloquear este.</p>
-                </div>
-                <div class="nl-lab__head">
-                    <p class="nl-lab__instruccion">
-                        <strong>1.</strong> Escribe de memoria el nombre de cada estructura y presiona <kbd>Enter</kbd>
-                        (o <kbd>?</kbd> si no lo recuerdas): verás la respuesta correcta.
-                        <strong>2.</strong> Luego elige su <strong>función</strong> entre las alternativas.
-                        Queda <span class="nl-lab__verde">verde</span> si acertaste ambas; si el nombre falló, queda por repasar.
-                    </p>
-                    <div class="nl-lab__estado">
-                        <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
-                        <span class="nl-lab__errores" id="nl-lab-errores"></span>
-                        <button type="button" class="nl-lab__reset" id="nl-lab-reset">Empezar de nuevo</button>
-                    </div>
-                </div>
-
-                <div class="nl-lab__canvas" id="nl-lab-canvas">
-                    <img src="<?= htmlspecialchars($imgLab) ?>" alt="Esquema de una neurona para identificar sus partes" class="nl-lab__img">
-                    <svg class="nl-lab__lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-                    <div class="nl-lab__capa" id="nl-lab-capa"></div>
-                </div>
-
-                <div class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></div>
-                <div id="nl-lab-guia" hidden></div>
-            </div>
-            <?php elseif ($quizEnStage): ?>
+            <?php if ($quizEnStage): ?>
             <div class="nl-act-quiz-stage">
                 <?php foreach ($quicesData as $q) { echo renderQuiz($q); } ?>
             </div>
@@ -279,6 +240,8 @@ try {
         </div>
         <div class="nl-tar__cuerpo"></div>
     </section>
+    <?php endif; ?>
+
     <?php endif; ?>
 
     <?php if (!empty($niveles)): ?>

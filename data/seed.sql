@@ -264,13 +264,14 @@ INSERT OR IGNORE INTO quices (actividad_id, titulo, datos_json, activo) VALUES
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (6, 2, 'Responde solo/a, sin apuntes. Al terminar revisa el resumen: las preguntas falladas son las que conviene repasar antes de Células II.', 1);
 
--- Actividad 7: LABELING nivel II (ultraestructura). Imagen img/neurona-nivel2.jpg (1536×1024).
+-- Actividad 7: LABELING nivel II (organelos y especializaciones). Imagen img/neurona-nivel2-organelos.jpg (1536×1024),
+-- derivada de la ilustración con zooms (img/_fuentes/neurona-nivel2-actina.png) quitando los círculos.
 -- Ajustar coordenadas con actividad.php?slug=labeling-neurona-nivel-2&calibrar=1
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
-  (7, 6, 'labeling-neurona-nivel-2', 'Partes de la neurona · Nivel II: estructura específica',
-       'Nivel II: estructura específica. Reconoce estructuras finas de la neurona (citoesqueleto, organelos, transporte axonal, crecimiento) y su función. Desbloquéalo completando el nivel I.', 'labeling', 1);
+  (7, 6, 'labeling-neurona-nivel-2', 'Partes de la neurona · Nivel II: organelos y especializaciones',
+       'Nivel II: organelos y especializaciones. Escribe de memoria el nombre de cada estructura, compáralo con la respuesta correcta y elige su función. Se desbloquea al completar el nivel I.', 'labeling', 1);
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (7, 'imagen', 'img/neurona-nivel2.jpg', 'Neurona: ultraestructura, transporte axonal y cono de crecimiento', 1);
+  (7, 'imagen', 'img/neurona-nivel2-organelos.jpg', 'Neurona: organelos y especializaciones', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
   (7, 'Espinas dendríticas', 32.6, 20.0,
       'Protrusiones de la dendrita sostenidas por actina. Reciben la mayoría de las sinapsis excitatorias y cambian de forma y número con la experiencia (plasticidad).',
@@ -292,37 +293,48 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
       'Tramo sin mielina donde el soma se estrecha (cono axónico o montículo axonal) y nace el axón. Su alta densidad de canales de Na⁺ dependientes de voltaje lo convierte en la zona gatillo.',
       'Zona gatillo: integra las señales recibidas y, gracias a su alta densidad de canales de sodio, allí se dispara el potencial de acción.',
       'segmento inicial|zona gatillo|cono axonico|cono axónico|monticulo axonal|montículo axonal|cono de implantacion', 43, 54, 5, NULL),
-  (7, 'Microtúbulos', 61.8, 27.8,
-      'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
-      'Forman los rieles por los que se mueve el transporte axonal.',
-      'microtubulo|microtúbulo|tubulina', 47, 41, 6, NULL),
-  (7, 'Neurofilamentos', 65.1, 32.2,
-      'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
-      'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
-      'neurofilamento|filamentos intermedios', 80, 30, 7, NULL),
-  (7, 'Proteínas motoras', 55.9, 24.2,
-      'Kinesina: transporte anterógrado (del soma al terminal: vesículas, mitocondrias, proteínas nuevas). Dineína: transporte retrógrado (del terminal al soma: membranas para reciclar, material endocitado, factores tróficos). Ambas caminan sobre los microtúbulos gastando ATP.',
-      'Transportan carga a lo largo del axón caminando sobre los microtúbulos, en ambos sentidos.',
-      'kinesina|dineína|kinesina y dineina|motores moleculares|proteinas motoras', 63, 5, 8, 'puntos:70.5,21.5'),
   (7, 'Colateral axónica', 60.6, 61.8,
       'Un axón puede formar muchas colaterales (hasta 200 o más) y comunicarse así con varios blancos a la vez.',
       'Rama lateral del axón que lleva la misma señal hacia otra célula.',
-      'colateral|rama colateral|colaterales', 53, 58.5, 9, 'corchete:58.3,55.0,62.8,68.5'),
+      'colateral|rama colateral|colaterales', 53, 58.5, 6, 'corchete:58.3,55.0,62.8,68.5'),
   (7, 'Célula de Schwann', 64.8, 52.0,
       'Cada célula de Schwann envuelve un solo internodo; en el SNC esta función la cumple el oligodendrocito. También favorece la regeneración del axón periférico.',
       'Forma la mielina alrededor de un tramo del axón en el sistema nervioso periférico.',
-      'celula de schwann|schwann|neurolemocito', 72, 62, 10, NULL),
-  (7, 'Cono de crecimiento', 67.2, 78.8,
-      'Rico en actina, con filopodios y lamelipodios. Dirige el crecimiento del axón durante el desarrollo y en la regeneración.',
-      'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
-      'cono de crecimiento axonal', 66, 88, 11, 'elipse:67.2,72.0,4.2,6.8'),
-  (7, 'Filamentos de actina', 51.4, 78.1,
+      'celula de schwann|schwann|neurolemocito', 72, 62, 7, NULL);
+INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
+  (7, 2, 'Los cuerpos de Nissl desaparecen del soma (cromatólisis) cuando el axón se lesiona: es una señal de que la neurona intenta regenerarlo.', 1);
+
+-- Actividad 8: LABELING nivel III (citoesqueleto y transporte). Imagen img/neurona-nivel3-zoom.jpg (1536×1024):
+-- tres ampliaciones (A axón, B cono de crecimiento, C botón terminal) + miniatura de la neurona.
+INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
+  (8, 6, 'labeling-neurona-nivel-3', 'Partes de la neurona · Nivel III: citoesqueleto y transporte',
+       'Nivel III: citoesqueleto y transporte. Los círculos A, B y C son ampliaciones de los lugares marcados en la neurona de abajo. Reconoce cada estructura y su función. Se desbloquea al completar el nivel II.', 'labeling', 1);
+INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
+  (8, 'imagen', 'img/neurona-nivel3-zoom.jpg', 'Ampliaciones: interior del axón (A), cono de crecimiento (B) y botón terminal (C)', 1);
+INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
+  (8, 'Microtúbulos', 19.5, 35.9,
+      'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
+      'Forman los rieles por los que se mueve el transporte axonal.',
+      'microtubulo|microtúbulo|tubulina', 14, 57, 1, NULL),
+  (8, 'Neurofilamentos', 16.3, 24.6,
+      'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
+      'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
+      'neurofilamento|filamentos intermedios', 20, 3.5, 2, NULL),
+  (8, 'Proteínas motoras', 8.5, 32.2,
+      'Kinesina: transporte anterógrado (del soma al terminal: vesículas, mitocondrias, proteínas nuevas). Dineína: transporte retrógrado (del terminal al soma: membranas para reciclar, material endocitado, factores tróficos). Ambas caminan sobre los microtúbulos gastando ATP.',
+      'Transportan carga a lo largo del axón caminando sobre los microtúbulos, en ambos sentidos.',
+      'kinesina|dineína|kinesina y dineina|motores moleculares|proteinas motoras', 7, 66, 3, 'puntos:26.2,29.3'),
+  (8, 'Filamentos de actina', 45.6, 32.2,
       'Polímeros de actina, los filamentos más delgados del citoesqueleto (microfilamentos). Se concentran en el cono de crecimiento (filopodios y lamelipodio) y en las espinas dendríticas; su armado y desarmado rápido permite que el axón avance y que las espinas cambien con la plasticidad.',
       'Forman los filopodios del cono de crecimiento y sostienen las espinas dendríticas: permiten cambios rápidos de forma.',
-      'actina|filamento de actina|microfilamentos|microfilamento|f-actina', 36, 95, 12, NULL),
-  (7, 'Vesículas sinápticas', 82.7, 78.1,
+      'actina|filamento de actina|microfilamentos|microfilamento|f-actina', 50, 56, 4, NULL),
+  (8, 'Cono de crecimiento', 57.2, 89.4,
+      'Rico en actina, con filopodios y lamelipodios. Dirige el crecimiento del axón durante el desarrollo y en la regeneración.',
+      'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
+      'cono de crecimiento axonal', 75, 93, 5, NULL),
+  (8, 'Vesículas sinápticas', 80.7, 28.8,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 73, 96, 13, NULL);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 86, 57, 6, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
-  (7, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);
+  (8, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);

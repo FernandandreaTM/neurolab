@@ -1,0 +1,173 @@
+/* NeuroLab — mesa.css
+   "Mesa de trabajo": vista ajustada al alto de la pantalla + panel fijo a la derecha.
+   Lo usan la identificación (labeling) y la lámina con tareas (_partials/mesa.php). */
+
+.nl-mesa-head {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem;
+    max-width: 1500px; padding-top: .8rem; padding-bottom: .6rem;
+}
+.nl-mesa-head h1 { margin: 0; font-size: clamp(1.05rem, 2vw, 1.35rem); flex: 1 1 auto; }
+.nl-mesa-head .nl-act-back { font-size: .85rem; }
+.nl-mesa-head .nl-lab__niveles { padding: 0; }
+
+.nl-mesa {
+    --alto: calc(100vh - 92px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    align-items: start;
+    max-width: 1500px;
+    padding-bottom: 1rem;
+}
+.nl-mesa--lamina { grid-template-columns: minmax(0, 1fr) 400px; }
+.nl-mesa__vista {
+    position: sticky; top: .5rem;
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 0;
+}
+.nl-mesa__panel {
+    position: sticky; top: .5rem;
+    max-height: var(--alto);
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: .8rem;
+    padding: 1rem;
+    border: 1px solid var(--gray-700);
+    border-radius: 14px;
+    background: var(--navy-mid);
+    scrollbar-width: thin;
+}
+.nl-mesa.is-bloqueada > :not(.nl-lab__candado) { display: none; }
+.nl-mesa .nl-lab__candado { grid-column: 1 / -1; }
+
+/* --- Identificación: la imagen nunca supera el alto disponible --- */
+.nl-mesa .nl-lab__canvas {
+    width: min(100%, calc(var(--alto) * var(--ar, 1.5)));
+    aspect-ratio: var(--ar, 1.5);
+}
+.nl-mesa .nl-lab__img { width: 100%; height: 100%; object-fit: contain; }
+.nl-lab__img-prev {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+    background: #fff; z-index: 3; opacity: 1; transform: scale(1);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+}
+.nl-lab__img-prev.is-fuera { opacity: 0; transform: scale(1.12); }
+.nl-lab__canvas.is-transicion .nl-lab__img { animation: nlZoomIn 1.6s ease; }
+@keyframes nlZoomIn { from { transform: scale(.92); opacity: .4; } to { transform: none; opacity: 1; } }
+
+/* Números sobre la imagen (botones) */
+.nl-mesa .nl-lab__punto {
+    cursor: pointer; padding: 0; font-family: inherit; line-height: 1;
+    width: 2.1em; height: 2.1em; font-size: .95em;
+    transition: transform .15s, box-shadow .15s, background .15s;
+}
+.nl-mesa .nl-lab__punto:hover { transform: translate(-50%, -50%) scale(1.15); }
+.nl-mesa .nl-lab__punto.is-sel {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 0 .3em rgba(245,158,11,.75), 0 2px 8px rgba(0,0,0,.4);
+    z-index: 2;
+}
+.nl-lab__punto.is-repasar { background: #D97706; }
+.nl-lab__punto.is-activa { background: #F59E0B; }
+.nl-lab__forma.is-sel { stroke: #F59E0B; stroke-dasharray: none; fill: rgba(245,158,11,.12); }
+.nl-lab__corchete.is-sel { fill: none; }
+
+/* Panel: estado, chips, trabajo */
+.nl-mesa .nl-lab__estado { justify-content: space-between; }
+.nl-lab__chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.nl-lab__chip {
+    width: 2rem; height: 2rem; border-radius: 50%;
+    font: inherit; font-size: .8rem; font-weight: 800;
+    color: var(--violet-light); background: rgba(139,92,246,.14);
+    border: 1.5px solid transparent; cursor: pointer;
+}
+.nl-lab__chip.is-ok { background: rgba(22,163,74,.25); color: #4ADE80; }
+.nl-lab__chip.is-repasar { background: rgba(217,119,6,.25); color: #FCD34D; }
+.nl-lab__chip.is-activa { background: #F59E0B; color: #1A0E2E; }
+.nl-lab__chip.is-sel { border-color: #F59E0B; box-shadow: 0 0 0 2px rgba(245,158,11,.35); }
+
+.nl-lab__trabajo {
+    display: flex; flex-direction: column; gap: .55rem;
+    padding: .9rem; border-radius: 12px;
+    background: rgba(255,255,255,.04); border: 1.5px solid var(--gray-700);
+    font-size: .9rem; line-height: 1.5; color: var(--gray-100);
+}
+.nl-lab__trabajo.is-pregunta { border-color: #F59E0B; }
+.nl-lab__trabajo.is-ok { border-color: rgba(34,197,94,.6); background: rgba(34,197,94,.07); }
+.nl-lab__trabajo.is-repasar { border-color: rgba(217,119,6,.6); background: rgba(217,119,6,.07); }
+.nl-lab__trabajo.is-esperando { opacity: .6; }
+.nl-lab__trabajo p { margin: 0; }
+.nl-lab__paso { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-weight: 800; font-size: 1rem; color: var(--white, #fff); }
+.nl-lab__badge {
+    display: inline-grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%;
+    background: #F59E0B; color: #1A0E2E; font-size: .85rem; font-weight: 800;
+}
+.nl-lab__ayuda { font-size: .82rem; color: var(--gray-300); }
+.nl-lab__resp-fila { display: flex; gap: .4rem; }
+.nl-mesa .nl-lab__input {
+    flex: 1; min-width: 0; width: auto;
+    padding: .55rem .7rem; font-size: .95rem; font-weight: 600;
+    color: #1A0E2E; background: #fff; border: 2px solid #C4B5FD; border-radius: 10px;
+}
+.nl-mesa .nl-lab__input:focus { outline: none; border-color: #F59E0B; box-shadow: 0 0 0 3px rgba(245,158,11,.3); }
+.nl-mesa .nl-lab__nose {
+    align-self: flex-start; width: auto; height: auto; padding: .2rem 0;
+    background: none; border: 0; border-radius: 0; color: var(--gray-300);
+    font: inherit; font-size: .82rem; text-decoration: underline; cursor: pointer;
+}
+.nl-mesa .nl-lab__nose:hover { color: var(--violet-light); background: none; }
+.nl-lab__estado-nombre { font-size: .72rem; font-weight: 800; padding: .1rem .5rem; border-radius: 99px; }
+.nl-lab__estado-nombre.ok { background: rgba(34,197,94,.2); color: #86EFAC; }
+.nl-lab__estado-nombre.rep { background: rgba(217,119,6,.25); color: #FCD34D; }
+.nl-mesa .nl-lab__alts { grid-template-columns: 1fr; }
+.nl-lab__alts.is-sacude { animation: nlLabMal 320ms ease; }
+.nl-mesa .nl-lab__comp { display: grid; grid-template-columns: 1fr; gap: .5rem; }
+.nl-mesa .nl-lab__etq { display: block; font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-500); }
+.nl-mesa .nl-lab__decision { display: flex; flex-wrap: wrap; gap: .4rem; }
+.nl-lab__bien { color: #86EFAC; font-weight: 800; }
+.nl-lab__aviso-act { color: #FCD34D; font-size: .82rem; font-weight: 700; }
+.nl-lab__resumen { padding: .7rem; border-radius: 10px; background: rgba(34,197,94,.12); color: #BBF7D0; }
+.nl-lab__resumen .nl-lab__alt { display: block; margin-top: .25rem; }
+.nl-lab__sig, .nl-lab__sig-nivel { align-self: flex-start; }
+.nl-mesa #nl-lab-guia .nl-guia-cta { margin-top: 0; }
+.nl-mesa #nl-lab-guia { display: flex; flex-direction: column; gap: .6rem; }
+.nl-mesa #nl-lab-guia[hidden] { display: none; }
+
+.nl-mesa__info { font-size: .82rem; color: var(--gray-300); border-top: 1px solid var(--gray-700); padding-top: .6rem; }
+.nl-mesa__info summary { cursor: pointer; font-weight: 700; color: var(--gray-300); }
+.nl-mesa__info p { margin: .5rem 0 0; line-height: 1.5; }
+.nl-mesa__carrera strong { color: var(--violet-light); }
+
+/* --- Lámina: iframe al alto disponible + pestañas en el panel --- */
+.nl-mesa__iframe { width: 100%; height: calc(var(--alto) - 1.6rem); border: 0; border-radius: 12px; background: #000; }
+.nl-mesa__caption { margin: .3rem 0 0; font-size: .75rem; color: var(--gray-500); align-self: flex-start; }
+.nl-mesa__tabs { display: flex; gap: .3rem; border-bottom: 1px solid var(--gray-700); }
+.nl-mesa__tab {
+    font: inherit; font-size: .85rem; font-weight: 700; padding: .45rem .8rem;
+    color: var(--gray-300); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer;
+}
+.nl-mesa__tab.active { color: var(--violet-light); border-bottom-color: var(--violet); }
+.nl-mesa__pane.nl-act-html { padding: 0; }
+.nl-mesa__pane .nl-guia__tareas li { font-size: .88rem; }
+.nl-mesa__ir { margin-top: .8rem; }
+.nl-mesa .nl-tar__caps { grid-template-columns: 1fr; margin-top: .6rem; }
+.nl-mesa .nl-tar__zona { min-height: 120px; }
+.nl-mesa .nl-tar__zona.tiene img { max-height: 200px; }
+.nl-mesa .nl-tar__ops { grid-template-columns: 1fr; }
+.nl-mesa .nl-tar__intro { font-size: .85rem; margin: 0; }
+.nl-mesa .nl-tar__final { position: sticky; bottom: -1rem; z-index: 2; box-shadow: 0 -6px 14px rgba(26,14,46,.5); background: #2A1A4A; }
+.nl-mesa .nl-tar__final.is-ok { background: #1E3A2A; }
+
+/* --- Pantallas angostas: una columna; el panel sigue a la imagen --- */
+@media (max-width: 900px) {
+    .nl-mesa, .nl-mesa--lamina { grid-template-columns: 1fr; --alto: 70vh; }
+    .nl-mesa__vista, .nl-mesa__panel { position: static; max-height: none; }
+    .nl-mesa .nl-lab__canvas { width: 100%; }
+    .nl-mesa__iframe { height: 60vh; }
+    .nl-mesa .nl-lab__capa { font-size: clamp(9px, 2.6cqw, 14px); }
+}
+.nl-mesa .nl-lab__capa { font-size: clamp(10px, 1.45cqw, 17px); }
+.nl-lab__fin { display: flex; flex-direction: column; gap: .6rem; }
+.nl-lab__fin[hidden] { display: none; }
+.nl-lab__fin .nl-guia-cta { margin-top: 0; }
+.nl-lab__sig-nivel[hidden] { display: none; }
+.nl-mesa .nl-tar { margin-top: 0; }

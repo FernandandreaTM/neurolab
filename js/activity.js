@@ -21,6 +21,15 @@ document.querySelectorAll('#recursos-tabs .nl-act-tab').forEach(tab => {
     });
 });
 
+// Pestañas del panel de la mesa de trabajo (lámina: guía / tu trabajo)
+function abrirPestana(id) {
+    document.querySelectorAll('.nl-mesa__tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+    document.querySelectorAll('.nl-mesa__pane').forEach(p => { p.hidden = p.dataset.pane !== id; });
+    document.querySelector('.nl-mesa__panel')?.scrollTo({ top: 0 });
+}
+document.querySelectorAll('.nl-mesa__tab').forEach(t => t.addEventListener('click', () => abrirPestana(t.dataset.tab)));
+document.querySelectorAll('.nl-mesa__ir').forEach(b => b.addEventListener('click', () => abrirPestana(b.dataset.ir)));
+
 // Marcar como completada
 const slug = new URLSearchParams(location.search).get('slug');
 const btnComplete = document.getElementById('nl-act-complete');
