@@ -979,3 +979,59 @@ button.nl-lab__campo {
 .nl-lab__forma.is-repasar { stroke: #D97706; fill: rgba(217,119,6,.08); stroke-dasharray: none; }
 .nl-lab__forma.is-activa  { stroke: #F59E0B; fill: rgba(245,158,11,.12); stroke-dasharray: none; }
 .nl-lab__corchete.is-ok, .nl-lab__corchete.is-repasar, .nl-lab__corchete.is-activa { fill: none; }
+
+/* ===============================================================
+   Trabajo autocorregible (js/tareas.js): capturas + preguntas
+   =============================================================== */
+.nl-tar { margin-top: 2.5rem; }
+.nl-tar__intro { color: var(--gray-300); line-height: 1.55; margin: .4rem 0 0; max-width: 70ch; }
+.nl-tar__caps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+.nl-tar__cap {
+    padding: 1rem; border: 1.5px solid var(--gray-700); border-radius: 14px; background: var(--navy-mid);
+    display: flex; flex-direction: column; gap: .6rem;
+}
+.nl-tar__cap.is-ok { border-color: rgba(34,197,94,.55); }
+.nl-tar__cap h3 { margin: 0; font-size: 1rem; }
+.nl-tar__n { color: var(--violet-light); }
+.nl-tar__ins { margin: 0; font-size: .86rem; color: var(--gray-300); line-height: 1.5; }
+.nl-tar__zona {
+    min-height: 170px; border: 2px dashed var(--violet); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem;
+    text-align: center; padding: 1rem; cursor: pointer; color: var(--gray-100);
+    background: rgba(139,92,246,.06); transition: background .15s, border-color .15s; outline: none;
+}
+.nl-tar__zona:focus, .nl-tar__zona.is-sobre { background: rgba(139,92,246,.16); border-color: var(--violet-light); box-shadow: 0 0 0 3px rgba(139,92,246,.3); }
+.nl-tar__zona span, .nl-tar__zona small { font-size: .8rem; color: var(--gray-300); }
+.nl-tar__zona-ico { font-size: 1.6rem !important; }
+.nl-tar__zona.tiene { padding: .4rem; border-style: solid; border-color: rgba(34,197,94,.5); }
+.nl-tar__zona.tiene img { max-width: 100%; max-height: 320px; border-radius: 8px; display: block; }
+.nl-tar__cambiar { margin-top: .3rem; }
+.nl-tar__subir { align-self: flex-start; }
+.nl-tar__checks { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: .88rem; }
+.nl-tar__checks legend { font-weight: 700; color: var(--gray-300); font-size: .82rem; margin-bottom: .3rem; width: 100%; }
+.nl-tar__checks label { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; }
+.nl-tar__checks input { width: 1.05rem; height: 1.05rem; accent-color: #22C55E; }
+
+.nl-tar__pregs { list-style: none; counter-reset: preg; padding: 0; margin: 1.4rem 0 0; display: flex; flex-direction: column; gap: .8rem; }
+.nl-tar__preg {
+    counter-increment: preg; padding: .9rem 1rem; border: 1.5px solid var(--gray-700); border-radius: 14px; background: var(--navy-mid);
+}
+.nl-tar__preg.is-ok { border-color: rgba(34,197,94,.55); }
+.nl-tar__preg.is-sacude { animation: nlLabMal 320ms ease; }
+.nl-tar__p { margin: 0 0 .6rem; font-weight: 600; line-height: 1.5; }
+.nl-tar__p::before { content: counter(preg) '. '; color: var(--violet-light); font-weight: 800; }
+.nl-tar__ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .45rem; }
+.nl-tar__op {
+    text-align: left; font: inherit; font-size: .88rem; line-height: 1.4; padding: .6rem .75rem;
+    color: var(--gray-100); background: rgba(255,255,255,.04);
+    border: 1.5px solid var(--gray-700); border-radius: 10px; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.nl-tar__op:hover:not(:disabled) { border-color: var(--violet); background: rgba(139,92,246,.12); }
+.nl-tar__op.is-mal { border-color: #EF4444; background: rgba(239,68,68,.1); opacity: .55; text-decoration: line-through; cursor: default; }
+.nl-tar__op.is-ok { border-color: #22C55E; background: rgba(34,197,94,.14); color: #BBF7D0; cursor: default; opacity: 1; }
+.nl-tar__op[hidden] { display: none; }
+.nl-tar__fb { margin: .5rem 0 0; font-size: .86rem; line-height: 1.5; }
+.nl-tar__fb.is-ok { color: #86EFAC; }
+.nl-tar__fb.is-mal { color: #FCA5A5; }
+.nl-tar__final { margin-top: 1.2rem; padding: .8rem 1rem; border-radius: 12px; background: rgba(255,255,255,.04); color: var(--gray-300); font-weight: 600; }
+.nl-tar__final.is-ok { background: rgba(34,197,94,.1); color: #BBF7D0; }

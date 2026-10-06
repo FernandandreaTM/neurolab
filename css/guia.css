@@ -74,3 +74,5 @@
     .nl-g-tabla-wrap { overflow: visible; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+.nl-g-figuras--fotos { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.nl-g-fig img { width: 100%; height: auto; display: block; border-radius: 6px; }

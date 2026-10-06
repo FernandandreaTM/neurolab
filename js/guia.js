@@ -13,6 +13,7 @@
  *   { t: 'lista',   items: ['...'] }
  *   { t: 'texto',   txt: '...' }
  *   { t: 'figuras', items: [{ svg: '<svg…>', titulo: '...', pie: '...' }] }
+ *   { t: 'imagenes', items: [{ src: 'data:image/jpeg;base64,…', titulo: '...', pie: '...' }] }
  */
 const KEY = 'nl_guia';
 
@@ -114,6 +115,14 @@ export function renderBloque(b) {
             <figure class="nl-g-fig">${svgSeguro(f.svg)}
                 <figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? ` ${esc(f.pie)}` : ''}</figcaption>
             </figure>`).join('')}</div>`;
+    }
+    if (b.t === 'imagenes') {
+        return `<div class="nl-g-figuras nl-g-figuras--fotos">${(b.items || []).map(f => {
+            const src = /^data:image\/(jpeg|png|webp);base64,/.test(String(f.src || '')) ? f.src : '';
+            return `<figure class="nl-g-fig">${src ? `<img src="${src}" alt="">` : ''}
+                <figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? ` ${esc(f.pie)}` : ''}</figcaption>
+            </figure>`;
+        }).join('')}</div>`;
     }
     return '';
 }

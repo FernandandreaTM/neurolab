@@ -17,6 +17,16 @@ try {
     $recs = $pdo->prepare("SELECT * FROM actividad_recursos WHERE actividad_id = ? ORDER BY orden");
     $recs->execute([$act['id']]);
     $recursos = $recs->fetchAll();
+    // Recurso "tareas": configuración JSON de un trabajo autocorregible (capturas + preguntas).
+    // No es una pestaña: se muestra como sección propia (js/tareas.js).
+    $tareas = null;
+    foreach ($recursos as $k => $r) {
+        if ($r['tipo'] === 'tareas') {
+            $tareas = json_decode((string)$r['url'], true);
+            unset($recursos[$k]);
+        }
+    }
+    $recursos = array_values($recursos);
 
     $cars = $pdo->prepare("
         SELECT ac.*, c.nombre AS carrera_nombre, c.slug AS carrera_slug, c.asignatura_codigo
@@ -257,6 +267,20 @@ try {
         </aside>
     </div>
 
+    <?php if (is_array($tareas)): ?>
+    <section class="nl-tar container" id="nl-tar"
+             data-slug="<?= htmlspecialchars($act['slug']) ?>"
+             data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
+             data-config="<?= htmlspecialchars(json_encode($tareas, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+        <div class="nl-prac__head">
+            <span class="label">Tu trabajo</span>
+            <h2><?= htmlspecialchars($tareas['titulo'] ?? 'Completa la actividad') ?></h2>
+            <?php if (!empty($tareas['intro'])): ?><p class="nl-tar__intro"><?= htmlspecialchars($tareas['intro']) ?></p><?php endif; ?>
+        </div>
+        <div class="nl-tar__cuerpo"></div>
+    </section>
+    <?php endif; ?>
+
     <?php if (!empty($niveles)): ?>
     <section class="nl-prac container" id="nl-prac" data-slug="<?= htmlspecialchars($act['slug']) ?>">
         <div class="nl-prac__head">
@@ -369,6 +393,9 @@ try {
     <script type="module" src="js/activity.js?v=<?= nl_ver('js/activity.js') ?>"></script>
     <?php if (!empty($niveles)): ?>
     <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
+    <?php endif; ?>
+    <?php if (is_array($tareas)): ?>
+    <script type="module" src="js/tareas.js?v=<?= nl_ver('js/tareas.js') ?>"></script>
     <?php endif; ?>
     </body>
     </html>
