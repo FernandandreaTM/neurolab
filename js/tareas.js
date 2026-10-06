@@ -101,8 +101,7 @@ function iniciar(raiz) {
                 </div>
                 <p class="nl-tar__fb" aria-live="polite"></p>
             </li>`).join('')}</ol>` : ''}
-        <div class="nl-tar__final" role="status" aria-live="polite"></div>
-        <div class="nl-tar__guia" hidden></div>`;
+        <div class="nl-tar__final" role="status" aria-live="polite"></div>`;
 
     /* --- Capturas --- */
     caps.forEach(c => {
@@ -219,7 +218,6 @@ function iniciar(raiz) {
 
     /* --- Cierre --- */
     const final = cuerpo.querySelector('.nl-tar__final');
-    const guiaBox = cuerpo.querySelector('.nl-tar__guia');
 
     function seccion() {
         return {
@@ -235,6 +233,11 @@ function iniciar(raiz) {
                 })) } : null,
                 pregs.length ? { t: 'tabla', cab: ['Pregunta', 'Respuesta', 'Explicación'],
                     filas: pregs.map(q => [q.p, q.ops[q.ok], q.exp || '']) } : null,
+                ...(() => {
+                    const tpl = document.getElementById('nl-conexion-tpl');
+                    const items = tpl ? Array.from(tpl.content.querySelectorAll('p')).map(p => p.textContent.replace(/\s+/g, ' ').trim()) : [];
+                    return items.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items }] : [];
+                })(),
             ].filter(Boolean),
         };
     }
@@ -243,18 +246,19 @@ function iniciar(raiz) {
         const nCap = caps.filter(capLista).length;
         const nPre = pregs.filter(pregLista).length;
         if (completa()) {
+            const tpl = document.getElementById('nl-conexion-tpl');
+            const ruta = new URLSearchParams(location.search).get('ruta');
             final.className = 'nl-tar__final is-ok';
             final.innerHTML = `🎉 <strong>¡Actividad completada!</strong> ` +
-                (est.err ? `Tuviste ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'} en las preguntas.` : 'Sin errores en las preguntas.');
+                (est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'} en las preguntas.` : 'Sin errores en las preguntas.') +
+                (ruta ? ` <a class="nl-tar__ruta" href="practico.php?p=${encodeURIComponent(ruta)}">Volver a la ruta →</a>` : '') +
+                (tpl ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tpl.innerHTML}</details>` : '') +
+                `<span class="nl-tar__guia-linea"></span>`;
             if (slug) markDone(slug);
-            const cx = raiz.querySelector('#nl-mesa-conexion');
-            if (cx) cx.hidden = false;
-            guiaBox.hidden = false;
-            botonGuia(guiaBox, slug, seccion);
+            botonGuia(final.querySelector('.nl-tar__guia-linea'), slug, seccion);
         } else {
             final.className = 'nl-tar__final';
             final.textContent = `Avance: ${nCap} / ${caps.length} capturas · ${nPre} / ${pregs.length} preguntas`;
-            guiaBox.hidden = true;
         }
     }
     revisar();

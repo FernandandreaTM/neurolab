@@ -192,3 +192,16 @@
 .nl-mesa__conexion strong { color: #FDE68A; }
 .nl-tar .nl-mesa__conexion { margin-top: .8rem; }
 .nl-mesa__instr p, .nl-mesa__conexion p { font-size: .84rem; line-height: 1.5; }
+
+/* Cierre del nivel: una sola tarjeta ordenada */
+.nl-lab__trabajo.is-cierre { border-color: rgba(34,197,94,.6); background: rgba(34,197,94,.08); gap: .6rem; }
+.nl-lab__cierre-tit { font-size: 1.15rem; font-weight: 800; color: #BBF7D0; }
+.nl-lab__trabajo.is-cierre .nl-lab__sig-nivel { align-self: stretch; text-align: center; }
+.nl-lab__conexion { font-size: .82rem; line-height: 1.5; color: var(--gray-300); }
+.nl-lab__conexion summary { cursor: pointer; font-weight: 700; color: #FCD34D; }
+.nl-lab__conexion p { margin: .35rem 0 0; font-size: .82rem; }
+.nl-lab__conexion strong { color: #FDE68A; }
+.nl-lab__trabajo .nl-guia-ok { margin-top: .2rem; }
+.nl-tar__final .nl-lab__conexion { margin-top: .4rem; font-weight: 400; }
+.nl-tar__final .nl-guia-ok { display: block; margin-top: .3rem; font-weight: 400; }
+.nl-tar__ruta { margin-left: .4rem; color: #86EFAC; font-weight: 700; }

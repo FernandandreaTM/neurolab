@@ -21,16 +21,15 @@ $instrucciones = function ($texto) use ($act) {
     <?php return ob_get_clean();
 };
 
-/** Conexión con la carrera: aparece recién al completar la actividad (como cierre con sentido). */
+/** Conexión con la carrera: plantilla que el JS muestra (plegada) en el cierre y copia a la guía. */
 $conexion = function () use ($carreras) {
     if (!$carreras) return '';
     ob_start(); ?>
-    <div class="nl-mesa__conexion" id="nl-mesa-conexion" hidden>
-        <p class="nl-mesa__conexion-tit">💡 ¿Para qué te sirve esto?</p>
+    <template id="nl-conexion-tpl">
         <?php foreach ($carreras as $c): ?>
-            <p><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
+            <p data-carrera="<?= htmlspecialchars($c['carrera_nombre']) ?>"><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
         <?php endforeach; ?>
-    </div>
+    </template>
     <?php return ob_get_clean();
 };
 ?>
@@ -84,12 +83,7 @@ $conexion = function () use ($carreras) {
             <button type="button" class="nl-lab__reset" id="nl-lab-reset">Empezar de nuevo</button>
         </div>
         <div class="nl-lab__chips" id="nl-lab-chips" aria-label="Estructuras"></div>
-        <div class="nl-lab__fin" id="nl-lab-fin" hidden>
-            <div class="nl-lab__resumen" id="nl-lab-resumen"></div>
-            <div id="nl-lab-guia"></div>
-            <?= $conexion() ?>
-            <a class="btn btn-primary btn-sm nl-lab__sig-nivel" id="nl-lab-sig" hidden>🔍 Acercarse más: siguiente nivel →</a>
-        </div>
+        <?= $conexion() ?>
         <div class="nl-lab__trabajo" id="nl-lab-feedback" role="status" aria-live="polite"></div>
     </aside>
 </div>
@@ -110,6 +104,7 @@ $conexion = function () use ($carreras) {
         <?php endif; ?>
     </div>
     <aside class="nl-mesa__panel">
+        <?= $conexion() ?>
         <?= $instrucciones('Lee «Cómo buscarlas», explora la lámina con el zoom y luego, en «Tu trabajo», pega tus capturas y responde las preguntas. Cada pregunta se corrige al instante.') ?>
         <div class="nl-mesa__tabs" role="tablist">
             <?php foreach ($textos as $i => $t): ?>
@@ -130,7 +125,6 @@ $conexion = function () use ($carreras) {
                      data-config="<?= htmlspecialchars(json_encode($tareas, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
                 <?php if (!empty($tareas['intro'])): ?><p class="nl-tar__intro"><?= htmlspecialchars($tareas['intro']) ?></p><?php endif; ?>
                 <div class="nl-tar__cuerpo"></div>
-                <?= $conexion() ?>
             </section>
         </div>
     </aside>

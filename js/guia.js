@@ -63,26 +63,15 @@ export function urlGuia() {
 }
 
 /**
- * Pinta en `contenedor` el llamado a sumar la sección a la guía.
- * `construir()` devuelve la sección en el momento de sumarla (así toma lo último).
+ * Al completar una actividad, su sección se guarda sola en la guía (cada vez que se
+ * llama, con lo último) y en `contenedor` queda sólo una línea discreta con el enlace.
+ * `construir()` devuelve la sección.
  */
 export function botonGuia(contenedor, clave, construir) {
     if (!contenedor) return;
-    const pintar = () => {
-        const ya = enGuia(clave);
-        contenedor.className = 'nl-guia-cta' + (ya ? ' is-sumada' : '');
-        contenedor.innerHTML = ya
-            ? `<span class="nl-guia-cta__txt">📘 <strong>Sección agregada a tu guía.</strong></span>
-               <button type="button" class="btn btn-ghost btn-sm nl-guia-cta__act">↻ Actualizar</button>
-               <a class="btn btn-primary btn-sm" href="${urlGuia()}">Ver mi guía →</a>`
-            : `<span class="nl-guia-cta__txt">🔓 <strong>¡Desbloqueaste una sección de tu guía!</strong></span>
-               <button type="button" class="btn btn-primary btn-sm nl-guia-cta__act">📘 Sumar a mi guía</button>`;
-        contenedor.querySelector('.nl-guia-cta__act').addEventListener('click', () => {
-            sumarAGuia(clave, construir());
-            pintar();
-        });
-    };
-    pintar();
+    sumarAGuia(clave, construir());
+    contenedor.className = 'nl-guia-ok';
+    contenedor.innerHTML = `✓ Guardado en tu guía de estudio · <a href="${urlGuia()}">Ver guía</a>`;
 }
 
 /* ---------------------------------------------------------------

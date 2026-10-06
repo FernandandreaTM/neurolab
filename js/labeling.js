@@ -14,7 +14,7 @@
  * Con ?calibrar=1, un clic sobre la imagen muestra coordenadas en % (para labeling_parts).
  */
 import { markDone, isDone } from './progress.js';
-import { botonGuia } from './guia.js';
+import { sumarAGuia, urlGuia } from './guia.js';
 
 const RAIZ = document.getElementById('nl-lab');
 const KEY_BASE = 'nl_lab2_';
@@ -63,10 +63,7 @@ function iniciar(raiz) {
     const contador = raiz.querySelector('#nl-lab-contador');
     const errores  = raiz.querySelector('#nl-lab-errores');
     const btnReset = raiz.querySelector('#nl-lab-reset');
-    const guiaBox  = raiz.querySelector('#nl-lab-guia');
-    const fin      = raiz.querySelector('#nl-lab-fin');
-    const resumen  = raiz.querySelector('#nl-lab-resumen');
-    const btnSig   = raiz.querySelector('#nl-lab-sig');
+    const tplCx    = document.getElementById('nl-conexion-tpl');
 
     transicion(raiz, canvas, slug);
 
@@ -85,6 +82,8 @@ function iniciar(raiz) {
     if (instr && !Object.keys(est.partes).length && !est.activa) instr.open = true;
     // est.activa = { id, n, a, r, nombreOk, opciones, mal } mientras se responde una estructura
     let sel = est.activa ? est.activa.id : (partes.find(p => !est.partes[p.id]) || partes[0]).id;
+    // Al completar el nivel el panel muestra el cierre; tocar un número abre esa estructura para repasar
+    let verCierre = false;
     const guardar = () => escribir(slug, est);
 
     /* --- Imagen: números + formas --- */
@@ -149,6 +148,7 @@ function iniciar(raiz) {
             return;
         }
         sel = id;
+        verCierre = false;
         pintarTodo();
     }
 
@@ -161,6 +161,7 @@ function iniciar(raiz) {
 
     /* --- Panel de trabajo --- */
     function pintarPanel() {
+        if (completa() && verCierre) { mostrarCierre(); return; }
         if (completa() && !est.partes[sel]) sel = partes[0].id;
         const p = partes.find(x => x.id === sel);
         const s = est.partes[sel];
@@ -269,6 +270,7 @@ function iniciar(raiz) {
         est.partes[a.id] = { n: d.nombre, f: d.funcion, d: d.detalle, a: d.alternativas || [], nombreOk: !!a.nombreOk, r: a.r, errF: a.mal.length };
         est.activa = null;
         guardar();
+        if (completa()) { verCierre = true; sel = null; }
         pintarTodo();
         if (!completa()) mostrarFicha(a.id, '🎯 ¡Función correcta!');
     }
@@ -286,8 +288,10 @@ function iniciar(raiz) {
              ${!s.nombreOk ? `<p class="nl-lab__tuya">↺ Nombre por repasar${s.r ? ' (escribiste: ' + escapar(s.r) + ')' : ''}</p>` : ''}
              <p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(s.f)}</p>
              ${s.d && s.d !== s.f ? `<p class="nl-lab__detalle">${escapar(s.d)}</p>` : ''}
-             ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente: estructura ${sig.n} →</button>` : ''}`;
+             ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente: estructura ${sig.n} →</button>` : ''}
+             ${completa() ? `<button type="button" class="btn btn-ghost btn-sm nl-lab__volver">← Resumen del nivel</button>` : ''}`;
         panel.querySelector('.nl-lab__sig')?.addEventListener('click', () => seleccionar(sig.id));
+        panel.querySelector('.nl-lab__volver')?.addEventListener('click', () => { verCierre = true; sel = null; pintarTodo(); });
     }
 
     function aviso(txt) {
@@ -300,12 +304,32 @@ function iniciar(raiz) {
     const completa = () => partes.every(p => est.partes[p.id]);
     const porRepasar = () => partes.filter(p => est.partes[p.id] && !est.partes[p.id].nombreOk);
 
-    function resumenHTML() {
+    /** Tarjeta de cierre: resultado, siguiente nivel, para qué sirve (plegado) y guía (discreto). */
+    function mostrarCierre() {
         const rep = porRepasar();
-        return `🎉 <strong>¡Completaste las ${partes.length} estructuras!</strong>
-            ${est.err ? `Tuviste ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}.` : 'Sin ningún error.'}
-            ${rep.length ? `<span class="nl-lab__alt">Nombres por repasar: ${rep.map(p => p.n + '. ' + escapar(est.partes[p.id].n)).join(' · ')}</span>` : ''}
-            <span class="nl-lab__alt">Toca cualquier número para repasar su función.</span>`;
+        const sig = raiz.dataset.siguiente;
+        const hrefSig = sig ? 'actividad.php?slug=' + encodeURIComponent(sig) + (ruta ? '&ruta=' + encodeURIComponent(ruta) : '') : '';
+        const hrefRuta = ruta ? 'practico.php?p=' + encodeURIComponent(ruta) : '';
+        panel.className = 'nl-lab__trabajo is-cierre';
+        panel.innerHTML = `
+            <p class="nl-lab__cierre-tit">🎉 ¡Nivel completado!</p>
+            <p>${partes.length} estructuras · ${est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}` : 'sin errores'}</p>
+            ${rep.length ? `<p class="nl-lab__alt">↺ Por repasar: ${rep.map(p => p.n + '. ' + escapar(est.partes[p.id].n)).join(' · ')}</p>` : ''}
+            ${hrefSig ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefSig}">🔍 Siguiente nivel →</a>`
+                      : (hrefRuta ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefRuta}">Volver a la ruta →</a>` : '')}
+            ${tplCx ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tplCx.innerHTML}</details>` : ''}
+            <p class="nl-lab__ayuda">Toca un número para repasar cualquier estructura.</p>
+            <p class="nl-guia-ok">✓ Guardado en tu guía de estudio · <a href="${urlGuia()}">Ver guía</a></p>`;
+        panel.querySelector('a.nl-lab__sig-nivel[href^="actividad"]')?.addEventListener('click', () => {
+            try { sessionStorage.setItem(KEY_TRANS, JSON.stringify({ a: sig, img: canvas.querySelector('img')?.src })); } catch { /* */ }
+        });
+    }
+
+    /** Texto de "para qué sirve" (por carrera) para la guía. */
+    function conexionGuia() {
+        if (!tplCx) return [];
+        const items = Array.from(tplCx.content.querySelectorAll('p')).map(p => p.textContent.replace(/\s+/g, ' ').trim());
+        return items.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items }] : [];
     }
 
     function seccionGuia() {
@@ -322,7 +346,7 @@ function iniciar(raiz) {
                     return [String(p.n) + (s.nombreOk ? '' : ' ↺'), s.n, s.f, s.d && s.d !== s.f ? s.d : ''];
                 }),
             }].concat(porRepasar().length ? [{ t: 'texto',
-                txt: '↺ Nombres por repasar: ' + porRepasar().map(p => est.partes[p.id].n).join(', ') + '.' }] : []),
+                txt: '↺ Nombres por repasar: ' + porRepasar().map(p => est.partes[p.id].n).join(', ') + '.' }] : []).concat(conexionGuia()),
         };
     }
 
@@ -333,21 +357,7 @@ function iniciar(raiz) {
         raiz.classList.toggle('is-completa', hechas === partes.length);
         if (hechas === partes.length) {
             if (slug) markDone(slug);
-            fin.hidden = false;
-            const cx = raiz.querySelector('#nl-mesa-conexion');
-            if (cx) cx.hidden = false;
-            resumen.innerHTML = resumenHTML();
-            botonGuia(guiaBox, slug, seccionGuia);
-            const sig = raiz.dataset.siguiente;
-            if (sig) {
-                btnSig.hidden = false;
-                btnSig.href = 'actividad.php?slug=' + encodeURIComponent(sig) + (ruta ? '&ruta=' + encodeURIComponent(ruta) : '');
-                btnSig.onclick = () => {
-                    try { sessionStorage.setItem(KEY_TRANS, JSON.stringify({ a: sig, img: canvas.querySelector('img')?.src })); } catch { /* */ }
-                };
-            }
-        } else {
-            fin.hidden = true;
+            sumarAGuia(slug, seccionGuia());     // se guarda solo (y se actualiza)
         }
     }
 
@@ -355,12 +365,13 @@ function iniciar(raiz) {
         if ((Object.keys(est.partes).length || est.activa) && !confirm('Esto borra todas tus respuestas de esta actividad. ¿Seguro?')) return;
         est = { partes: {}, err: 0 };
         sel = partes[0].id;
+        verCierre = false;
         guardar();
         pintarTodo();
     });
 
+    if (completa() && !est.activa) { verCierre = true; sel = null; }
     pintarTodo();
-    if (completa()) mostrarFicha(sel);
 
     if (new URLSearchParams(location.search).get('calibrar') === '1') calibrar(canvas, raiz);
 }
