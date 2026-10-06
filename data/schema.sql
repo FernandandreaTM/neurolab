@@ -91,3 +91,34 @@ CREATE TABLE IF NOT EXISTS labeling_parts (
     orden         INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (actividad_id) REFERENCES actividades(id)
 );
+
+-- Práctica por niveles dentro de una actividad (p. ej. el comparador de tipos de neurona).
+-- Cada nivel tiene un tipo de ejercicio; activo = 0 lo muestra como "Próximamente".
+CREATE TABLE IF NOT EXISTS practica_niveles (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    actividad_id  INTEGER NOT NULL,
+    numero        INTEGER NOT NULL,          -- 1, 2, 3... orden en que se juegan
+    titulo        TEXT    NOT NULL,
+    instrucciones TEXT,
+    tipo          TEXT    NOT NULL DEFAULT 'completar',   -- completar (frase + escribir la respuesta)
+    activo        INTEGER NOT NULL DEFAULT 1,
+    UNIQUE(actividad_id, numero),
+    FOREIGN KEY (actividad_id) REFERENCES actividades(id)
+);
+
+-- Ítems de un nivel. En el enunciado, {} marca dónde va el espacio para escribir;
+-- si no hay {}, el espacio va al comienzo de la frase.
+-- La respuesta NO se manda al navegador: se revisa en api/practica_check.php.
+CREATE TABLE IF NOT EXISTS practica_items (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    nivel_id      INTEGER NOT NULL,
+    enunciado     TEXT    NOT NULL,
+    respuesta     TEXT    NOT NULL,          -- lo que se muestra al acertar (p. ej. "Pseudounipolar")
+    sinonimos     TEXT,                      -- otras formas válidas separadas por | (p. ej. "falsa unipolar")
+    pista         TEXT,                      -- se muestra al equivocarse, sin decir la respuesta
+    explicacion   TEXT,                      -- se muestra al acertar
+    orden         INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (nivel_id) REFERENCES practica_niveles(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_practica_items_nivel ON practica_items(nivel_id);

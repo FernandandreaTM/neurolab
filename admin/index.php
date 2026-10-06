@@ -5,9 +5,8 @@
 <meta charset="UTF-8">
 <title>Admin — NeuroLab</title>
 <link rel="stylesheet" href="../css/base.css">
-<link rel="stylesheet" href="../css/nav.css">
 <style>
-.nl-admin-wrap { padding: 7rem 0 3rem; max-width: 800px; margin: 0 auto; }
+.nl-admin-wrap { padding: 3rem 0 3rem; max-width: 800px; margin: 0 auto; }
 .nl-admin-card {
     background: var(--navy-mid);
     border: 1px solid var(--gray-700);
@@ -26,7 +25,6 @@
 </head>
 <body>
 <div class="bg-mesh"></div>
-<?php include __DIR__ . '/../_partials/nav.php'; ?>
 
 <div class="container nl-admin-wrap">
     <span class="label">Panel de administración</span>

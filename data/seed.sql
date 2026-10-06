@@ -3,6 +3,8 @@
 -- Idempotente: limpia tablas antes de poblar (manteniendo PK contadores).
 
 -- Limpiar primero (orden importa por FK)
+DELETE FROM practica_items;
+DELETE FROM practica_niveles;
 DELETE FROM actividad_carrera;
 DELETE FROM labeling_parts;
 DELETE FROM quices;
@@ -11,7 +13,7 @@ DELETE FROM actividades;
 DELETE FROM topic_recursos;
 DELETE FROM topics;
 DELETE FROM carreras;
-DELETE FROM sqlite_sequence WHERE name IN ('carreras','topics','actividades','actividad_recursos','actividad_carrera','labeling_parts','quices','topic_recursos');
+DELETE FROM sqlite_sequence WHERE name IN ('carreras','topics','actividades','actividad_recursos','actividad_carrera','labeling_parts','quices','topic_recursos','practica_niveles','practica_items');
 
 -- Carreras
 INSERT OR IGNORE INTO carreras (id, slug, nombre, asignatura_codigo, descripcion) VALUES
@@ -82,6 +84,67 @@ INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orde
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (3, 1, 'En Fonoaudiología interesa especialmente la neurona bipolar coclear y vestibular, relevante en la vía auditiva.', 1),
   (3, 2, 'En TO interesa la motoneurona multipolar (asta ventral) y las interneuronas de la médula espinal.', 2);
+
+-- Práctica por niveles del comparador (actividad 3)
+INSERT OR IGNORE INTO practica_niveles (id, actividad_id, numero, titulo, instrucciones, tipo, activo) VALUES
+  (1, 3, 1, 'Frases',
+      'Completa cada frase con el tipo de neurona que describe: bipolar, pseudounipolar o multipolar. Escribe y presiona Enter.',
+      'completar', 1),
+  (2, 3, 2, 'Dibujo de neuronas',
+      'Arma cada neurona: elige una pieza (dendrita, axón o neurita en T) y toca un punto alrededor del soma para agregarla. Tocar de nuevo la quita. Cuando esté lista, presiona Revisar.',
+      'armar', 1),
+  (3, 3, 3, 'Subtipos de neuronas multipolares',
+      'Piramidales, de Purkinje, estrelladas o granulares y motoneuronas espinales.',
+      'completar', 0);
+
+-- Nivel 1: frases. {} marca el espacio; sin {} el espacio va al inicio.
+INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos, pista, explicacion, orden) VALUES
+  (1, 'Tiene una neurita que se bifurca.',
+      'Pseudounipolar', 'pseudo unipolar|seudounipolar|pseudomonopolar|falsa unipolar|falsas unipolares',
+      'Del soma sale una sola prolongación, que luego se divide en forma de «T».',
+      'Parece unipolar, pero su única neurita se bifurca: una rama va a la periferia y la otra entra al sistema nervioso central.', 1),
+  (1, 'Son las neuronas sensoriales primarias del cuerpo.',
+      'Pseudounipolar', 'pseudo unipolar|seudounipolar|pseudomonopolar|falsa unipolar|falsas unipolares',
+      'Transmiten tacto, dolor, presión y temperatura.',
+      'Llevan el tacto, el dolor, la presión y la temperatura hacia el sistema nervioso central.', 2),
+  (1, 'Se localizan en los ganglios sensitivos de los nervios craneales.',
+      'Pseudounipolar', 'pseudo unipolar|seudounipolar|pseudomonopolar|falsa unipolar|falsas unipolares',
+      'Un ejemplo es el ganglio de Gasser del nervio trigémino.',
+      'Por ejemplo, en el ganglio de Gasser del nervio trigémino.', 3),
+  (1, 'Se localizan en los ganglios de las raíces dorsales de la médula espinal.',
+      'Pseudounipolar', 'pseudo unipolar|seudounipolar|pseudomonopolar|falsa unipolar|falsas unipolares',
+      'Sus somas, grandes y redondeados, se agrupan en racimos junto a la médula.',
+      'Sus cuerpos celulares, grandes y redondeados, se agrupan en esos ganglios.', 4),
+  (1, 'Posee dos neuritas que nacen de polos opuestos del soma.',
+      'Bipolar', NULL,
+      'Cuenta las neuritas: son exactamente dos.',
+      'Sus somas suelen ser fusiformes (alargados) u ovoides.', 5),
+  (1, 'A partir de un extremo emerge una dendrita y en el otro un axón.',
+      'Bipolar', NULL,
+      'Una prolongación recibe y la otra transmite, cada una en un polo del soma.',
+      'Se encuentran en la retina, el epitelio olfatorio y los ganglios vestibular y coclear del oído interno.', 6),
+  (1, 'Tiene 1 único axón y múltiples dendritas.',
+      'Multipolar', NULL,
+      'Sus muchas dendritas le permiten integrar información de miles de células a la vez.',
+      'Las dendritas nacen de distintos puntos del cuerpo celular.', 7),
+  (1, 'Las neuronas de Golgi I y II pertenecen al tipo de neuronas {}.',
+      'Multipolar', NULL,
+      'Golgi I (axón largo) y Golgi II (axón corto) son familias de la neurona con muchas dendritas.',
+      'Golgi I: axón largo (motoneuronas, piramidales). Golgi II: axón corto (interneuronas de la corteza).', 8),
+  (1, 'Son el tipo de neuronas más frecuente en mamíferos.',
+      'Multipolar', NULL,
+      'Es la que tiene muchas dendritas y un solo axón.',
+      'Es el tipo celular más común y abundante del sistema nervioso humano.', 9);
+
+-- Nivel 2: armar la neurona. `respuesta` es el tipo pedido; las reglas de cada
+-- tipo están en api/practica_check.php (nl_prac_evalua_armado).
+INSERT OR IGNORE INTO practica_items (nivel_id, enunciado, respuesta, sinonimos, pista, explicacion, orden) VALUES
+  (2, 'Arma una neurona bipolar.', 'Bipolar', NULL, NULL,
+      'Dos neuritas que nacen de polos opuestos del soma: una dendrita que recibe y un axón que transmite. Su soma suele ser fusiforme u ovoide.', 1),
+  (2, 'Arma una neurona pseudounipolar.', 'Pseudounipolar', NULL, NULL,
+      'Una sola neurita que se bifurca en «T»: una rama va hacia la periferia y la otra entra al sistema nervioso central.', 2),
+  (2, 'Arma una neurona multipolar.', 'Multipolar', NULL, NULL,
+      'Un único axón y múltiples dendritas que nacen de distintos puntos del soma: así integra información de miles de células a la vez.', 3);
 
 -- Actividad demo 4: LABELING (imagen con hotspots)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES

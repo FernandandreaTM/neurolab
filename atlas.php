@@ -9,12 +9,11 @@ $active_page = 'atlas';
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Atlas — NeuroLab</title>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/nav.css">
 <link rel="stylesheet" href="css/atlas.css">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <style>
 /* Layout mínimo del atlas (paleta morada) */
-.nl-atlas-header { padding: 6rem 0 2rem; text-align: center; }
+.nl-atlas-header { padding: 3rem 0 2rem; text-align: center; }
 .nl-atlas-header h1 { margin-bottom: .5rem; }
 .nl-atlas-header p { max-width: 540px; margin: 0 auto 1.5rem; }
 .nl-atlas-tabs { display: flex; justify-content: center; gap: .5rem; margin-top: 1.5rem; flex-wrap: wrap; }
@@ -62,7 +61,6 @@ $active_page = 'atlas';
 </head>
 <body>
 <div class="bg-mesh"></div>
-<?php include '_partials/nav.php'; ?>
 
 <div class="nl-atlas-header">
   <div class="container">
