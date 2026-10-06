@@ -3,6 +3,7 @@ error_reporting(0);
 require_once __DIR__ . '/api/db.php';
 
 $slug = $_GET['slug'] ?? '';
+$ruta = isset($_GET['ruta']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['ruta']) : '';
 if (!$slug) { echo "slug requerido"; exit; }
 
 try {
@@ -78,6 +79,9 @@ try {
         }
     }
 
+    // Quiz sin recurso visual: se muestra en el panel principal (no en la columna lateral)
+    $quizEnStage = ($act['tipo'] === 'quiz') && empty($recursos) && !empty($quicesData);
+
     $active_page = 'actividad';
     ?>
     <!DOCTYPE html>
@@ -90,14 +94,21 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/activity.css">
+    <link rel="stylesheet" href="css/base.css?v=<?= nl_ver('css/base.css') ?>">
+    <link rel="stylesheet" href="css/activity.css?v=<?= nl_ver('css/activity.css') ?>">
+    <?php if (!empty($quicesData)): ?>
+    <link rel="stylesheet" href="css/quiz.css?v=<?= nl_ver('css/quiz.css') ?>">
+    <?php endif; ?>
     </head>
     <body>
     <div class="bg-mesh"></div>
 
     <div class="nl-act-header container">
+        <?php if ($ruta !== ''): ?>
+        <a href="practico.php?p=<?= htmlspecialchars(rawurlencode($ruta)) ?>" class="nl-act-back">← Volver a la ruta del práctico</a>
+        <?php else: ?>
         <a href="atlas.php" class="nl-act-back">← Volver al atlas</a>
+        <?php endif; ?>
         <div class="nl-act-meta">
             <span class="badge badge-violet"><?= htmlspecialchars(tipoLabel($act['tipo'])) ?></span>
             <span class="text-muted text-sm">slug: <?= htmlspecialchars($act['slug']) ?></span>
@@ -133,6 +144,10 @@ try {
 
                 <div class="nl-lab__feedback" id="nl-lab-feedback" role="status" aria-live="polite"></div>
             </div>
+            <?php elseif ($quizEnStage): ?>
+            <div class="nl-act-quiz-stage">
+                <?php foreach ($quicesData as $q) { echo renderQuiz($q); } ?>
+            </div>
             <?php else: ?>
             <div class="nl-act-tabs" id="recursos-tabs">
                 <?php foreach ($recursos as $i => $r): ?>
@@ -148,7 +163,7 @@ try {
                 <?php foreach ($recursos as $i => $r): ?>
                     <div class="nl-act-recurso-pane <?= $i === 0 ? 'active' : '' ?>" data-i="<?= $i ?>">
                         <?= renderRecurso($r) ?>
-                        <?php if (!empty($r['caption'])): ?>
+                        <?php if (!empty($r['caption']) && $r['tipo'] !== 'texto_html'): ?>
                             <p class="nl-act-caption"><?= htmlspecialchars($r['caption']) ?></p>
                         <?php endif; ?>
                     </div>
@@ -181,21 +196,10 @@ try {
             </div>
             <?php endif; ?>
 
-            <?php if (!empty($quicesData)): ?>
+            <?php if (!empty($quicesData) && !$quizEnStage): ?>
             <div class="nl-act-section">
                 <span class="label">Quiz</span>
-                <?php foreach ($quicesData as $q): ?>
-                    <div class="nl-act-quiz"
-                         data-preguntas='<?= htmlspecialchars($q['datos_json'], ENT_QUOTES) ?>'
-                         data-titulo="<?= htmlspecialchars($q['titulo'] ?? 'Quiz') ?>">
-                        <div class="nl-act-quiz-head">
-                            <strong>✏️ <?= htmlspecialchars($q['titulo'] ?? 'Quiz') ?></strong>
-                            <span class="text-muted text-sm">20 preguntas</span>
-                        </div>
-                        <button class="btn btn-primary btn-sm nl-act-quiz-start">Iniciar quiz →</button>
-                        <div class="nl-act-quiz-body" style="display:none"></div>
-                    </div>
-                <?php endforeach; ?>
+                <?php foreach ($quicesData as $q) { echo renderQuiz($q); } ?>
             </div>
             <?php endif; ?>
 
@@ -296,9 +300,9 @@ try {
     <?php endif; ?>
 
     <?php include '_partials/footer.php'; ?>
-    <script type="module" src="js/activity.js"></script>
+    <script type="module" src="js/activity.js?v=<?= nl_ver('js/activity.js') ?>"></script>
     <?php if (!empty($niveles)): ?>
-    <script type="module" src="js/practica.js"></script>
+    <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
     <?php endif; ?>
     </body>
     </html>
@@ -318,11 +322,34 @@ function tipoLabel($t) {
     ][$t] ?? $t;
 }
 
+/** Versión de un archivo estático (fecha de modificación) para evitar caché vieja. */
+function nl_ver($rel) {
+    $f = __DIR__ . '/' . $rel;
+    return is_file($f) ? filemtime($f) : '1';
+}
+
+function renderQuiz($q) {
+    $n = 0;
+    $datos = json_decode((string)$q['datos_json'], true);
+    if (is_array($datos)) $n = count($datos);
+    $titulo = htmlspecialchars($q['titulo'] ?? 'Quiz');
+    return '<div class="nl-act-quiz" data-preguntas=\'' . htmlspecialchars((string)$q['datos_json'], ENT_QUOTES) . '\' data-titulo="' . $titulo . '">'
+         . '<div class="nl-act-quiz-head"><strong>✏️ ' . $titulo . '</strong>'
+         . '<span class="text-muted text-sm">' . $n . ' pregunta' . ($n === 1 ? '' : 's') . '</span></div>'
+         . '<button class="btn btn-primary btn-sm nl-act-quiz-start">Iniciar quiz →</button>'
+         . '<div class="nl-act-quiz-body" style="display:none"></div>'
+         . '</div>';
+}
+
 function tabLabel($r) {
     if ($r['tipo'] === 'imagen')        return '🖼️ Imagen';
     if ($r['tipo'] === 'embed_3d')      return '🧊 Modelo 3D';
-    if ($r['tipo'] === 'iframe_url')    return '🌐 Recurso';
-    if ($r['tipo'] === 'texto_html')    return '📋 Contenido';
+    if ($r['tipo'] === 'iframe_url') {
+        return strpos((string)$r['url'], 'histologyguide') !== false ? '🔬 Lámina virtual' : '🌐 Recurso';
+    }
+    if ($r['tipo'] === 'texto_html') {
+        return '📋 ' . htmlspecialchars(!empty($r['caption']) ? $r['caption'] : 'Contenido');
+    }
     return '• ' . htmlspecialchars($r['tipo']);
 }
 

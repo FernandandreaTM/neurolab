@@ -102,6 +102,38 @@
     background: rgba(139,92,246,.1);
     color: var(--violet-light);
 }
+/* Contenido HTML: guía de observación (lámina) y cuadro resumen (comparador) */
+.nl-act-recurso-pane:has(.nl-act-html) { background: var(--navy-mid, #1E1235); }
+.nl-act-html h3 { font-size: 1rem; margin: 1.25rem 0 .5rem; color: var(--violet-light); }
+.nl-act-html ol { list-style: decimal; padding-left: 1.4rem; margin: .5rem 0; }
+.nl-act-html li::marker { color: var(--violet-light); font-weight: 700; }
+.nl-act-html li { margin: .4rem 0; line-height: 1.5; }
+.nl-guia__intro, .nl-comp-intro p { line-height: 1.55; color: var(--gray-300); margin: 0 0 .5rem; }
+.nl-guia__q, .nl-comp-resumen {
+    border: 1px solid var(--gray-700);
+    border-radius: 10px;
+    margin: .6rem 0;
+    background: rgba(139,92,246,.05);
+}
+.nl-guia__q summary, .nl-comp-resumen summary {
+    cursor: pointer;
+    padding: .7rem .9rem;
+    font-weight: 600;
+    color: var(--gray-100);
+    list-style-position: inside;
+}
+.nl-guia__q summary:hover, .nl-comp-resumen summary:hover { color: var(--violet-light); }
+.nl-guia__q[open] summary { border-bottom: 1px solid var(--gray-700); }
+.nl-guia__q p { margin: 0; padding: .7rem .9rem; line-height: 1.55; color: var(--gray-300); }
+.nl-comp-resumen { margin-top: 1rem; }
+.nl-comp-resumen[open] summary { border-bottom: 1px solid var(--gray-700); }
+.nl-comp-resumen .comparador-table { margin: 0; }
+.nl-comp-resumen > table { display: block; overflow-x: auto; }
+
+/* Quiz en el panel principal */
+.nl-act-quiz-stage { padding: 1.5rem; }
+.nl-act-quiz-stage .nl-act-quiz-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 1rem; }
+
 .nl-act-caption {
     padding: .65rem 1rem;
     font-size: .8rem;

@@ -1,0 +1,42 @@
+/* NeuroLab — practico.css: ruta guiada de un práctico (practico.php) */
+.nl-ruta { padding-top: 3rem; padding-bottom: 3rem; max-width: 860px; }
+.nl-ruta__head h1 { margin: .6rem 0 .8rem; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+.nl-ruta__obj, .nl-ruta__intro { color: var(--gray-300); line-height: 1.6; margin: 0 0 .6rem; }
+.nl-ruta__meta { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; align-items: center; margin: 1rem 0 2rem; font-size: .9rem; color: var(--gray-300); }
+.nl-ruta__leyenda::before { content: ''; display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; margin-right: .4rem; vertical-align: -1px; }
+.nl-ruta__leyenda--solo::before    { background: var(--violet); }
+.nl-ruta__leyenda--docente::before { background: var(--pink); }
+.nl-ruta__avance { margin-left: auto; color: var(--violet-light); font-weight: 700; }
+
+.nl-ruta__pasos { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .9rem; }
+.nl-paso {
+    display: flex; gap: 1rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--gray-700);
+    border-left: 4px solid var(--violet);
+    border-radius: 12px;
+    background: var(--navy-mid);
+}
+.nl-paso--docente { border-left-color: var(--pink); background: rgba(236,72,153,.06); }
+.nl-paso.is-hecho { border-color: rgba(34,197,94,.45); border-left-color: #22C55E; }
+.nl-paso__num {
+    flex: 0 0 2rem; height: 2rem; border-radius: 50%;
+    display: grid; place-items: center;
+    font-weight: 800; font-size: .9rem;
+    background: rgba(139,92,246,.18); color: var(--violet-light);
+}
+.nl-paso--docente .nl-paso__num { background: rgba(236,72,153,.18); color: var(--pink); }
+.nl-paso__cuerpo { flex: 1; min-width: 0; }
+.nl-paso__top { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.nl-paso__top h2 { font-size: 1.05rem; margin: 0; }
+.nl-paso__min { flex: none; font-size: .85rem; font-weight: 700; color: var(--gray-300); }
+.nl-paso__modo { margin: .2rem 0 .4rem; font-size: .82rem; color: var(--gray-500); }
+.nl-paso__tarea { margin: 0 0 .6rem; line-height: 1.55; color: var(--gray-100); }
+.nl-paso--docente .nl-paso__tarea { margin-bottom: 0; }
+.nl-paso__hecho { margin-left: .8rem; font-size: .85rem; font-weight: 700; color: #4ADE80; }
+
+@media (max-width: 600px) {
+    .nl-ruta { padding-top: 2rem; }
+    .nl-paso { padding: .9rem; gap: .7rem; }
+    .nl-ruta__avance { margin-left: 0; width: 100%; }
+}

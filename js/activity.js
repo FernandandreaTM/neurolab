@@ -46,6 +46,9 @@ document.querySelectorAll('.nl-act-quiz').forEach(box => {
         }
         btnStart.style.display = 'none';
         body.style.display = 'block';
-        new Quiz(body, preguntas, { shuffle: true, onComplete: () => {} }).render();
+        new Quiz(body, preguntas, { shuffle: true, onComplete: () => {
+            // Al responder todas las preguntas, la actividad queda completada
+            if (slug) { markDone(slug); if (btnComplete) btnComplete.textContent = '✓ Completada'; }
+        } }).render();
     });
 });
