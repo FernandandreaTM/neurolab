@@ -492,6 +492,8 @@
 .nl-arm__item.is-esperando .nl-arm__lienzo { opacity: .6; }
 @media (prefers-reduced-motion: reduce) {
     .nl-arm__item.is-mal .nl-arm__lienzo { animation: none; }
+}
+
 /* La identificación necesita todo el ancho: el diagrama es la actividad. */
 .nl-act-layout--ancho { grid-template-columns: 1fr; }
 .nl-act-layout--ancho .nl-act-panel {
