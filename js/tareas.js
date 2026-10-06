@@ -247,6 +247,8 @@ function iniciar(raiz) {
             final.innerHTML = `🎉 <strong>¡Actividad completada!</strong> ` +
                 (est.err ? `Tuviste ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'} en las preguntas.` : 'Sin errores en las preguntas.');
             if (slug) markDone(slug);
+            const cx = raiz.querySelector('#nl-mesa-conexion');
+            if (cx) cx.hidden = false;
             guiaBox.hidden = false;
             botonGuia(guiaBox, slug, seccion);
         } else {

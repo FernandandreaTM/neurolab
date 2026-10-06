@@ -70,6 +70,9 @@ function iniciar(raiz) {
 
     transicion(raiz, canvas, slug);
 
+    // Instrucciones abiertas la primera vez (sin avance en esta actividad)
+    const instr = raiz.querySelector('#nl-mesa-instr');
+
     // Nivel que exige completar el anterior
     const requiere = raiz.dataset.requiere || '';
     if (requiere && !isDone(requiere)) {
@@ -79,6 +82,7 @@ function iniciar(raiz) {
     }
 
     let est = leer(slug);
+    if (instr && !Object.keys(est.partes).length && !est.activa) instr.open = true;
     // est.activa = { id, n, a, r, nombreOk, opciones, mal } mientras se responde una estructura
     let sel = est.activa ? est.activa.id : (partes.find(p => !est.partes[p.id]) || partes[0]).id;
     const guardar = () => escribir(slug, est);
@@ -91,8 +95,9 @@ function iniciar(raiz) {
     }
     const anclas = p => [[p.x, p.y]].concat(p.f && p.f.t === 'puntos' ? p.f.v : []);
 
+    /** Contorno/corchete: sólo para la estructura que se está respondiendo (o revisando). */
     function formaSVG(p) {
-        if (!p.f) return '';
+        if (!p.f || p.id !== sel) return '';
         const c = 'nl-lab__forma' + clase(p.id) + (p.id === sel ? ' is-sel' : '');
         const [a, b, cc, d] = p.f.v;
         if (p.f.t === 'elipse') {
@@ -108,11 +113,12 @@ function iniciar(raiz) {
     }
 
     function pintarImagen() {
-        capa.innerHTML = partes.map(p => anclas(p).map(([x, y]) =>
+        // Los puntos extra de una estructura sólo aparecen cuando es la seleccionada
+        capa.innerHTML = partes.map(p => (p.id === sel ? anclas(p) : [[p.x, p.y]]).map(([x, y]) =>
             `<button type="button" class="nl-lab__punto${clase(p.id)}${p.id === sel ? ' is-sel' : ''}" data-id="${p.id}"
                      style="left:${x}%;top:${y}%" aria-label="Estructura ${p.n}">${p.n}</button>`).join('')).join('');
         // Puntos múltiples de una misma estructura: unidos por una línea fina
-        svg.innerHTML = partes.map(formaSVG).join('') + partes.filter(p => anclas(p).length > 1).map(p => {
+        svg.innerHTML = partes.map(formaSVG).join('') + partes.filter(p => p.id === sel && anclas(p).length > 1).map(p => {
             const [[x0, y0], ...resto] = anclas(p);
             return resto.map(([x, y]) => `<line x1="${x0}" y1="${y0}" x2="${x}" y2="${y}"
                 class="nl-lab__linea${clase(p.id)}" vector-effect="non-scaling-stroke"/>`).join('');
@@ -183,6 +189,7 @@ function iniciar(raiz) {
 
     async function probarNombre(id, texto) {
         if (est.activa || est.partes[id]) return;
+        if (instr) instr.open = false;          // ya empezó: las instrucciones se pliegan
         panel.classList.add('is-esperando');
         const d = await consultar({ parte_id: id, accion: 'nombre', respuesta: texto });
         panel.classList.remove('is-esperando');
@@ -327,6 +334,8 @@ function iniciar(raiz) {
         if (hechas === partes.length) {
             if (slug) markDone(slug);
             fin.hidden = false;
+            const cx = raiz.querySelector('#nl-mesa-conexion');
+            if (cx) cx.hidden = false;
             resumen.innerHTML = resumenHTML();
             botonGuia(guiaBox, slug, seccionGuia);
             const sig = raiz.dataset.siguiente;

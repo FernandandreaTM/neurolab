@@ -171,3 +171,24 @@
 .nl-lab__fin .nl-guia-cta { margin-top: 0; }
 .nl-lab__sig-nivel[hidden] { display: none; }
 .nl-mesa .nl-tar { margin-top: 0; }
+
+/* Instrucciones arriba del panel y conexión con la carrera al completar */
+.nl-mesa__instr {
+    font-size: .84rem; line-height: 1.5; color: var(--gray-100);
+    padding: .55rem .75rem; border-radius: 10px;
+    background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.35);
+}
+.nl-mesa__instr summary { cursor: pointer; font-weight: 800; color: var(--violet-light); }
+.nl-mesa__instr p { margin: .45rem 0 0; }
+.nl-mesa__instr strong { color: #fff; }
+.nl-mesa__desc { color: var(--gray-300); font-size: .8rem; }
+.nl-mesa__conexion {
+    padding: .7rem .85rem; border-radius: 10px; font-size: .84rem; line-height: 1.5;
+    background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.45); color: var(--gray-100);
+}
+.nl-mesa__conexion[hidden] { display: none; }
+.nl-mesa__conexion p { margin: .3rem 0 0; }
+.nl-mesa__conexion-tit { margin: 0 !important; font-weight: 800; color: #FCD34D; }
+.nl-mesa__conexion strong { color: #FDE68A; }
+.nl-tar .nl-mesa__conexion { margin-top: .8rem; }
+.nl-mesa__instr p, .nl-mesa__conexion p { font-size: .84rem; line-height: 1.5; }

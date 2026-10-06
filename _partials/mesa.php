@@ -11,17 +11,26 @@ $volver = $ruta !== ''
     ? ['practico.php?p=' . rawurlencode($ruta), '← Ruta del práctico']
     : ['atlas.php', '← Atlas'];
 
-/** Bloque plegable con instrucciones, descripción y énfasis por carrera. */
-$info = function ($instrucciones) use ($act, $carreras) {
+/** Instrucciones plegables: van arriba del panel, antes que todo. */
+$instrucciones = function ($texto) use ($act) {
     ob_start(); ?>
-    <details class="nl-mesa__info">
-        <summary>ⓘ Instrucciones y énfasis por carrera</summary>
-        <?php if ($instrucciones): ?><p><?= $instrucciones ?></p><?php endif; ?>
-        <p><?= nl2br(htmlspecialchars($act['descripcion'] ?? '')) ?></p>
-        <?php foreach ($carreras as $c): ?>
-            <p class="nl-mesa__carrera"><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
-        <?php endforeach; ?>
+    <details class="nl-mesa__instr" id="nl-mesa-instr">
+        <summary>ⓘ Cómo se responde</summary>
+        <?php if ($texto): ?><p><?= $texto ?></p><?php endif; ?>
     </details>
+    <?php return ob_get_clean();
+};
+
+/** Conexión con la carrera: aparece recién al completar la actividad (como cierre con sentido). */
+$conexion = function () use ($carreras) {
+    if (!$carreras) return '';
+    ob_start(); ?>
+    <div class="nl-mesa__conexion" id="nl-mesa-conexion" hidden>
+        <p class="nl-mesa__conexion-tit">💡 ¿Para qué te sirve esto?</p>
+        <?php foreach ($carreras as $c): ?>
+            <p><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
+        <?php endforeach; ?>
+    </div>
     <?php return ob_get_clean();
 };
 ?>
@@ -68,6 +77,7 @@ $info = function ($instrucciones) use ($act, $carreras) {
         </div>
     </div>
     <aside class="nl-mesa__panel">
+        <?= $instrucciones('Toca un número de la imagen (o un círculo de aquí abajo). Escribe de memoria el nombre de esa estructura y presiona Enter: verás la respuesta correcta. Luego elige su función entre las alternativas. <strong>Verde</strong>: nombre y función correctos. <strong>Ámbar</strong>: el nombre quedó por repasar.') ?>
         <div class="nl-lab__estado">
             <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
             <span class="nl-lab__errores" id="nl-lab-errores"></span>
@@ -77,10 +87,10 @@ $info = function ($instrucciones) use ($act, $carreras) {
         <div class="nl-lab__fin" id="nl-lab-fin" hidden>
             <div class="nl-lab__resumen" id="nl-lab-resumen"></div>
             <div id="nl-lab-guia"></div>
+            <?= $conexion() ?>
             <a class="btn btn-primary btn-sm nl-lab__sig-nivel" id="nl-lab-sig" hidden>🔍 Acercarse más: siguiente nivel →</a>
         </div>
         <div class="nl-lab__trabajo" id="nl-lab-feedback" role="status" aria-live="polite"></div>
-        <?= $info('Toca un número de la imagen. Escribe de memoria el nombre de esa estructura, compáralo con la respuesta correcta y elige su función. Verde: nombre y función correctos. Ámbar: el nombre quedó por repasar.') ?>
     </aside>
 </div>
 
@@ -100,6 +110,7 @@ $info = function ($instrucciones) use ($act, $carreras) {
         <?php endif; ?>
     </div>
     <aside class="nl-mesa__panel">
+        <?= $instrucciones('Lee «Cómo buscarlas», explora la lámina con el zoom y luego, en «Tu trabajo», pega tus capturas y responde las preguntas. Cada pregunta se corrige al instante.') ?>
         <div class="nl-mesa__tabs" role="tablist">
             <?php foreach ($textos as $i => $t): ?>
                 <button type="button" role="tab" class="nl-mesa__tab<?= $i === 0 ? ' active' : '' ?>" data-tab="t<?= $i ?>"><?= htmlspecialchars($t['caption'] ?: 'Guía') ?></button>
@@ -119,9 +130,9 @@ $info = function ($instrucciones) use ($act, $carreras) {
                      data-config="<?= htmlspecialchars(json_encode($tareas, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
                 <?php if (!empty($tareas['intro'])): ?><p class="nl-tar__intro"><?= htmlspecialchars($tareas['intro']) ?></p><?php endif; ?>
                 <div class="nl-tar__cuerpo"></div>
+                <?= $conexion() ?>
             </section>
         </div>
-        <?= $info('') ?>
     </aside>
 </div>
 <?php endif; ?>

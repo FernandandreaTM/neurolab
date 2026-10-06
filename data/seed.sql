@@ -242,8 +242,8 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
       'Libera neurotransmisores hacia la siguiente célula.',
       'boton terminal|botones terminales|boton sinaptico|botón sináptico|terminal presinaptico|terminal presináptico|botones sinapticos|terminal sinaptico|terminal sináptico', 88.0, 20.0, 8, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
-  (4, 1, 'Reconocer las partes es fundamental para entender los trastornos del lenguaje asociados a daño en áreas corticales específicas.', 1),
-  (4, 2, 'Las lesiones en axón y mielina son la base de enfermedades desmielinizantes (p. ej. esclerosis múltiple) que afectan la función motora y sensorial. El neurofilamento ligero (NfL) en sangre se usa como marcador de daño axonal.', 2);
+  (4, 2, 'En la esclerosis múltiple se daña la vaina de mielina: el impulso se enlentece o se bloquea y aparecen debilidad, fatiga y alteraciones de la sensibilidad que dificultan las actividades de la vida diaria. Saber qué hace cada parte permite entender qué síntoma aparece cuando falla.', 1),
+  (4, 1, 'Cuando se daña la mielina de la vía auditiva o de los nervios que mueven la boca y la lengua, la conducción se enlentece: se altera la percepción del habla y la articulación.', 2);
 
 -- Actividad demo 5: QUIZ (potencial de acción)
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
@@ -302,7 +302,8 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
       'Forma la mielina alrededor de un tramo del axón en el sistema nervioso periférico.',
       'celula de schwann|schwann|neurolemocito', 72, 62, 7, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
-  (7, 2, 'Los cuerpos de Nissl desaparecen del soma (cromatólisis) cuando el axón se lesiona: es una señal de que la neurona intenta regenerarlo.', 1);
+  (7, 2, 'Cuando un axón periférico se lesiona (por ejemplo, en una lesión de nervio de la mano), los cuerpos de Nissl se dispersan (cromatólisis) y la célula de Schwann guía la regeneración: por eso la recuperación funcional toma semanas a meses.', 1),
+  (7, 1, 'En una lesión del nervio facial o hipogloso, la neurona muestra cromatólisis mientras intenta regenerar su axón; la célula de Schwann guía ese recrecimiento.', 2);
 
 -- Actividad 8: LABELING nivel III (citoesqueleto y transporte). Imagen img/neurona-nivel3-zoom.jpg (1536×1024):
 -- tres ampliaciones (A axón, B cono de crecimiento, C botón terminal) + miniatura de la neurona.
@@ -337,4 +338,5 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
       'vesiculas|vesícula sináptica|vesiculas sinapticas', 86, 57, 6, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
-  (8, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);
+  (8, 2, 'El transporte axonal depende del citoesqueleto: en los axones más largos (como los que llegan a los pies y las manos) falla primero, y por eso las neuropatías periféricas empiezan con hormigueo y torpeza distal.', 1),
+  (8, 1, 'Las espinas dendríticas y su actina cambian con la práctica: es la base celular del aprendizaje, por ejemplo al adquirir o rehabilitar habilidades del habla.', 2);
