@@ -291,7 +291,7 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
   (7, 'Segmento inicial del axón', 37.8, 45.4,
       'Tramo sin mielina donde el soma se estrecha (cono axónico o montículo axonal) y nace el axón. Su alta densidad de canales de Na⁺ dependientes de voltaje lo convierte en la zona gatillo.',
       'Zona gatillo: integra las señales recibidas y, gracias a su alta densidad de canales de sodio, allí se dispara el potencial de acción.',
-      'segmento inicial|zona gatillo|cono axonico|cono axónico|monticulo axonal|montículo axonal|cono de implantacion', 46, 62, 5, NULL),
+      'segmento inicial|zona gatillo|cono axonico|cono axónico|monticulo axonal|montículo axonal|cono de implantacion', 43, 54, 5, NULL),
   (7, 'Microtúbulos', 61.8, 27.8,
       'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
       'Forman los rieles por los que se mueve el transporte axonal.',
@@ -307,7 +307,7 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
   (7, 'Colateral axónica', 60.6, 61.8,
       'Un axón puede formar muchas colaterales (hasta 200 o más) y comunicarse así con varios blancos a la vez.',
       'Rama lateral del axón que lleva la misma señal hacia otra célula.',
-      'colateral|rama colateral|colaterales', 52, 74, 9, 'corchete:58.3,55.0,62.8,68.5'),
+      'colateral|rama colateral|colaterales', 53, 58.5, 9, 'corchete:58.3,55.0,62.8,68.5'),
   (7, 'Célula de Schwann', 64.8, 52.0,
       'Cada célula de Schwann envuelve un solo internodo; en el SNC esta función la cumple el oligodendrocito. También favorece la regeneración del axón periférico.',
       'Forma la mielina alrededor de un tramo del axón en el sistema nervioso periférico.',
@@ -316,9 +316,13 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
       'Rico en actina, con filopodios y lamelipodios. Dirige el crecimiento del axón durante el desarrollo y en la regeneración.',
       'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
       'cono de crecimiento axonal', 66, 88, 11, 'elipse:67.2,72.0,4.2,6.8'),
+  (7, 'Filamentos de actina', 51.4, 78.1,
+      'Polímeros de actina, los filamentos más delgados del citoesqueleto (microfilamentos). Se concentran en el cono de crecimiento (filopodios y lamelipodio) y en las espinas dendríticas; su armado y desarmado rápido permite que el axón avance y que las espinas cambien con la plasticidad.',
+      'Forman los filopodios del cono de crecimiento y sostienen las espinas dendríticas: permiten cambios rápidos de forma.',
+      'actina|filamento de actina|microfilamentos|microfilamento|f-actina', 36, 95, 12, NULL),
   (7, 'Vesículas sinápticas', 82.7, 78.1,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 73, 96, 12, NULL);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 73, 96, 13, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (7, 2, 'El transporte axonal y el citoesqueleto explican por qué un axón largo (como el de una motoneurona) es vulnerable: si el transporte falla, el extremo distal se daña primero (neuropatías periféricas).', 1);
