@@ -77,3 +77,11 @@ Neurona: [DESCRIPCIÓN]
 
 Subirlos a `img/tipos/` con esos nombres exactos: la página los usa automáticamente en vez
 de los dibujos provisorios (no hay que tocar código).
+
+## 3. Set coherente (versión final, 2026-10-06)
+
+Los tres niveles usan la MISMA neurona:
+| Archivo | Origen | Nivel |
+|---|---|---|
+| `img/neurona-base.jpg` | `img/_fuentes/base-espinas.png` (ChatGPT: imagen 2 sin zooms + espinas en todas las dendritas) | I y II |
+| `img/neurona-nivel3-zoom.jpg` | Composición: 4 zooms (A espina = `_fuentes/zoom-espina.png`, B axón, C cono y D botón = `_fuentes/neurona-nivel2-actina.png`) + miniatura de la base con líneas | III |

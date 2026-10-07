@@ -207,40 +207,40 @@ INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo
 -- Texto vigente (actualiza también BD ya pobladas)
 UPDATE actividades SET titulo = 'Partes de la neurona · Nivel I: estructura general', descripcion = 'Nivel I: estructura general. Escribe de memoria el nombre de cada estructura, compáralo con la respuesta correcta y luego elige su función entre alternativas. Al completar todas, súmala a tu guía.' WHERE slug = 'labeling-partes-neurona';
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (4, 'imagen', 'img/neurona-partes.jpg', 'Esquema de una neurona multipolar mielinizada', 1);
+  (4, 'imagen', 'img/neurona-base.jpg', 'Neurona multipolar mielinizada', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
-  (4, 'Dendritas', 23.0, 21.0,
+  (4, 'Dendritas', 13.0, 18.5,
       'Etapa de recepción. Cuanto más ramificado es el árbol dendrítico, más contactos puede recibir la neurona.',
       'Reciben las señales de otras neuronas y las conducen hacia el cuerpo celular.',
-      'dendrita|arbol dendritico|árbol dendrítico|dendritas', 15, 8, 1, NULL),
-  (4, 'Núcleo', 23.6, 41.0,
+      'dendrita|arbol dendritico|árbol dendrítico|dendritas', 6, 8, 1, NULL),
+  (4, 'Núcleo', 22.5, 40.0,
       'La neurona es postmitótica: no se divide. Por eso una neurona perdida no se reemplaza; el sistema nervioso se adapta por plasticidad.',
       'Contiene el material genético y dirige la síntesis de proteínas de la célula.',
-      'nucleo|núcleo celular|nucleo celular', 12, 30, 2, 'elipse:23.6,45.4,3.2,5.8'),
-  (4, 'Soma', 28.0, 54.0,
+      'nucleo|núcleo celular|nucleo celular', 12, 30, 2, 'elipse:22.5,43.5,3.8,6.0'),
+  (4, 'Soma', 19.5, 53.0,
       'También se llama pericarion y además recibe señales. En el SNC los somas se agrupan en núcleos y en el SNP, en ganglios.',
       'Centro metabólico: produce las macromoléculas y contiene la mayoría de los organelos.',
-      'cuerpo celular|pericarion|pericarión|soma neuronal|cuerpo neuronal', 31, 68, 3, 'elipse:25.0,46.5,12.5,16.5'),
-  (4, 'Axón', 42.8, 46.9,
+      'cuerpo celular|pericarion|pericarión|soma neuronal|cuerpo neuronal', 8, 64, 3, 'elipse:23.5,44.0,10.5,15.5'),
+  (4, 'Axón', 37.4, 45.1,
       'Etapa de conducción. Hay uno solo por neurona y su longitud va de 1 mm a 1 m.',
       'Conduce el impulso nervioso desde el cuerpo celular hacia los terminales.',
-      'axon|fibra nerviosa|cilindroeje', 45, 64, 4, 'corchete:40.0,52.5,81.0,58.5'),
-  (4, 'Vaina de mielina', 56.3, 50.5,
+      'axon|fibra nerviosa|cilindroeje', 40, 64, 4, 'corchete:38.5,51.5,81.0,55.5'),
+  (4, 'Vaina de mielina', 53.5, 50.6,
       'La forman células gliales (las verás en Células nerviosas II). Gracias a ella el impulso salta entre los nódulos de Ranvier: conducción saltatoria.',
       'Aísla la prolongación y aumenta la velocidad de conducción del impulso.',
-      'mielina|vaina mielinica|vaina mielínica|vaina de mielina', 56, 38, 5, 'elipse:55.6,49.6,4.0,3.4'),
-  (4, 'Nódulo de Ranvier', 71.4, 53.0,
+      'mielina|vaina mielinica|vaina mielínica|vaina de mielina', 50, 37, 5, 'elipse:53.5,50.6,4.9,3.6'),
+  (4, 'Nódulo de Ranvier', 58.9, 51.0,
       'Es el espacio sin mielina entre dos segmentos de la vaina.',
       'Interrupción del aislante donde se regenera el impulso, que salta de una a otra.',
-      'nodulo de ranvier|nodo de ranvier|nódulo|nodulo|ranvier|nodulos de ranvier', 71.4, 64.0, 6, NULL),
-  (4, 'Ramas terminales', 89.0, 58.0,
+      'nodulo de ranvier|nodo de ranvier|nódulo|nodulo|ranvier|nodulos de ranvier', 62, 38, 6, NULL),
+  (4, 'Ramas terminales', 86.6, 50.8,
       'También se llaman telodendrón: es la ramificación final del axón.',
       'Reparten la señal hacia varias células blanco a la vez.',
-      'telodendron|telodendrón|arborizacion terminal|arborización terminal|terminal axonico|terminal axónico|ramas terminales', 80, 70, 7, 'elipse:90.0,51.0,8.8,19.5'),
-  (4, 'Botón terminal', 90.5, 31.0,
+      'telodendron|telodendrón|arborizacion terminal|arborización terminal|terminal axonico|terminal axónico|ramas terminales', 80, 66, 7, 'elipse:91.0,46.0,8.8,19.0'),
+  (4, 'Botón terminal', 95.2, 32.5,
       'Etapa de transmisión: es el ensanchamiento del extremo de cada rama terminal.',
       'Libera neurotransmisores hacia la siguiente célula.',
-      'boton terminal|botones terminales|boton sinaptico|botón sináptico|terminal presinaptico|terminal presináptico|botones sinapticos|terminal sinaptico|terminal sináptico', 88.0, 20.0, 8, NULL);
+      'boton terminal|botones terminales|boton sinaptico|botón sináptico|terminal presinaptico|terminal presináptico|botones sinapticos|terminal sinaptico|terminal sináptico', 88, 18, 8, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (4, 2, 'En la esclerosis múltiple se daña la vaina de mielina: el impulso se enlentece o se bloquea y aparecen debilidad, fatiga y alteraciones de la sensibilidad que dificultan las actividades de la vida diaria. Saber qué hace cada parte permite entender qué síntoma aparece cuando falla.', 1),
   (4, 1, 'Cuando se daña la mielina de la vía auditiva o de los nervios que mueven la boca y la lengua, la conducción se enlentece: se altera la percepción del habla y la articulación.', 2);
@@ -264,75 +264,75 @@ INSERT OR IGNORE INTO quices (actividad_id, titulo, datos_json, activo) VALUES
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (6, 2, 'Responde solo/a, sin apuntes. Al terminar revisa el resumen: las preguntas falladas son las que conviene repasar antes de Células II.', 1);
 
--- Actividad 7: LABELING nivel II (organelos y especializaciones). Imagen img/neurona-nivel2-organelos.jpg (1536×1024),
--- derivada de la ilustración con zooms (img/_fuentes/neurona-nivel2-actina.png) quitando los círculos.
+-- Actividad 7: LABELING nivel II (organelos y especializaciones). Imagen img/neurona-base.jpg (1536×1024), la misma de los niveles I y III
+-- (img/_fuentes/base-espinas.png).
 -- Ajustar coordenadas con actividad.php?slug=labeling-neurona-nivel-2&calibrar=1
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
   (7, 6, 'labeling-neurona-nivel-2', 'Partes de la neurona · Nivel II: organelos y especializaciones',
        'Nivel II: organelos y especializaciones. Escribe de memoria el nombre de cada estructura, compáralo con la respuesta correcta y elige su función. Se desbloquea al completar el nivel I.', 'labeling', 1);
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (7, 'imagen', 'img/neurona-nivel2-organelos.jpg', 'Neurona: organelos y especializaciones', 1);
+  (7, 'imagen', 'img/neurona-base.jpg', 'Neurona: organelos y especializaciones', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
-  (7, 'Espinas dendríticas', 32.6, 20.0,
-      'Protrusiones de la dendrita que reciben la mayoría de las sinapsis excitatorias. Cambian de forma y número con la experiencia (plasticidad): son la base celular del aprendizaje.',
-      'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
-      'espina dendritica|espinas|espina', 40, 6, 1, NULL),
   (7, 'Cuerpos de Nissl', 17.1, 43.5,
       'Acúmulos de retículo endoplásmico rugoso y polirribosomas. Dan el aspecto basófilo al soma y reflejan su alta síntesis proteica; no entran al axón.',
       'Fabrican en gran cantidad las proteínas que la neurona necesita.',
-      'sustancia de nissl|grumos de nissl|nissl|retículo endoplásmico rugoso|reticulo endoplasmico rugoso|rer', 10, 36, 2, NULL),
+      'sustancia de nissl|grumos de nissl|nissl|retículo endoplásmico rugoso|reticulo endoplasmico rugoso|rer', 10, 36, 1, NULL),
   (7, 'Aparato de Golgi', 24.7, 36.1,
       'Trabaja junto a los cuerpos de Nissl: recibe lo que ellos fabrican y lo envía hacia las dendritas y el axón.',
       'Modifica, empaqueta y distribuye las proteínas en vesículas.',
-      'golgi|complejo de golgi', 22, 8, 3, NULL),
+      'golgi|complejo de golgi', 22, 8, 2, NULL),
   (7, 'Mitocondria', 30.6, 40.0,
       'Abundan en el soma, a lo largo del axón y en los terminales, donde la demanda de energía es mayor.',
       'Produce el ATP que la neurona necesita, sobre todo para mantener sus gradientes iónicos.',
-      'mitocondrias', 41, 30, 4, NULL),
+      'mitocondrias', 41, 30, 3, NULL),
   (7, 'Segmento inicial del axón', 37.8, 45.4,
       'Es el tramo sin mielina donde el soma se estrecha (cono axónico o montículo axonal) y nace el axón.',
       'Zona gatillo: integra las señales recibidas y, gracias a su alta densidad de canales de sodio, allí se dispara el potencial de acción.',
-      'segmento inicial|zona gatillo|cono axonico|cono axónico|monticulo axonal|montículo axonal|cono de implantacion', 43, 54, 5, NULL),
+      'segmento inicial|zona gatillo|cono axonico|cono axónico|monticulo axonal|montículo axonal|cono de implantacion', 43, 54, 4, NULL),
   (7, 'Colateral axónica', 60.6, 61.8,
       'Un axón puede formar muchas colaterales (hasta 200 o más) y comunicarse así con varios blancos a la vez.',
       'Rama lateral del axón que lleva la misma señal hacia otra célula.',
-      'colateral|rama colateral|colaterales', 53, 58.5, 6, 'corchete:58.3,55.0,62.8,68.5'),
+      'colateral|rama colateral|colaterales', 53, 58.5, 5, 'corchete:58.3,55.0,62.8,68.5'),
   (7, 'Cono de crecimiento', 67.2, 71.0,
       'Extremo ensanchado del axón en crecimiento, con prolongaciones finas (filopodios) que exploran el entorno. Dirige el crecimiento durante el desarrollo y la regeneración; su citoesqueleto lo verás en el nivel III.',
       'Extremo móvil de un axón en crecimiento que explora el entorno y guía su avance.',
-      'cono de crecimiento axonal', 66, 88, 7, 'elipse:67.2,72.0,4.2,6.8');
+      'cono de crecimiento axonal', 66, 88, 6, 'elipse:67.2,72.0,4.2,6.8');
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (7, 2, 'Cuando un axón periférico se lesiona (por ejemplo, en una lesión de nervio de la mano), los cuerpos de Nissl se dispersan (cromatólisis) y el extremo del axón forma un nuevo cono de crecimiento para volver a crecer: por eso la recuperación funcional toma semanas a meses.', 1),
   (7, 1, 'En una lesión del nervio facial o hipogloso, la neurona muestra cromatólisis mientras intenta regenerar su axón, que avanza guiado por su cono de crecimiento.', 2);
 
 -- Actividad 8: LABELING nivel III (citoesqueleto y transporte). Imagen img/neurona-nivel3-zoom.jpg (1536×1024):
--- tres ampliaciones (A axón, B cono de crecimiento, C botón terminal) + miniatura de la neurona.
+-- cuatro ampliaciones (A espina dendrítica, B axón, C cono de crecimiento, D botón terminal) + miniatura de la neurona base.
 INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo) VALUES
   (8, 6, 'labeling-neurona-nivel-3', 'Partes de la neurona · Nivel III: citoesqueleto y transporte',
-       'Nivel III: citoesqueleto y transporte. Los círculos A, B y C son ampliaciones de los lugares marcados en la neurona de abajo (B es el interior del cono de crecimiento). Reconoce cada estructura y su función. Se desbloquea al completar el nivel II.', 'labeling', 1);
+       'Nivel III: citoesqueleto y transporte. Los círculos A, B, C y D son ampliaciones de los lugares marcados en la neurona de abajo. Reconoce cada estructura y su función. Se desbloquea al completar el nivel II.', 'labeling', 1);
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
-  (8, 'imagen', 'img/neurona-nivel3-zoom.jpg', 'Ampliaciones: interior del axón (A), cono de crecimiento (B) y botón terminal (C)', 1);
+  (8, 'imagen', 'img/neurona-nivel3-zoom.jpg', 'Ampliaciones: espina dendrítica (A), interior del axón (B), cono de crecimiento (C) y botón terminal (D)', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
-  (8, 'Microtúbulos', 19.5, 35.9,
+  (8, 'Espinas dendríticas', 12.8, 11.7,
+      'Protrusiones de la dendrita que reciben la mayoría de las sinapsis excitatorias. A diferencia del tronco de la dendrita (sostenido por microtúbulos), las espinas se sostienen con actina: por eso cambian de forma y número con la experiencia (plasticidad), la base celular del aprendizaje.',
+      'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
+      'espina dendritica|espinas|espina', 5, 44, 1, NULL),
+  (8, 'Microtúbulos', 38.7, 26.5,
       'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
       'Forman los rieles por los que se mueve el transporte axonal.',
-      'microtubulo|microtúbulo|tubulina', 14, 57, 1, NULL),
-  (8, 'Neurofilamentos', 16.3, 24.6,
+      'microtubulo|microtúbulo|tubulina', 31, 44, 2, NULL),
+  (8, 'Neurofilamentos', 36.2, 17.9,
       'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
       'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
-      'neurofilamento|filamentos intermedios', 20, 3.5, 2, NULL),
-  (8, 'Proteínas motoras', 8.5, 32.2,
+      'neurofilamento|filamentos intermedios', 47, 43, 3, NULL),
+  (8, 'Proteínas motoras', 30.3, 23.7,
       'Kinesina: transporte anterógrado (del soma al terminal: vesículas, mitocondrias, proteínas nuevas). Dineína: transporte retrógrado (del terminal al soma: membranas para reciclar, material endocitado, factores tróficos). Ambas caminan sobre los microtúbulos gastando ATP.',
       'Transportan carga a lo largo del axón caminando sobre los microtúbulos, en ambos sentidos.',
-      'kinesina|dineína|kinesina y dineina|motores moleculares|proteinas motoras', 7, 66, 3, 'puntos:26.2,29.3'),
-  (8, 'Filamentos de actina', 45.6, 32.2,
+      'kinesina|dineína|kinesina y dineina|motores moleculares|proteinas motoras', 37, 2.5, 4, 'puntos:43.8,21.4'),
+  (8, 'Filamentos de actina', 58.4, 23.7,
       'Polímeros de actina, los filamentos más delgados del citoesqueleto (microfilamentos). Se concentran en el cono de crecimiento (filopodios y lamelipodio) y en las espinas dendríticas; su armado y desarmado rápido permite que el axón avance y que las espinas cambien con la plasticidad.',
       'Forman los filopodios del cono de crecimiento y sostienen las espinas dendríticas: permiten cambios rápidos de forma.',
-      'actina|filamento de actina|microfilamentos|microfilamento|f-actina', 50, 56, 4, NULL),
-  (8, 'Vesículas sinápticas', 80.7, 28.8,
+      'actina|filamento de actina|microfilamentos|microfilamento|f-actina', 66, 42, 5, 'puntos:13.0,15.9'),
+  (8, 'Vesículas sinápticas', 84.9, 21.1,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 86, 57, 5, NULL);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 90, 44, 6, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (8, 2, 'El transporte axonal depende del citoesqueleto: en los axones más largos (como los que llegan a los pies y las manos) falla primero, y por eso las neuropatías periféricas empiezan con hormigueo y torpeza distal.', 1),
   (8, 1, 'Las espinas dendríticas y su actina cambian con la práctica: es la base celular del aprendizaje, por ejemplo al adquirir o rehabilitar habilidades del habla.', 2);
