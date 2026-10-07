@@ -3,12 +3,13 @@
  * Niveles "capturas" de la lámina, en mesa de trabajo (misma dinámica que labeling.js y tipos.js).
  * Vista: la lámina virtual (iframe, con selector de tinción) o la captura del estudiante.
  * Panel: por cada captura, 4 pasos:
- *   1. Buscar   -> dónde buscar; se pega (Ctrl+V) o se sube la captura de pantalla
+ *   1. Buscar   -> dónde buscar; «Capturar» toma la pestaña (getDisplayMedia, con permiso) y la
+ *                  recorta al área de la lámina; de respaldo se pega (Ctrl+V) o se sube la captura
  *   2. Recortar -> se arrastra un rectángulo sobre la captura (o se usa completa)
  *   3. Etiquetar-> se toca una etiqueta (lista fija) y luego su lugar en la imagen
  *   4. Preguntas-> alternativas; la incorrecta queda en rojo con su pista, hasta acertar
  * Verde = correcto · rojo suave = por repasar · naranjo = lo que se está haciendo.
- * El navegador no puede capturar el iframe de otro sitio: la captura la hace el estudiante.
+ * El navegador no puede leer el iframe de otro sitio: la captura de la pestaña necesita el permiso del estudiante.
  *
  * Avance en localStorage (nl_lam_<clave>). Al completar: markDone(clave) y la sección
  * (capturas anotadas + preguntas) se guarda sola en la guía.
@@ -45,6 +46,9 @@ function barajar(n) {
     return a;
 }
 const angosta = () => window.matchMedia('(max-width: 900px)').matches;
+/** Captura de la pestaña: navegadores de escritorio con getDisplayMedia (Chrome, Edge, Firefox). */
+const puedeCapturar = () => !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
+    && !angosta() && !/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 /* ---------------------------------------------------------------
    Imágenes: reducir, recortar, anotar
@@ -324,11 +328,16 @@ function iniciar(raiz) {
         if (s.paso === 'buscar') {
             panel.innerHTML = `${av}${cab}${linea}
                 <div class="nl-ficha__bloque"><span class="nl-ficha__etq">Dónde buscar</span><p>${escapar(sel.busca)}</p></div>
-                <div class="nl-lam__pegar" tabindex="0">
-                    <strong>📋 Pega aquí tu captura</strong>
-                    <span>Haz zoom, captura la pantalla (<kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> · Mac: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>4</kbd> · celular: captura de pantalla) y pégala con <kbd>Ctrl</kbd>+<kbd>V</kbd>.</span>
+                ${puedeCapturar() ? `<div class="nl-lam__capt">
+                    <button type="button" class="btn btn-primary btn-sm nl-lam__capturar">📷 Capturar la lámina</button>
+                    <span>Haz zoom en la lámina hasta que la ${/capa|cerebelo/i.test(sel.titulo) ? 'zona' : 'neurona'} se vea bien y presiona <strong>Capturar</strong>. El navegador te pedirá compartir <strong>esta pestaña</strong>: acepta y se abre el recorte.</span>
+                </div>` : ''}
+                <div class="nl-lam__pegar${puedeCapturar() ? ' is-respaldo' : ''}" tabindex="0">
+                    <strong>${puedeCapturar() ? '¿No funcionó? Pega o sube una captura' : '📋 Pega aquí tu captura'}</strong>
+                    <span>Captura la pantalla (<kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> · Mac: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>4</kbd> · celular: captura de pantalla) y pégala con <kbd>Ctrl</kbd>+<kbd>V</kbd>.</span>
                     <label class="btn btn-ghost btn-sm nl-lam__subir">o súbela desde tu equipo<input type="file" accept="image/*" hidden></label>
                 </div>`;
+            panel.querySelector('.nl-lam__capturar')?.addEventListener('click', capturar);
             panel.querySelector('input[type=file]').addEventListener('change', ev => {
                 const f = ev.target.files && ev.target.files[0];
                 if (f) recibir(f);
@@ -453,6 +462,62 @@ function iniciar(raiz) {
         pintar();
         verVista('captura');
         if (angosta()) raiz.querySelector('.nl-lam__vista').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /** Toma un cuadro de esta pestaña (con permiso) y lo deja recortado al área de la lámina. */
+    async function capturar() {
+        if (panel.classList.contains('is-esperando')) return;
+        verVista('lamina');
+        let stream = null;
+        try {
+            stream = await navigator.mediaDevices.getDisplayMedia({
+                video: { displaySurface: 'browser', frameRate: 5 }, audio: false,
+                preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude', monitorTypeSurfaces: 'exclude',
+            });
+        } catch {
+            aviso = 'No se tomó la captura (el permiso se canceló o el navegador no lo permite). Puedes pegar o subir una captura.';
+            pintarPanel();
+            return;
+        }
+        panel.classList.add('is-esperando');
+        const track = stream.getVideoTracks()[0];
+        try {
+            let ajustada = false;   // Region Capture (Chrome/Edge): el video ya viene recortado al iframe
+            if (window.CropTarget && track.cropTo) {
+                try { await track.cropTo(await window.CropTarget.fromElement(iframe)); ajustada = true; } catch { ajustada = false; }
+            }
+            const video = document.createElement('video');
+            video.muted = true; video.playsInline = true; video.srcObject = stream;
+            await video.play();
+            await new Promise(r => setTimeout(r, 600));   // deja que el navegador quite su aviso de «compartiendo»
+            const W = video.videoWidth, H = video.videoHeight;
+            if (!W || !H) throw new Error('sin cuadro');
+            let sx = 0, sy = 0, sw = W, sh = H;
+            const sup = (track.getSettings && track.getSettings().displaySurface) || 'browser';
+            const r = iframe.getBoundingClientRect();
+            const mismaPestana = sup === 'browser' && Math.abs(W / H - innerWidth / innerHeight) < 0.04;
+            if (!ajustada && mismaPestana && r.width > 50) {
+                const k = W / innerWidth;
+                sx = Math.max(0, r.left * k); sy = Math.max(0, r.top * k);
+                sw = Math.min(W - sx, r.width * k); sh = Math.min(H - sy, r.height * k);
+            }
+            const c = document.createElement('canvas');
+            c.width = Math.round(sw); c.height = Math.round(sh);
+            c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, c.width, c.height);
+            video.srcObject = null;
+            const blob = await new Promise(ok => c.toBlob(ok, 'image/png'));
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+            panel.classList.remove('is-esperando');
+            if (!blob) throw new Error('sin imagen');
+            await recibir(blob);
+        } catch {
+            panel.classList.remove('is-esperando');
+            aviso = 'No pudimos tomar la captura. Puedes pegar o subir una captura.';
+            pintarPanel();
+        } finally {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+        }
     }
 
     async function recortar(rec) {

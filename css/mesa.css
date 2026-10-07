@@ -183,6 +183,14 @@
 .nl-mesa__instr p { margin: .45rem 0 0; }
 .nl-mesa__instr strong { color: #fff; }
 .nl-mesa__desc { color: var(--gray-300); font-size: .8rem; }
+.nl-mesa__aviso {
+    font-size: .84rem; line-height: 1.5; color: var(--gray-100);
+    padding: .55rem .75rem; border-radius: 10px;
+    background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.45);
+}
+.nl-mesa__aviso summary { cursor: pointer; font-weight: 800; color: #FCD34D; }
+.nl-mesa__aviso p { margin: .45rem 0 0; font-size: .84rem; line-height: 1.5; }
+.nl-mesa__aviso strong { color: #FDE68A; }
 .nl-mesa__conexion {
     padding: .7rem .85rem; border-radius: 10px; font-size: .84rem; line-height: 1.5;
     background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.45); color: var(--gray-100);
@@ -486,6 +494,14 @@
 .nl-lam__pegar strong { color: #FCD34D; font-size: .95rem; }
 .nl-lam__pegar kbd { font-size: .72rem; padding: .05rem .3rem; border-radius: 4px; background: rgba(255,255,255,.12); color: #fff; }
 .nl-lam__subir { cursor: pointer; }
+.nl-lam__capt {
+    display: flex; flex-direction: column; align-items: flex-start; gap: .45rem;
+    padding: .8rem .85rem; border-radius: 12px; border: 2px solid rgba(245,158,11,.7); background: rgba(245,158,11,.1);
+    font-size: .84rem; color: var(--gray-100); line-height: 1.5;
+}
+.nl-lam__capt strong { color: #FDE68A; }
+.nl-lam__pegar.is-respaldo { padding: .6rem .8rem; border-width: 1.5px; border-color: rgba(255,255,255,.18); background: transparent; }
+.nl-lam__pegar.is-respaldo strong { color: var(--gray-100); font-size: .84rem; }
 .nl-lam__etqs { display: flex; flex-wrap: wrap; gap: .35rem; }
 .nl-lam__etq {
     font: inherit; font-size: .82rem; font-weight: 700; padding: .35rem .75rem; border-radius: 99px; cursor: pointer;
