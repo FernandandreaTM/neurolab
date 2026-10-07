@@ -18,9 +18,9 @@ import { C, R, PUNTOS, LUGAR, PIEZAS, ICONOS, dibujoPieza, coordPunto } from './
 const RAIZ = document.getElementById('nl-tip');
 const KEY_BASE = 'nl_tipos_';
 const FILAS = [
-    { k: 'morfologia',   t: 'Morfología' },
-    { k: 'funcion',      t: 'Función y dirección' },
-    { k: 'localizacion', t: 'Localización y ejemplos' },
+    { k: 'morfologia',   t: 'Morfología',              c: 'Morfología' },
+    { k: 'funcion',      t: 'Función y dirección',     c: 'Función' },
+    { k: 'localizacion', t: 'Localización y ejemplos', c: 'Localización' },
 ];
 
 function leer(nivel) {
@@ -104,7 +104,7 @@ function iniciar(raiz) {
         panel.innerHTML = `
             <p class="nl-lab__cierre-tit">🎉 ¡Nivel completado!</p>
             <p>${motor.resumenCierre()} · ${est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}` : 'sin errores'}</p>
-            ${rep.length ? `<p class="nl-lab__alt nl-lab__repasar">↺ Por repasar: ${rep.map(motor.nombreRepaso).join(' · ')}</p>` : ''}
+            ${rep.length ? `<p class="nl-lab__alt nl-lab__repasar">↺ Por repasar: ${[...new Set(rep.map(motor.nombreRepaso))].join(' · ')}</p>` : ''}
             ${d.siguiente ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${escapar(d.siguiente)}">Siguiente nivel →</a>`
                           : (hrefRuta ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefRuta}">Volver a la ruta →</a>` : '')}
             ${tplCx ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tplCx.innerHTML}</details>` : ''}
@@ -132,7 +132,7 @@ function iniciar(raiz) {
                 slug: d.slug,
                 nota: `${motor.resumenCierre()} · ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}`,
                 bloques: motor.bloquesGuia().concat(porRepasar().length
-                    ? [{ t: 'texto', txt: '↺ Por repasar: ' + porRepasar().map(motor.nombreRepaso).join(', ') + '.' }] : [])
+                    ? [{ t: 'texto', txt: '↺ Por repasar: ' + [...new Set(porRepasar().map(motor.nombreRepaso))].join(', ') + '.' }] : [])
                     .concat(conexionGuia()),
             });
         }
@@ -353,9 +353,172 @@ function motorArmar(cm) {
    Nivel "elegir": frase + tarjetas en la vista; cuadro comparativo en el panel
    =============================================================== */
 function motorElegir(cm) {
+    const { raiz, items, vista, panel, progreso } = cm;
+    let tipos = [];
+    try { tipos = JSON.parse(raiz.dataset.tipos || '[]'); } catch { tipos = []; }
+    const iconos = {};
+    document.getElementById('nl-tip-iconos')?.content.querySelectorAll('[data-tipo]').forEach(n => { iconos[n.dataset.tipo] = n.innerHTML; });
+    const porId = Object.fromEntries(items.map(it => [it.id, it]));
+    const filaT = k => (FILAS.find(f => f.k === k) || { t: '' }).t;
+    let sel = null;            // frase en pantalla
+    let nueva = null;          // última celda escrita (se destaca en el cuadro)
+    let verCierre = false;
+
+    /** Orden: fila por fila (morfología → función → localización); dentro de cada fila, al azar. */
+    function orden() {
+        const e = cm.est();
+        const ids = items.map(it => it.id);
+        if (Array.isArray(e.orden) && e.orden.length === ids.length && ids.every(id => e.orden.includes(id))) return e.orden;
+        e.orden = FILAS.flatMap(f => {
+            const fila = items.filter(it => it.fila === f.k).map(it => it.id);
+            for (let i = fila.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [fila[i], fila[j]] = [fila[j], fila[i]]; }
+            return fila;
+        }).concat(ids.filter(id => !items.find(it => it.id === id && FILAS.some(f => f.k === it.fila))));
+        cm.guardar();
+        return e.orden;
+    }
+    const num = it => orden().indexOf(it.id) + 1;
+    const mal = it => ((cm.est().mal || {})[it.id]) || [];
+    const frase = it => escapar(it.e).replace('{}', '<span class="nl-tip__hueco">____</span>');
+
+    /* --- Vista: la frase y las tres tarjetas --- */
+    function pintarVista() {
+        if (verCierre) {
+            vista.innerHTML = `<div class="nl-tip__frase-caja is-cierre"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>`;
+            return;
+        }
+        const s = cm.est().items[sel.id];
+        const m = mal(sel);
+        vista.innerHTML = `
+          <div class="nl-tip__frase-caja">
+            <p class="nl-tip__fila-etq">${escapar(filaT(sel.fila))} · frase ${num(sel)} de ${items.length}</p>
+            <p class="nl-tip__frase">${frase(sel)}</p>
+            <div class="nl-tip__cartas" role="group" aria-label="Elige el tipo de neurona">
+              ${tipos.map(t => {
+                  const esMal = m.some(x => x.t === t);
+                  const esOk = s && s.r === t;
+                  const cls = esOk ? ' is-ok is-vuelta' : esMal ? ' is-mal is-vuelta' : (s ? ' is-apagada' : '');
+                  const dorso = esOk ? `${iconos[t] || ''}<strong>✓ ${escapar(t)}</strong>`
+                              : esMal ? `<strong>✗ No es ${escapar(t.toLowerCase())}</strong><small>${escapar(m.find(x => x.t === t).p)}</small>` : '';
+                  return `<button type="button" class="nl-tip__carta${cls}" data-tipo="${escapar(t)}"${s || esMal ? ' disabled' : ''}>
+                            <span class="nl-tip__carta-in">
+                              <span class="nl-tip__cara">${iconos[t] || ''}<span class="nl-tip__carta-nom">${escapar(t).replace("Pseudo", "Pseudo&shy;")}</span></span>
+                              <span class="nl-tip__dorso">${dorso}</span>
+                            </span>
+                          </button>`;
+              }).join('')}
+            </div>
+          </div>`;
+        vista.querySelectorAll('.nl-tip__carta:not([disabled])').forEach(b =>
+            b.addEventListener('click', () => elegir(b.dataset.tipo, b)));
+    }
+
+    async function elegir(tipo, btn) {
+        if (cm.est().items[sel.id] || panel.classList.contains('is-esperando')) return;
+        cm.cerrarInstr();
+        panel.classList.add('is-esperando');
+        btn.classList.add('is-esperando');
+        const it = sel;
+        const r = await revisar(it.id, { respuesta: tipo });
+        panel.classList.remove('is-esperando');
+        if (!r || !r.correcto) {
+            if (r && r.red) { btn.classList.remove('is-esperando'); avisar(r.feedback); return; }
+            const e = cm.est();
+            e.mal = Object.assign({}, e.mal, { [it.id]: mal(it).concat([{ t: tipo, p: String((r && r.feedback) || '').replace(/^Todavía no\.\s*(Pista:\s*)?/, '') }]) });
+            cm.fallo();
+            pintarVista(); pintarPanel();
+            return;
+        }
+        cm.est().items[it.id] = { r: r.respuesta, celda: r.celda || '', exp: r.feedback || '', e: mal(it).length };
+        nueva = it.id;
+        cm.guardar();
+        pintar();
+        if (angosta()) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* --- Panel: cuadro comparativo + ficha --- */
+    function cuadro(grande) {
+        const hechos = items.filter(it => cm.est().items[it.id]);
+        return `<table class="nl-tip__cuadro${grande ? ' is-grande' : ''}">
+            <thead><tr><th></th>${tipos.map(t => `<th>${grande ? '' : iconos[t] || ''}<span>${escapar(t).replace('Pseudo', 'Pseudo&shy;')}</span></th>`).join('')}</tr></thead>
+            <tbody>${FILAS.map(f => `<tr class="${!grande && sel && !verCierre && sel.fila === f.k ? 'is-actual' : ''}"><th title="${f.t}">${grande ? f.t : f.c}</th>${tipos.map(t => {
+                const c = hechos.filter(it => it.fila === f.k && cm.est().items[it.id].r === t);
+                return `<td>${c.length ? c.map(it => `<span class="nl-tip__celda${it.id === nueva && !grande ? ' is-nueva' : ''}">${escapar(cm.est().items[it.id].celda)}</span>`).join('')
+                                       : '<span class="nl-tip__vacia">·</span>'}</td>`;
+            }).join('')}</tr>`).join('')}</tbody></table>`;
+    }
+
+    function pintarProgreso() {
+        progreso.hidden = verCierre;
+        progreso.innerHTML = verCierre ? '' : cuadro(false);
+    }
+
+    function pintarPanel() {
+        if (verCierre) { cm.mostrarCierre(); return; }
+        const s = cm.est().items[sel.id];
+        if (s) { mostrarFicha(sel); return; }
+        const m = mal(sel);
+        panel.className = 'nl-lab__trabajo is-pregunta';
+        panel.innerHTML = `
+            <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> ¿Qué tipo de neurona describe la frase?</p>
+            <p class="nl-lab__ayuda">Toca la tarjeta en la imagen. Fila del cuadro: <strong>${escapar(filaT(sel.fila))}</strong>.</p>
+            ${m.length ? `<p class="nl-lab__q-fb">✗ Esa tarjeta no era: lee la pista y prueba con otra.</p>` : ''}`;
+    }
+
+    function mostrarFicha(it) {
+        const s = cm.est().items[it.id];
+        const sig = orden().map(id => porId[id]).find(x => !cm.est().items[x.id]);
+        panel.className = 'nl-lab__trabajo ' + (s.e ? 'is-repasar' : 'is-ok');
+        panel.innerHTML = `
+            <p class="nl-lab__paso"><span class="nl-lab__badge">${num(it)}</span> Neurona ${escapar(s.r.toLowerCase())}
+               ${it.id === nueva ? `<span class="nl-tip__logro">${s.e ? '✓ con pista' : '🎯 al primer intento'}</span>` : ''}</p>
+            ${s.exp ? `<div class="nl-ficha__bloque"><span class="nl-ficha__etq">Para recordar</span><p>${escapar(s.exp)}</p></div>` : ''}
+            <div class="nl-ficha__acciones">
+                ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente frase →</button>`
+                      : `<button type="button" class="btn btn-primary btn-sm nl-lab__volver">Ver el cuadro completo →</button>`}
+            </div>`;
+        if (!angosta()) panel.querySelector('.nl-ficha__acciones')?.scrollIntoView({ block: 'nearest' });
+        panel.querySelector('.nl-lab__sig')?.addEventListener('click', () => {
+            sel = sig; nueva = null; pintar();
+            if (angosta()) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        panel.querySelector('.nl-lab__volver')?.addEventListener('click', () => { verCierre = true; nueva = null; pintar(); });
+    }
+
+    function avisar(txt) {
+        panel.querySelector('.nl-lab__aviso-act')?.remove();
+        panel.insertAdjacentHTML('afterbegin', `<p class="nl-lab__aviso-act">${escapar(txt)}</p>`);
+    }
+
+    function pintar() {
+        pintarVista();
+        pintarProgreso();
+        pintarPanel();
+        cm.actualizar();
+    }
+
     return {
-        iniciar() { cm.vista.textContent = 'Próximamente.'; },
-        reiniciar() {}, resumenCierre: () => '', nombreRepaso: () => '', bloquesGuia: () => [],
+        iniciar() {
+            const pend = orden().map(id => porId[id]).find(it => !cm.est().items[it.id]);
+            if (pend) sel = pend; else { sel = porId[orden()[0]]; verCierre = true; }
+            pintar();
+        },
+        reiniciar() {
+            verCierre = false; nueva = null;
+            sel = porId[orden()[0]];
+            pintar();
+        },
+        resumenCierre: () => `${items.length} frases`,
+        nombreRepaso: it => cm.est().items[it.id].r.toLowerCase(),
+        ayudaCierre: 'Tu cuadro completo está a la izquierda y en tu guía.',
+        subtituloGuia: 'Cuadro comparativo construido fila por fila: morfología, función y localización',
+        bloquesGuia: () => [{
+            t: 'tabla',
+            cab: ['Característica'].concat(tipos),
+            filas: FILAS.map(f => [f.t].concat(tipos.map(t => items
+                .filter(it => it.fila === f.k && cm.est().items[it.id] && cm.est().items[it.id].r === t)
+                .map(it => cm.est().items[it.id].celda).join(' · ')))),
+        }],
     };
 }
 
