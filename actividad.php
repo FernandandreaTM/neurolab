@@ -81,10 +81,36 @@ try {
         }
         if ($imgLab === '') { $esLabeling = false; }
     }
+    // --- Lámina por niveles (recurso "tareas" con "niveles"): un nivel por página (&nivel=N).
+    //     Nivel "identificar" -> motor de identificación (labeling_parts de esta actividad);
+    //     nivel "capturas"    -> js/lamina.js (capturar, recortar, etiquetar, preguntas) ---
+    $lamPorNiveles = is_array($tareas) && !empty($tareas['niveles']);
+    $esLamina = false; $nivelLam = null; $claveLab = ''; $sigHrefLab = ''; $nivelesNav = [];
+    if ($lamPorNiveles) {
+        $nivs = array_values($tareas['niveles']);
+        $pedido = isset($_GET['nivel']) ? (int)$_GET['nivel'] : 0;
+        $iL = 0;
+        foreach ($nivs as $k => $n) { if ((int)$n['n'] === $pedido) $iL = $k; }
+        $nivelesNav = nl_nav_niveles($act['slug'], $ruta, array_map(function ($n) { return [(int)$n['n'], $n['titulo']]; }, $nivs), $iL);
+        $nivelLam = $nivs[$iL];
+        $nivelLam['romano']    = nl_romano($iL);
+        $nivelLam['clave']     = $act['slug'] . ':' . (int)$nivelLam['n'];
+        $nivelLam['requiere']  = $iL > 0 ? $act['slug'] . ':' . (int)$nivs[$iL - 1]['n'] : '';
+        $nivelLam['siguiente'] = isset($nivs[$iL + 1]) ? $nivelesNav[$iL + 1]['href'] : '';
+        if (($nivelLam['tipo'] ?? '') === 'identificar' && !empty($labelParts) && !empty($nivelLam['img'])) {
+            $esLabeling = true;
+            $imgLab     = $nivelLam['img'];
+            $claveLab   = $nivelLam['clave'];
+            $sigHrefLab = $nivelLam['siguiente'];
+        } else {
+            $esLamina = true;
+        }
+    }
+
     $nivelesLab = [];   // otras actividades de identificación del mismo tema (niveles)
-    $requiereLab = '';
+    $requiereLab = $lamPorNiveles ? (string)$nivelLam['requiere'] : '';
     $siguienteLab = '';
-    if ($esLabeling) {
+    if ($esLabeling && !$lamPorNiveles) {
         $sv = $pdo->prepare("SELECT slug, titulo, activo FROM actividades
                              WHERE tipo = 'labeling' AND topic_id IS ? ORDER BY id");
         $sv->execute([$act['topic_id']]);
@@ -115,7 +141,7 @@ try {
 
     // --- Tipos de neurona en mesa de trabajo: un nivel por página (&nivel=N) ---
     $esTipos = ($act['tipo'] === 'comparador') && !empty($niveles);
-    $nivelTip = null; $nivelesNav = []; $siguienteTip = '';
+    $nivelTip = null; $siguienteTip = '';
     if ($esTipos) {
         $jugables = array_values(array_filter($niveles, function ($n) { return (int)$n['activo'] && !empty($n['items']); }));
         if (!$jugables) { $esTipos = false; }
@@ -125,16 +151,8 @@ try {
         $iTip = 0;
         foreach ($jugables as $k => $n) { if ((int)$n['numero'] === $pedido) $iTip = $k; }
         $nivelTip = $jugables[$iTip];
-        $romanos = ['I', 'II', 'III', 'IV', 'V'];
-        foreach ($jugables as $k => $n) {
-            $nivelesNav[] = [
-                'etq'    => 'Nivel ' . ($romanos[$k] ?? ($k + 1)),
-                'titulo' => $n['titulo'],
-                'href'   => 'actividad.php?slug=' . rawurlencode($act['slug']) . '&nivel=' . (int)$n['numero'] . ($ruta !== '' ? '&ruta=' . rawurlencode($ruta) : ''),
-                'actual' => $k === $iTip,
-            ];
-        }
-        $nivelTip['romano'] = $romanos[$iTip] ?? ($iTip + 1);
+        $nivelesNav = nl_nav_niveles($act['slug'], $ruta, array_map(function ($n) { return [(int)$n['numero'], $n['titulo']]; }, $jugables), $iTip);
+        $nivelTip['romano'] = nl_romano($iTip);
         $nivelTip['requiere'] = $iTip > 0 ? $act['slug'] . ':' . (int)$jugables[$iTip - 1]['numero'] : '';
         $siguienteTip = isset($jugables[$iTip + 1]) ? $nivelesNav[$iTip + 1]['href'] : '';
         if ($nivelTip['tipo'] === 'elegir') {
@@ -152,7 +170,7 @@ try {
     // Mesa de trabajo (vista + panel): identificación, o lámina con tareas
     $tieneIframe = false;
     foreach ($recursos as $r) { if ($r['tipo'] === 'iframe_url') { $tieneIframe = true; break; } }
-    $modoMesa = $esLabeling || $esTipos || (is_array($tareas) && $tieneIframe);
+    $modoMesa = $esLabeling || $esTipos || $esLamina || (is_array($tareas) && $tieneIframe);
 
     $active_page = 'actividad';
     ?>
@@ -392,7 +410,9 @@ try {
     <?php elseif (!empty($niveles)): ?>
     <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
     <?php endif; ?>
-    <?php if (is_array($tareas)): ?>
+    <?php if ($esLamina): ?>
+    <script type="module" src="js/lamina.js?v=<?= nl_ver('js/lamina.js') ?>"></script>
+    <?php elseif (is_array($tareas) && !$lamPorNiveles): ?>
     <script type="module" src="js/tareas.js?v=<?= nl_ver('js/tareas.js') ?>"></script>
     <?php endif; ?>
     </body>
@@ -411,6 +431,26 @@ function tipoLabel($t) {
         'labeling' => 'Identificación',
         'quiz' => 'Quiz',
     ][$t] ?? $t;
+}
+
+/** Número romano de un nivel (índice 0 -> "I"). */
+function nl_romano($i) {
+    $r = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    return $r[$i] ?? (string)($i + 1);
+}
+
+/** Botones "Nivel I · Nivel II…" del encabezado. $niveles = [[número, título], ...]. */
+function nl_nav_niveles($slug, $ruta, $niveles, $iActual) {
+    $nav = [];
+    foreach ($niveles as $k => $n) {
+        $nav[] = [
+            'etq'    => 'Nivel ' . nl_romano($k),
+            'titulo' => $n[1],
+            'href'   => 'actividad.php?slug=' . rawurlencode($slug) . '&nivel=' . (int)$n[0] . ($ruta !== '' ? '&ruta=' . rawurlencode($ruta) : ''),
+            'actual' => $k === $iActual,
+        ];
+    }
+    return $nav;
 }
 
 /** Versión de un archivo estático (fecha de modificación) para evitar caché vieja. */

@@ -53,6 +53,7 @@ function iniciar(raiz) {
     if (!partes.length) return;
 
     const slug     = raiz.dataset.slug || '';
+    const clave    = raiz.dataset.clave || slug;     // avance, progreso y guía (la lámina usa '<slug>:1')
     const titulo   = raiz.dataset.titulo || 'Partes de la neurona';
     const ruta     = new URLSearchParams(location.search).get('ruta') || '';
     const capa     = raiz.querySelector('#nl-lab-capa');
@@ -78,13 +79,13 @@ function iniciar(raiz) {
         return;
     }
 
-    let est = leer(slug);
+    let est = leer(clave);
     if (instr && !Object.keys(est.partes).length && !est.activa) instr.open = true;
     // est.activa = { id, n, a, r, nombreOk, opciones, mal } mientras se responde una estructura
     let sel = est.activa ? est.activa.id : (partes.find(p => !est.partes[p.id]) || partes[0]).id;
     // Al completar el nivel el panel muestra el cierre; tocar un número abre esa estructura para repasar
     let verCierre = false;
-    const guardar = () => escribir(slug, est);
+    const guardar = () => escribir(clave, est);
 
     /* --- Imagen: números + formas --- */
     function clase(id) {
@@ -329,7 +330,8 @@ function iniciar(raiz) {
     function mostrarCierre() {
         const rep = porRepasar();
         const sig = raiz.dataset.siguiente;
-        const hrefSig = sig ? 'actividad.php?slug=' + encodeURIComponent(sig) + (ruta ? '&ruta=' + encodeURIComponent(ruta) : '') : '';
+        const hrefSig = raiz.dataset.siguienteHref
+            || (sig ? 'actividad.php?slug=' + encodeURIComponent(sig) + (ruta ? '&ruta=' + encodeURIComponent(ruta) : '') : '');
         const hrefRuta = ruta ? 'practico.php?p=' + encodeURIComponent(ruta) : '';
         panel.className = 'nl-lab__trabajo is-cierre';
         panel.innerHTML = `
@@ -377,8 +379,8 @@ function iniciar(raiz) {
         if (errores) errores.textContent = est.err ? `${est.err} ${est.err === 1 ? 'error' : 'errores'}` : '';
         raiz.classList.toggle('is-completa', hechas === partes.length);
         if (hechas === partes.length) {
-            if (slug) markDone(slug);
-            sumarAGuia(slug, seccionGuia());     // se guarda solo (y se actualiza)
+            if (clave) markDone(clave);
+            sumarAGuia(clave, seccionGuia());     // se guarda solo (y se actualiza)
         }
     }
 
