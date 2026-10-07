@@ -13,7 +13,9 @@ function hecho(clave) { if (!clave) return; const p = leer('nl_progress', {}); p
 
 async function api(params) {
     const r = await fetch('api/autocompletar.php?' + new URLSearchParams(params), { cache: 'no-store' });
-    const d = await r.json();
+    if (r.status === 404) throw new Error('falta subir api/autocompletar.php al servidor');
+    let d;
+    try { d = await r.json(); } catch { throw new Error('api/autocompletar.php respondió con un error (' + r.status + ')'); }
     if (!d.ok) throw new Error(d.error || 'sin respuestas');
     return d;
 }
