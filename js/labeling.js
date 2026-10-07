@@ -116,18 +116,27 @@ function iniciar(raiz) {
      * fina a un punto pequeño sobre la estructura (x, y). La línea se vuelve naranja cuando es
      * la estructura activa; los puntos extra y su línea sólo aparecen en la activa.
      */
+    // Sobre la imagen sólo aparecen las estructuras ya respondidas y la que toca ahora,
+    // para dirigir la atención (los círculos del panel siguen mostrando todas).
+    const yaMostrados = new Set();
+    const visible = p => !!est.partes[p.id] || p.id === sel || (est.activa && est.activa.id === p.id);
+
     function pintarImagen() {
         const destinos = p => (p.id === sel ? anclas(p) : [[p.x, p.y]]);
-        capa.innerHTML = partes.map(p => {
+        const vis = partes.filter(visible);
+        const nuevos = new Set(vis.filter(p => !yaMostrados.has(p.id)).map(p => p.id));
+        vis.forEach(p => yaMostrados.add(p.id));
+        const ap = p => (nuevos.has(p.id) && yaMostrados.size > 1 ? ' is-aparece' : '');
+        capa.innerHTML = vis.map(p => {
             const dianas = destinos(p).filter(([x, y]) => x !== p.bx || y !== p.by)
-                .map(([x, y]) => `<span class="nl-lab__diana${clase(p.id)}${p.id === sel ? ' is-sel' : ''}" style="left:${x}%;top:${y}%" aria-hidden="true"></span>`).join('');
-            return dianas + `<button type="button" class="nl-lab__punto${clase(p.id)}${p.id === sel ? ' is-sel' : ''}" data-id="${p.id}"
+                .map(([x, y]) => `<span class="nl-lab__diana${clase(p.id)}${p.id === sel ? ' is-sel' : ''}${ap(p)}" style="left:${x}%;top:${y}%" aria-hidden="true"></span>`).join('');
+            return dianas + `<button type="button" class="nl-lab__punto${clase(p.id)}${p.id === sel ? ' is-sel' : ''}${ap(p)}" data-id="${p.id}"
                      style="left:${p.bx}%;top:${p.by}%" aria-label="Estructura ${p.n}">${p.n}</button>`;
         }).join('');
-        svg.innerHTML = partes.map(formaSVG).join('') + partes.map(p => destinos(p)
+        svg.innerHTML = vis.map(formaSVG).join('') + vis.map(p => destinos(p)
             .filter(([x, y]) => x !== p.bx || y !== p.by)
             .map(([x, y]) => `<line x1="${p.bx}" y1="${p.by}" x2="${x}" y2="${y}"
-                class="nl-lab__guia-linea${clase(p.id)}${p.id === sel ? ' is-sel' : ''}" vector-effect="non-scaling-stroke"/>`).join('')).join('');
+                class="nl-lab__guia-linea${clase(p.id)}${p.id === sel ? ' is-sel' : ''}${ap(p)}" vector-effect="non-scaling-stroke"/>`).join('')).join('');
         capa.querySelectorAll('.nl-lab__punto').forEach(b =>
             b.addEventListener('click', () => seleccionar(Number(b.dataset.id))));
     }

@@ -251,3 +251,13 @@
 .nl-mesa .nl-lab__trabajo.is-repasar { border-color: rgba(232,128,111,.65); background: rgba(232,128,111,.08); }
 .nl-mesa .nl-lab__trabajo.is-repasar .nl-ficha__bloque { border-left-color: var(--repasar); }
 .nl-lab__repasar { color: var(--repasar-claro); }
+
+/* Aparición progresiva de cada estructura sobre la imagen */
+.nl-lab__punto.is-aparece { animation: nlAparece .45s cubic-bezier(.3,1.5,.5,1); }
+.nl-lab__diana.is-aparece { animation: nlFade .45s ease; }
+.nl-lab__guia-linea.is-aparece { animation: nlFade .6s ease; }
+@keyframes nlAparece { from { opacity: 0; transform: translate(-50%, -50%) scale(.3); } to { opacity: 1; } }
+@keyframes nlFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+    .nl-lab__punto.is-aparece, .nl-lab__diana.is-aparece, .nl-lab__guia-linea.is-aparece { animation: none; }
+}
