@@ -29,6 +29,20 @@ if (file_exists($db_path)) {
 <link rel="stylesheet" href="css/base.css">
 <style>
 /* --- Layout específico de la landing --- */
+.nl-practicos { padding: 3rem 16px 1rem; }
+.nl-practicos__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+.nl-practico-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; padding: 1.2rem 1.3rem;
+    border-radius: 16px; text-decoration: none; color: var(--gray-100, #EDE9FE);
+    background: linear-gradient(135deg, rgba(139,92,246,.22), rgba(236,72,153,.12)); border: 1px solid rgba(167,139,250,.45);
+    transition: transform .2s ease, border-color .2s ease;
+}
+.nl-practico-card:hover { transform: translateY(-3px); border-color: #FCD34D; color: inherit; }
+.nl-practico-card strong { font-size: 1.2rem; color: #fff; }
+.nl-practico-card__asig { font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #FCD34D; }
+.nl-practico-card__obj { font-size: .9rem; line-height: 1.5; }
+.nl-practico-card__pasos { font-size: .82rem; color: var(--gray-300); }
+.nl-practico-card .btn { margin-top: .4rem; }
 .nl-hero {
     min-height: 100vh;
     display: flex;
@@ -289,9 +303,17 @@ if (file_exists($db_path)) {
     .nl-features-grid { grid-template-columns: 1fr; }
     .nl-hero__top { grid-template-columns: 1fr; }
 }
+@media (max-width: 640px) {
+    .nl-hero__eyebrow { white-space: normal; max-width: 100%; }
+    .nl-hero__discipline-row { display: grid; grid-template-columns: 1fr 1fr; }
+    .nl-disc { min-width: 0; }
+    .nl-hero__inner, .nl-hero__top, .nl-hero__top-left { min-width: 0; max-width: 100%; }
+    .nl-modules-row { flex: 1 1 100%; min-width: 0; grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
+<?php include '_partials/nav.php'; ?>
 <div class="bg-mesh"></div>
 
 
@@ -306,7 +328,6 @@ if (file_exists($db_path)) {
       <!-- Fila superior: logo UACH izq + 2 rectángulos interactuables der -->
       <div class="nl-hero__top">
         <div class="nl-hero__top-left">
-          <img src="img/logo-uach.png" alt="Universidad Austral de Chile" class="nl-hero__logo-uach">
           <div class="nl-hero__eyebrow">🧠 Sistema Nervioso · Actividades Interactivas</div>
           <h1 class="nl-hero__title">
             NeuroLab<br>
@@ -350,6 +371,23 @@ if (file_exists($db_path)) {
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ─── PRÁCTICOS ───────────────────────────────────── -->
+<section class="container nl-practicos" id="practicos">
+  <span class="label">Prácticos autoguiados</span>
+  <h2 class="mt-1">Avanza a tu ritmo y arma tu guía de estudio</h2>
+  <div class="nl-practicos__grid">
+    <?php foreach ($nl_rutas_nav as $k => $r): ?>
+    <a class="nl-practico-card" href="practico.php?p=<?= rawurlencode($k) ?>">
+      <span class="nl-practico-card__asig"><?= htmlspecialchars(preg_replace('/\s*·.*$/', '', $r['asignatura'])) ?></span>
+      <strong><?= htmlspecialchars($r['titulo']) ?></strong>
+      <span class="nl-practico-card__obj"><?= htmlspecialchars($r['objetivo']) ?></span>
+      <span class="nl-practico-card__pasos"><?= implode(' · ', array_map(function ($p) { return htmlspecialchars(preg_replace('/\s*\([^)]*\)$/', '', $p['titulo'])); }, $r['pasos'])) ?></span>
+      <span class="btn btn-primary btn-sm">Ir al práctico →</span>
+    </a>
+    <?php endforeach; ?>
   </div>
 </section>
 
@@ -424,7 +462,7 @@ if (file_exists($db_path)) {
 <section class="nl-recursos">
   <div class="container">
     <h2 class="reveal">Visita nuestros otros recursos educativos</h2>
-    <p class="lead reveal">Explora las plataformas de TecMedHub desarrolladas para la enseñanza en ciencias de la salud.</p>
+    <p class="lead reveal">Explora las plataformas de TecMedHUB desarrolladas para la enseñanza en ciencias de la salud.</p>
     <div class="nl-recursos-logos stagger">
       <a href="https://tmeduca.org/ferlopezmoncada/cellview" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
         <img src="img/logo-cellview.svg" alt="CellView">
@@ -434,12 +472,6 @@ if (file_exists($db_path)) {
       </a>
       <a href="https://tmeduca.org/ferlopezmoncada/labimaths" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
         <img src="img/logo-labimaths.png" alt="LABIMATHS">
-      </a>
-      <a href="https://www.instagram.com/tecmedhub" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
-        <img src="img/logotecmedhub.jpg" alt="TecMedHub">
-      </a>
-      <a href="https://www.instagram.com/tecmeduachpm/" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
-        <img src="img/logoescuela.png" alt="Escuela Tecnología Médica">
       </a>
     </div>
   </div>

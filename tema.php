@@ -166,6 +166,7 @@ if (!$topic) {
     </head>
     <body>
     <div class="bg-mesh"></div>
+    <?php $active_page = 'tema'; include '_partials/nav.php'; ?>
     <div class="container nl-tema-vacio">
         <span class="label">Tema</span>
         <h1 class="mt-2">No encontramos ese tema</h1>
@@ -292,6 +293,7 @@ $active_page = 'atlas';
 </head>
 <body>
 <div class="bg-mesh"></div>
+<?php $active_page = 'tema'; include '_partials/nav.php'; ?>
 
 <header class="nl-tema-header">
   <div class="container">

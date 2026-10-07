@@ -377,4 +377,86 @@ p {
 /* Modo de carrera: se oculta lo de la otra carrera */
 html[data-carrera="terapia-ocupacional"] [data-carrera="fonoaudiologia"],
 html[data-carrera="fonoaudiologia"] [data-carrera="terapia-ocupacional"] { display: none !important; }
-.nl-barra__logo-uach { background: #fff; padding: 2px 6px; border-radius: 6px; opacity: 1; height: 34px; }
+.nl-barra__logo-uach { height: 30px; opacity: 1; }
+
+/* ===============================================================
+   Navegación del sitio (_partials/nav.php) — estilo DigitalDuck
+   =============================================================== */
+.nl-nav {
+    position: sticky; top: 0; z-index: 900;
+    background: linear-gradient(120deg, #3B0764 0%, #5B21B6 60%, #9D174D 100%);
+    box-shadow: 0 4px 18px rgba(0,0,0,.35);
+}
+.nl-nav__in { max-width: 1240px; margin: 0 auto; padding: .5rem 16px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.nl-nav__logos { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+.nl-nav__logo-nl { height: 40px; width: auto; }
+.nl-nav__marca { font-weight: 800; font-size: 1.15rem; color: #fff; letter-spacing: .01em; }
+.nl-nav__logo-uach { height: 42px; width: auto; margin-left: .4rem; padding-left: .8rem; border-left: 1px solid rgba(255,255,255,.3); }
+.nl-nav__menu { display: flex; align-items: center; gap: 1.1rem; }
+.nl-nav__link { color: #EDE9FE; font-weight: 700; font-size: .9rem; text-decoration: none; padding: .3rem 0; border-bottom: 2px solid transparent; }
+.nl-nav__link:hover, .nl-nav__link.is-activo { color: #fff; border-bottom-color: #FCD34D; }
+.nl-nav__pill {
+    display: inline-flex; align-items: center; gap: .35rem; height: 2.2rem; padding: 0 1rem;
+    font: inherit; font-weight: 800; font-size: .85rem; color: #2E1065; text-decoration: none; white-space: nowrap;
+    background: linear-gradient(135deg, #FCD34D, #FDE68A); border: none; border-radius: 99px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(252,211,77,.3); transition: transform .2s ease;
+}
+.nl-nav__pill:hover { transform: translateY(-1px); color: #2E1065; }
+.nl-nav__pill--guia { background: rgba(255,255,255,.14); color: #fff; box-shadow: none; border: 1px solid rgba(255,255,255,.35); }
+.nl-nav__pill--guia:hover { color: #fff; background: rgba(255,255,255,.22); }
+.nl-nav__caret { font-size: .65rem; }
+.nl-nav__drop { position: relative; }
+.nl-nav__drop-menu {
+    position: absolute; right: 0; top: calc(100% + 10px); min-width: 280px; padding: .4rem;
+    background: #fff; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,.35);
+    opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all .2s ease;
+}
+.nl-nav__drop-menu.is-abierto { opacity: 1; visibility: visible; transform: none; }
+.nl-nav__drop-menu a { display: block; padding: .6rem .8rem; border-radius: 10px; text-decoration: none; color: #1F1A2E; }
+.nl-nav__drop-menu a:hover { background: #F5F3FF; }
+.nl-nav__drop-menu strong { display: block; font-size: .92rem; }
+.nl-nav__drop-menu span { font-size: .8rem; color: #4B4560; }
+.nl-nav__admin { color: #fff; opacity: .4; text-decoration: none; font-size: .9rem; }
+.nl-nav__admin:hover { opacity: 1; }
+.nl-nav__toggle { display: none; flex-direction: column; gap: 4px; background: none; border: 0; padding: 6px; cursor: pointer; }
+.nl-nav__toggle span { width: 24px; height: 2.5px; border-radius: 2px; background: #FCD34D; }
+@media (max-width: 820px) {
+    .nl-nav__logo-uach { height: 34px; }
+    .nl-nav__toggle { display: flex; }
+    .nl-nav__menu {
+        display: none; position: absolute; left: 0; right: 0; top: 100%;
+        flex-direction: column; align-items: stretch; gap: .3rem; padding: .8rem 16px 1rem;
+        background: #3B0764; box-shadow: 0 10px 20px rgba(0,0,0,.35);
+    }
+    .nl-nav__menu.is-abierto { display: flex; }
+    .nl-nav__link { padding: .5rem 0; }
+    .nl-nav__drop-menu { position: static; min-width: 0; margin-top: .4rem; display: none; opacity: 1; visibility: visible; transform: none; }
+    .nl-nav__drop-menu.is-abierto { display: block; }
+    .nl-nav__pill { justify-content: center; }
+}
+@media (max-width: 420px) { .nl-nav__marca { display: none; } }
+
+/* ===============================================================
+   Pie común (_partials/footer.php)
+   =============================================================== */
+.nl-pie { margin-top: 3rem; background: #120822; border-top: 1px solid rgba(167,139,250,.2); color: #DDD6FE; font-size: .88rem; line-height: 1.55; }
+.nl-pie a { color: #C4B5FD; }
+.nl-pie a:hover { color: #FCD34D; }
+.nl-pie__in { max-width: 1240px; margin: 0 auto; padding: 2rem 16px 1.2rem; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1.5rem 2rem; }
+.nl-pie__tit { margin: 0 0 .5rem; font-weight: 800; color: #fff; font-size: .95rem; }
+.nl-pie p { margin: 0; color: #DDD6FE; }
+.nl-pie ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.nl-pie li span { color: #A99BC6; font-size: .82rem; }
+.nl-pie__logos { display: flex; align-items: center; gap: .8rem; margin-top: .8rem; }
+.nl-pie__logos img { height: 44px; width: auto; }
+.nl-pie__logo-tmh { border-radius: 8px; background: #fff; padding: 2px; }
+.nl-pie__fuentes { margin-top: .7rem !important; font-size: .82rem; }
+.nl-pie__equipo { max-width: 1240px; margin: 0 auto; padding: 1.2rem 16px 1.6rem; border-top: 1px solid rgba(167,139,250,.15); }
+.nl-pie__equipo ul { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .8rem; margin-top: .3rem; }
+.nl-pie__equipo li { display: flex; align-items: center; gap: .6rem; }
+.nl-pie__equipo img { width: 40px; height: 40px; border-radius: 50%; background: #2A1A4A; flex: none; }
+.nl-pie__equipo li span { display: flex; flex-direction: column; font-size: .82rem; color: #A99BC6; }
+.nl-pie__equipo li strong { color: #fff; font-size: .88rem; }
+.nl-pie__copy { margin-top: 1rem !important; font-size: .8rem; color: #A99BC6 !important; }
+@media (max-width: 760px) { .nl-pie__in { grid-template-columns: 1fr; } }
+@media print { .nl-pie, .nl-nav { display: none !important; } }

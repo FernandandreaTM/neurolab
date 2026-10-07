@@ -29,7 +29,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
 </head>
 <body>
 <div class="bg-mesh"></div>
-<?php nl_barra(['volver' => ['atlas.php', '← Atlas'], 'guia' => $ruta ? 'guia.php?p=' . rawurlencode($clave) : '']); ?>
+<?php nl_barra(['volver' => ['index.php', '← Inicio'], 'guia' => $ruta ? 'guia.php?p=' . rawurlencode($clave) : '']); ?>
 
 <main class="container nl-ruta">
 <?php if (!$ruta): ?>

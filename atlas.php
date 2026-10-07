@@ -61,6 +61,7 @@ $active_page = 'atlas';
 </head>
 <body>
 <div class="bg-mesh"></div>
+<?php $active_page = 'atlas'; include '_partials/nav.php'; ?>
 
 <div class="nl-atlas-header">
   <div class="container">
