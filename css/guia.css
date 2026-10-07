@@ -20,7 +20,8 @@
     font: inherit; font-weight: 500; color: var(--g-txt); background: #fff;
     padding: .5rem .7rem; border: 1.5px solid #C4B5FD; border-radius: 8px;
 }
-.nl-guia-herr__acc { display: flex; align-items: center; gap: .8rem; font-size: .9rem; font-weight: 700; }
+.nl-guia-herr__acc { display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; font-size: .9rem; font-weight: 700; }
+.nl-guia-herr__btns { display: flex; flex-direction: column; align-items: stretch; gap: .35rem; }
 .nl-guia-herr__ayuda, .nl-guia-herr__error { grid-column: 1 / -1; margin: 0; font-size: .9rem; color: #DDD6FE; }
 .nl-guia-herr__error { color: #FECACA; font-weight: 700; }
 
@@ -78,6 +79,8 @@
 .nl-g-tabla { width: 100%; border-collapse: collapse; margin-top: .6rem; }
 .nl-g-tabla th, .nl-g-tabla td { border: 1px solid var(--g-linea); padding: .4rem .55rem; text-align: left; vertical-align: top; }
 .nl-g-tabla th { background: var(--g-suave); color: var(--g-txt); font-weight: 700; }
+.nl-g-ico { display: block; width: 64px; height: 64px; object-fit: contain; margin: 0 auto .25rem; }
+.nl-g-tabla th:has(.nl-g-ico) { text-align: center; }
 
 .nl-g-figuras { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .6rem; }
 .nl-g-figuras--fotos { grid-template-columns: repeat(2, 1fr); }
@@ -111,6 +114,7 @@
 
 @media (max-width: 640px) {
     .nl-guia-herr { grid-template-columns: 1fr; }
+    .nl-guia-herr__acc { align-items: stretch; }
     .nl-gd-banner { padding: .8rem 1rem; }
     .nl-gd-banner__logos img { height: 34px; }
     .nl-gd-meta, #nl-guia-secciones { padding-left: 1rem; padding-right: 1rem; }

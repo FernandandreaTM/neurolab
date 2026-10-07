@@ -22,13 +22,33 @@ $instrucciones = function ($texto) use ($act) {
     <?php return ob_get_clean();
 };
 
+/* «¿Para qué te sirve?» propio del nivel: data/practicos.php ('conexion' => [clave => textos | null]).
+   Si el nivel no está ahí, se usa el de la actividad (actividad_carrera). null = el nivel no lo muestra. */
+$claveMesa = !empty($esTipos) && $nivelTip ? $act['slug'] . ':' . (int)$nivelTip['numero']
+           : (!empty($lamPorNiveles) && $nivelLam ? $nivelLam['clave'] : (!empty($claveLab) ? $claveLab : $act['slug']));
+$cxNivel = ['hay' => false, 'textos' => null];
+foreach (((@include __DIR__ . '/../data/practicos.php') ?: []) as $rr) {
+    foreach (($rr['pasos'] ?? []) as $pp) {
+        if (isset($pp['conexion']) && array_key_exists($claveMesa, $pp['conexion'])) {
+            $cxNivel = ['hay' => true, 'textos' => $pp['conexion'][$claveMesa]];
+        }
+    }
+}
+
 /** Conexión con la carrera: plantilla que el JS muestra (plegada) en el cierre y copia a la guía. */
-$conexion = function () use ($carreras) {
-    if (!$carreras) return '';
+$conexion = function () use ($carreras, $cxNivel) {
+    $items = [];
+    if ($cxNivel['hay']) {
+        $nombres = ['terapia-ocupacional' => 'Terapia Ocupacional', 'fonoaudiologia' => 'Fonoaudiología'];
+        foreach ((array)$cxNivel['textos'] as $slug => $txt) $items[] = [$slug, $nombres[$slug] ?? $slug, $txt];
+    } else {
+        foreach ((array)$carreras as $c) $items[] = [$c['carrera_slug'], $c['carrera_nombre'], $c['descripcion'] ?? ''];
+    }
+    if (!$items) return '';
     ob_start(); ?>
     <template id="nl-conexion-tpl">
-        <?php foreach ($carreras as $c): ?>
-            <p data-carrera="<?= htmlspecialchars($c['carrera_slug']) ?>"><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
+        <?php foreach ($items as $c): ?>
+            <p data-carrera="<?= htmlspecialchars($c[0]) ?>"><strong><?= htmlspecialchars($c[1]) ?>:</strong> <?= htmlspecialchars($c[2]) ?></p>
         <?php endforeach; ?>
     </template>
     <?php return ob_get_clean();

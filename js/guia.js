@@ -208,11 +208,14 @@ function svgSeguro(svg) {
 const pieFig = f => (f.titulo || f.pie)
     ? `<figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? `<span>${esc(f.pie)}</span>` : ''}</figcaption>` : '';
 
+/** Ícono de tipo de neurona en la cabecera de un cuadro (sólo los de img/tipos/). */
+const icono = src => /^img\/tipos\/[a-z0-9-]+\.png(\?v=\d+)?$/.test(String(src || '')) ? `<img class="nl-g-ico" src="${src}" alt="">` : '';
+
 export function renderBloque(b, car = carrera()) {
     if (!b || !b.t) return '';
     if (b.t === 'tabla') {
         return `<div class="nl-g-tabla-wrap"><table class="nl-g-tabla">
-            ${b.cab ? `<thead><tr>${b.cab.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>` : ''}
+            ${b.cab ? `<thead><tr>${b.cab.map((c, i) => `<th>${icono((b.iconos || [])[i])}${esc(c)}</th>`).join('')}</tr></thead>` : ''}
             <tbody>${(b.filas || []).map(f => `<tr>${f.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
         </table></div>`;
     }

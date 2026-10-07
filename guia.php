@@ -44,7 +44,10 @@ $asig = $ruta ? preg_replace('/\s*·.*$/', '', $ruta['asignatura']) : '';
         </label>
         <div class="nl-guia-herr__acc">
             <span id="nl-guia-progreso"></span>
-            <button type="button" class="btn btn-primary btn-sm" id="nl-guia-pdf">⬇ Descargar PDF</button>
+            <div class="nl-guia-herr__btns">
+                <button type="button" class="btn btn-primary btn-sm" id="nl-guia-html">⬇ Descargar guía (HTML)</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="nl-guia-pdf">Imprimir o guardar PDF</button>
+            </div>
         </div>
         <p class="nl-guia-herr__ayuda">Se incluye sólo lo de tu carrera (<strong id="nl-guia-car"></strong>). En la ventana de impresión elige <strong>«Guardar como PDF»</strong>.</p>
         <p class="nl-guia-herr__error" id="nl-guia-error" hidden>Tu navegador no tiene espacio para guardar más en la guía. Borra la guía y vuelve a completar los niveles, o usa otro navegador.</p>
@@ -89,6 +92,7 @@ const cont = document.getElementById('nl-guia-secciones');
 const inp = document.getElementById('nl-guia-integrantes');
 const inpPrint = document.getElementById('nl-guia-integrantes-print');
 const btnPdf = document.getElementById('nl-guia-pdf');
+const btnHtml = document.getElementById('nl-guia-html');
 let listas = Promise.resolve();
 
 const sinParentesis = t => String(t).replace(/\s*\([^)]*\)\s*$/, '');
@@ -131,7 +135,8 @@ function pintar() {
     cont.innerHTML = hechas ? html : '<p class="nl-g-vacia">Tu guía está vacía. Cada nivel que completes se agrega solo.</p>' + html;
     document.getElementById('nl-guia-progreso').textContent = `${hechas} / ${total} secciones`;
     btnPdf.disabled = hechas === 0;
-    listas = hidratarImagenes(cont);
+    btnHtml.disabled = hechas === 0;
+    listas = hidratarImagenes(cont).then(() => reparar(g));
 }
 
 inp.addEventListener('input', () => ponerIntegrantes(inp.value.trim()));
@@ -151,6 +156,80 @@ document.addEventListener('nl:carrera', pintar);
 document.addEventListener('nl:guia-error', () => { document.getElementById('nl-guia-error').hidden = false; });
 
 pintar();
+/* Secciones de identificación (tabla «Nº») sin su imagen rotulada: se abre el nivel en un marco
+   oculto, que la vuelve a dibujar y guardar (una vez por visita). */
+const reparadas = new Set();
+async function reparar(g) {
+    const faltan = RUTA.filter(s => {
+        const sec = seccionDe(g, s.clave);
+        if (!sec || reparadas.has(s.clave)) return false;
+        const esLab = (sec.bloques || []).some(b => b.t === 'tabla' && (b.cab || [])[0] === 'Nº');
+        const sinImg = !(sec.bloques || []).some(b => b.t === 'imagenes' && (b.items || []).length)
+            || !!cont.querySelector('.is-sin-img');
+        return esLab && sinImg;
+    });
+    if (!faltan.length) return;
+    for (const s of faltan) {
+        reparadas.add(s.clave);
+        const [slug, n] = s.clave.split(':');
+        await new Promise(ok => {
+            const f = document.createElement('iframe');
+            f.hidden = true;
+            f.src = 'actividad.php?slug=' + encodeURIComponent(slug) + (n ? '&nivel=' + n : '') + '&ruta=' + encodeURIComponent(CLAVE);
+            let fin = null;
+            const listo = () => { clearTimeout(fin); setTimeout(() => { f.remove(); ok(); }, 300); };
+            f.addEventListener('load', () => {
+                let veces = 0;
+                try { f.contentDocument.addEventListener('nl:guia', () => { if (++veces >= 2) listo(); }); } catch { listo(); }
+                fin = setTimeout(listo, 8000);
+            });
+            document.body.appendChild(f);
+        });
+    }
+    pintar();
+}
+
+/* Descarga la guía como un archivo HTML único (estilos e imágenes adentro). */
+async function aDataUrl(src) {
+    try {
+        const r = await fetch(src);
+        const b = await r.blob();
+        return await new Promise(ok => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(b); });
+    } catch { return src; }
+}
+btnHtml.addEventListener('click', async () => {
+    guardarMeta({ integrantes: inp.value.trim() });
+    ponerIntegrantes(inp.value.trim());
+    btnHtml.disabled = true;
+    await listas;
+    const doc = document.querySelector('.nl-guia-doc').cloneNode(true);
+    doc.querySelectorAll('.nl-g-faltan, .nl-g-vacia').forEach(n => n.remove());
+    for (const im of doc.querySelectorAll('img')) {
+        const src = im.getAttribute('src') || '';
+        if (src && !src.startsWith('data:')) im.setAttribute('src', await aDataUrl(src));
+    }
+    const css = await fetch('css/guia.css').then(r => r.text()).catch(() => '');
+    const titulo = document.title;
+    const html = `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(titulo)}</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:24px 16px;background:#EEEAF6;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.nl-guia-doc{max-width:920px;margin:0 auto}
+h1,h2,h3{font-family:inherit}
+${css}
+</style></head>
+<body class="nl-guia-body">${doc.outerHTML}</body></html>`;
+    const nombre = 'guia-' + CLAVE + (inp.value.trim() ? '-' + inp.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) : '') + '.html';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    btnHtml.disabled = false;
+});
+
 limpiarGuia(RUTA.map(s => s.clave)).then(pintar);
 </script>
 </body>

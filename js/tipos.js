@@ -630,6 +630,7 @@ function motorElegir(cm) {
         bloquesGuia: () => [{
             t: 'tabla',
             cab: ['Característica'].concat(tipos),
+            iconos: [''].concat(tipos.map(t => ((iconos[t] || '').match(/src="([^"]+)"/) || [])[1] || '')),
             filas: FILAS.map(f => [f.t].concat(tipos.map(t => items
                 .filter(it => it.fila === f.k && cm.est().items[it.id] && cm.est().items[it.id].r === t)
                 .map(it => cm.est().items[it.id].celda).join(' · ')))),
