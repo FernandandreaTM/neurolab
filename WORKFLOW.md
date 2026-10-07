@@ -42,7 +42,9 @@ Si algo falla, le digo al estudiante en el PR qué corregir y el ciclo vuelve a 
 
 - Trabajan en su rama (`feat/<tarea>` o `fix/<bug>`).
 - NUNCA tocan `data/neurolab.db` ni `admin/data/neurolab.db` (ya está en `.gitignore`).
-- NUNCE suben al hosting por su cuenta — siempre yo.
+- NUNCA commitean `data/docente.php` ni escriben la clave docente en PRs, issues o chats.
+- Ponerse al día y empezar tareas: `docs/AYUDANTES.md`.
+- NUNCA suben al hosting por su cuenta — siempre yo.
 - Mensaje de commit en imperativo, < 60 caracteres.
 - Antes de hacer push, corren `php -l` en sus archivos PHP modificados.
 
@@ -52,4 +54,8 @@ Si algo falla, le digo al estudiante en el PR qué corregir y el ciclo vuelve a 
 - `README.md`, `PLAN.md`
 - `que-subir.ps1`
 - `data/neurolab.db`, `admin/data/neurolab.db`
+- `docs/` completo
 - Todo lo que esté listado en `.gitignore`
+## Archivo que se sube a mano una sola vez
+
+- `data/docente.php` (clave del modo docente): se crea en el servidor desde `data/docente.ejemplo.php`. No está en git.
