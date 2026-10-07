@@ -196,7 +196,7 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
-    <script type="importmap"><?= nl_importmap() ?></script>
+    <?= nl_importmap_tag() ?>
     <link rel="stylesheet" href="css/base.css?v=<?= nl_ver('css/base.css') ?>">
     <link rel="stylesheet" href="css/activity.css?v=<?= nl_ver('css/activity.css') ?>">
     <?php if ($modoMesa): ?><link rel="stylesheet" href="css/mesa.css?v=<?= nl_ver('css/mesa.css') ?>"><?php endif; ?>
@@ -491,15 +491,6 @@ function nl_forma_lab($txt) {
     $v = array_map('floatval', explode(',', $datos));
     if (in_array($tipo, ['elipse', 'corchete'], true) && count($v) === 4) return ['t' => $tipo, 'v' => $v];
     return null;
-}
-
-/** Import map: cada js/*.js con ?v=<fecha> para que los módulos importados tampoco queden en caché. */
-function nl_importmap() {
-    $map = [];
-    foreach (glob(__DIR__ . '/js/*.js') as $f) {
-        $map['./js/' . basename($f)] = './js/' . basename($f) . '?v=' . filemtime($f);
-    }
-    return json_encode(['imports' => $map], JSON_UNESCAPED_SLASHES);
 }
 
 function renderQuiz($q) {

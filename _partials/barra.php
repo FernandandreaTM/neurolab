@@ -12,8 +12,21 @@
  *   'guia'    => 'guia.php?p=…',             // opcional: enlace «Mi guía»
  * ]);
  */
+/** Import map: cada js/*.js con ?v=<fecha> para que los módulos importados tampoco queden en caché (se emite una vez). */
+function nl_importmap_tag() {
+    static $hecho = false;
+    if ($hecho) return '';
+    $hecho = true;
+    $map = [];
+    foreach (glob(__DIR__ . '/../js/*.js') as $f) {
+        $map['./js/' . basename($f)] = './js/' . basename($f) . '?v=' . filemtime($f);
+    }
+    return '<script type="importmap">' . json_encode(['imports' => $map], JSON_UNESCAPED_SLASHES) . '</script>';
+}
+
 function nl_barra(array $o) {
     $niveles = $o['niveles'] ?? [];
+    echo nl_importmap_tag();
     ?>
     <script>try { document.documentElement.dataset.carrera = localStorage.getItem('nl_carrera') || 'terapia-ocupacional'; } catch (e) { document.documentElement.dataset.carrera = 'terapia-ocupacional'; }</script>
     <header class="nl-barra">
@@ -50,6 +63,6 @@ function nl_barra(array $o) {
             </div>
         </div>
     </header>
-    <script type="module" src="js/carrera.js?v=<?= @filemtime(__DIR__ . '/../js/carrera.js') ?: 1 ?>"></script>
+    <script type="module">import './js/carrera.js';</script>
     <?php
 }

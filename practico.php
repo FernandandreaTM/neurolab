@@ -97,26 +97,27 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
 <?php include '_partials/footer.php'; ?>
 <script type="module">
 import { isDone } from './js/progress.js?v=<?= nl_v('js/progress.js') ?>';
-import { leerGuia } from './js/guia.js?v=<?= nl_v('js/guia.js') ?>';
+import { leerGuia, seccionDe } from './js/guia.js?v=<?= nl_v('js/guia.js') ?>';
 const activas = <?= json_encode(array_column($seccionesActivas, 'clave')) ?>;
 function pintar() {
-    const g = leerGuia().secciones;
+    const g = leerGuia();
     document.querySelectorAll('.nl-paso[data-slug]').forEach(p => {
         const hecho = isDone(p.dataset.slug);
         p.classList.toggle('is-hecho', hecho);
         const h = p.querySelector('.nl-paso__hecho'); if (h) h.hidden = !hecho;
     });
     document.querySelectorAll('.nl-paso__sec').forEach(li => {
-        const ok = !!g[li.dataset.clave];
+        const ok = !!seccionDe(g, li.dataset.clave);
         li.classList.toggle('is-ok', ok);
         li.querySelector('.nl-paso__sec-ico').textContent = ok ? '📘' : '🔒';
     });
-    const n = activas.filter(c => g[c]).length;
+    const n = activas.filter(c => seccionDe(g, c)).length;
     document.getElementById('nl-ruta-guia-n').textContent = `${n} / ${activas.length} secciones desbloqueadas`;
     document.getElementById('nl-ruta-barra').style.width = (activas.length ? n * 100 / activas.length : 0) + '%';
 }
 pintar();
 window.addEventListener('pageshow', pintar);
+document.addEventListener('nl:carrera', pintar);
 </script>
 </body>
 </html>

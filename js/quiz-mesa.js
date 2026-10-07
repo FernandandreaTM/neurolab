@@ -194,12 +194,12 @@ function iniciar(raiz) {
         if (hechas() === est.orden.length) {
             markDone(slug);
             const n = aciertos(), t = est.orden.length;
-            sumarAGuia(slug, {
+            sumarAGuia(slug + '|' + car, {
                 titulo: 'Quiz de cierre',
-                subtitulo: `Puntaje: ${n} / ${t} (${Math.round(n / t * 100)}%) · pool común + ${CARRERAS[car]}`,
                 slug,
-                nota: t - n ? `${t - n} preguntas para repasar (marcadas con ✗)` : 'Todas correctas',
-                bloques: [{
+                carrera: car,
+                nota: t - n ? `${t - n} ${t - n === 1 ? 'pregunta' : 'preguntas'} para repasar (marcadas con ✗)` : 'Todas correctas',
+                bloques: [{ t: 'texto', txt: `Puntaje: ${n} / ${t} (${Math.round(n / t * 100)} %) · preguntas comunes y de ${CARRERAS[car]}` }, {
                     t: 'tabla',
                     cab: ['', 'Pregunta', 'Respuesta correcta', 'Para recordar'],
                     filas: est.orden.map(id => {

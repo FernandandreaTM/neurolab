@@ -1,23 +1,68 @@
 /**
  * NeuroLab — guia.js
- * "Mi guía de estudio": cada actividad, al completarse, ofrece sumar una sección
- * con lo trabajado (respuestas correctas, explicaciones, dibujos). La guía se ve
- * y se descarga como PDF en guia.php.
+ * "Mi guía de estudio": cada actividad, al completarse, guarda sola una sección con lo
+ * trabajado (respuestas, explicaciones, dibujos, imágenes). guia.php la muestra y la
+ * descarga como PDF.
  *
- * Se guarda en localStorage (nl_guia):
- *   { meta: { integrantes: "..." },
- *     secciones: { <clave>: { titulo, subtitulo, slug, fecha, nota, bloques: [...] } } }
+ * Texto en localStorage (nl_guia):
+ *   { v: 2, meta: { integrantes }, secciones: { <clave>: { titulo, slug, carrera?, fecha, nota, bloques } } }
+ * Imágenes en IndexedDB (nl_guia_img): la sección guarda sólo 'idb:<clave>#<n>'.
+ * Clave de sección: la de data/practicos.php; si depende de la carrera, '<clave>|<carrera>'.
  *
  * Bloques de una sección:
- *   { t: 'tabla',   cab: ['A','B'], filas: [['a','b'], ...] }
- *   { t: 'lista',   items: ['...'] }
- *   { t: 'texto',   txt: '...' }
- *   { t: 'figuras', items: [{ svg: '<svg…>', titulo: '...', pie: '...' }] }
- *   { t: 'imagenes', items: [{ src: 'data:image/jpeg;base64,…', titulo: '...', pie: '...' }] }
- *   { t: 'conexion', items: [{ c: 'terapia-ocupacional', txt: '...' }] }  (se ve sólo la carrera activa)
+ *   { t: 'tabla',    cab: ['A','B'], filas: [['a','b'], ...] }
+ *   { t: 'lista',    items: ['...'] }
+ *   { t: 'texto',    txt: '...' }
+ *   { t: 'figuras',  items: [{ svg: '<svg…>', titulo, pie }] }
+ *   { t: 'imagenes', items: [{ src: 'data:image/jpeg;base64,…' | 'idb:…', titulo, pie }] }
+ *   { t: 'conexion', items: [{ c: 'terapia-ocupacional', txt }] }   (se muestra sólo la carrera activa)
  */
-const KEY = 'nl_guia';
+import { carrera } from './carrera.js';
 
+const KEY = 'nl_guia';
+const VERSION = 2;
+const OBSOLETAS = ['nl_tareas_', 'nl_practica_'];   // módulos antiguos de actividades
+
+/* ---------------------------------------------------------------
+   Imágenes en IndexedDB
+   --------------------------------------------------------------- */
+let dbProm = null;
+function db() {
+    if (!dbProm) {
+        dbProm = new Promise((ok, mal) => {
+            if (!window.indexedDB) { mal(new Error('sin IndexedDB')); return; }
+            const r = indexedDB.open('nl_guia_img', 1);
+            r.onupgradeneeded = () => r.result.createObjectStore('img');
+            r.onsuccess = () => ok(r.result);
+            r.onerror = () => mal(r.error);
+        });
+        dbProm.catch(() => {});
+    }
+    return dbProm;
+}
+async function tx(modo, fn) {
+    const d = await db();
+    return new Promise((ok, mal) => {
+        const t = d.transaction('img', modo);
+        const st = t.objectStore('img');
+        const res = fn(st);
+        t.oncomplete = () => ok(res && 'result' in res ? res.result : undefined);
+        t.onerror = () => mal(t.error);
+        t.onabort = () => mal(t.error);
+    });
+}
+const imgPoner = (id, dato) => tx('readwrite', st => st.put(dato, id));
+const imgLeer = id => tx('readonly', st => st.get(id));
+const imgClaves = () => tx('readonly', st => st.getAllKeys());
+async function imgBorrar(pred) {
+    const ks = await imgClaves();
+    const fuera = (ks || []).filter(pred);
+    if (fuera.length) await tx('readwrite', st => { fuera.forEach(k => st.delete(k)); });
+}
+
+/* ---------------------------------------------------------------
+   Lectura y escritura
+   --------------------------------------------------------------- */
 export function leerGuia() {
     let g = null;
     try { g = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { g = null; }
@@ -28,22 +73,53 @@ export function leerGuia() {
 }
 
 function escribirGuia(g) {
-    try { localStorage.setItem(KEY, JSON.stringify(g)); } catch { /* sin almacenamiento */ }
+    g.v = VERSION;
+    try { localStorage.setItem(KEY, JSON.stringify(g)); }
+    catch {
+        document.dispatchEvent(new CustomEvent('nl:guia-error'));
+        return false;
+    }
     document.dispatchEvent(new CustomEvent('nl:guia'));
+    return true;
+}
+
+/** Saca las imágenes de la sección a IndexedDB (si se puede) y deja la referencia. */
+async function separarImagenes(clave, seccion) {
+    const s = JSON.parse(JSON.stringify(seccion));
+    const ids = [];
+    let n = 0;
+    for (const b of s.bloques || []) {
+        if (b.t !== 'imagenes') continue;
+        for (const it of b.items || []) {
+            if (!/^data:image\//.test(String(it.src || ''))) continue;
+            const id = clave + '#' + (n++);
+            try { await imgPoner(id, it.src); it.src = 'idb:' + id; ids.push(id); }
+            catch { /* sin IndexedDB: queda en línea */ }
+        }
+    }
+    try { await imgBorrar(k => k.startsWith(clave + '#') && !ids.includes(k)); } catch { /* */ }
+    return s;
+}
+
+let cola = Promise.resolve();
+/** Guarda (o reemplaza) la sección `clave`. Las escrituras van en orden. */
+export function sumarAGuia(clave, seccion) {
+    cola = cola.then(async () => {
+        const s = await separarImagenes(clave, seccion);
+        const g = leerGuia();
+        g.secciones[clave] = Object.assign({}, s, { fecha: Date.now() });
+        escribirGuia(g);
+    }).catch(() => {});
+    return cola;
 }
 
 export function enGuia(clave) { return !!leerGuia().secciones[clave]; }
-
-export function sumarAGuia(clave, seccion) {
-    const g = leerGuia();
-    g.secciones[clave] = Object.assign({}, seccion, { fecha: Date.now() });
-    escribirGuia(g);
-}
 
 export function quitarDeGuia(clave) {
     const g = leerGuia();
     delete g.secciones[clave];
     escribirGuia(g);
+    imgBorrar(k => k.startsWith(clave + '#')).catch(() => {});
 }
 
 export function guardarMeta(meta) {
@@ -54,7 +130,47 @@ export function guardarMeta(meta) {
 
 export function borrarGuia() {
     try { localStorage.removeItem(KEY); } catch { /* */ }
+    imgBorrar(() => true).catch(() => {});
     document.dispatchEvent(new CustomEvent('nl:guia'));
+}
+
+const base = k => String(k).split('|')[0];
+
+/**
+ * Deja en la guía sólo las secciones de `claves` (las de data/practicos.php), borra sus
+ * imágenes huérfanas y el avance guardado por módulos antiguos. Lo llama guia.php.
+ */
+export async function limpiarGuia(claves) {
+    const validas = new Set(claves);
+    const g = leerGuia();
+    let cambio = g.v !== VERSION;
+    Object.keys(g.secciones).forEach(k => {
+        if (!validas.has(base(k))) { delete g.secciones[k]; cambio = true; }
+    });
+    // secciones antiguas con imágenes en línea: se pasan a IndexedDB
+    for (const k of Object.keys(g.secciones)) {
+        const s = g.secciones[k];
+        if ((s.bloques || []).some(b => b.t === 'imagenes' && (b.items || []).some(i => /^data:/.test(i.src || '')))) {
+            g.secciones[k] = Object.assign(await separarImagenes(k, s), { fecha: s.fecha });
+            cambio = true;
+        }
+    }
+    if (cambio) escribirGuia(g);
+    try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (k && OBSOLETAS.some(p => k.startsWith(p))) localStorage.removeItem(k);
+        }
+    } catch { /* */ }
+    try { await imgBorrar(k => !g.secciones[k.split('#')[0]]); } catch { /* */ }
+}
+
+/** Sección de `clave` para la carrera activa (las que no dependen de la carrera valen para ambas). */
+export function seccionDe(g, clave, car = carrera()) {
+    const propia = g.secciones[clave + '|' + car];
+    if (propia) return propia;
+    const s = g.secciones[clave];
+    return s && (!s.carrera || s.carrera === car) ? s : null;
 }
 
 /** Enlace a la guía, conservando la ruta del práctico si se llegó desde ella. */
@@ -64,9 +180,8 @@ export function urlGuia() {
 }
 
 /**
- * Al completar una actividad, su sección se guarda sola en la guía (cada vez que se
- * llama, con lo último) y en `contenedor` queda sólo una línea discreta con el enlace.
- * `construir()` devuelve la sección.
+ * Al completar una actividad, su sección se guarda sola y en `contenedor` queda una
+ * línea discreta con el enlace. `construir()` devuelve la sección.
  */
 export function botonGuia(contenedor, clave, construir) {
     if (!contenedor) return;
@@ -76,21 +191,24 @@ export function botonGuia(contenedor, clave, construir) {
 }
 
 /* ---------------------------------------------------------------
-   Render de una sección (lo usa guia.php)
+   Render (lo usa guia.php)
    --------------------------------------------------------------- */
 export function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-/** Sólo se aceptan SVG generados por NeuroLab (sin scripts ni atributos on*). */
+/** Sólo se aceptan SVG generados por NeuroLab (sin scripts ni manejadores de eventos). */
 function svgSeguro(svg) {
     const s = String(svg || '');
-    if (!/^<svg[\s>]/i.test(s) || /<script|on\w+\s*=|javascript:/i.test(s)) return '';
+    if (!/^<svg[\s>]/i.test(s) || /<script|<foreignObject|\son[a-z]+\s*=|javascript:/i.test(s)) return '';
     return s;
 }
 
-export function renderBloque(b) {
+const pieFig = f => (f.titulo || f.pie)
+    ? `<figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? `<span>${esc(f.pie)}</span>` : ''}</figcaption>` : '';
+
+export function renderBloque(b, car = carrera()) {
     if (!b || !b.t) return '';
     if (b.t === 'tabla') {
         return `<div class="nl-g-tabla-wrap"><table class="nl-g-tabla">
@@ -99,36 +217,45 @@ export function renderBloque(b) {
         </table></div>`;
     }
     if (b.t === 'conexion') {
-        return `<div class="nl-g-conexion"><p class="nl-g-texto">💡 ¿Para qué te sirve?</p>${(b.items || []).map(i =>
-            `<p class="nl-g-texto" data-carrera="${esc(i.c)}">${esc(i.txt)}</p>`).join('')}</div>`;
+        const it = (b.items || []).filter(i => i.c === car);
+        return it.length ? `<aside class="nl-g-conexion"><strong>¿Para qué te sirve?</strong>${it.map(i => `<p>${esc(i.txt)}</p>`).join('')}</aside>` : '';
     }
     if (b.t === 'lista') return `<ul class="nl-g-lista">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
     if (b.t === 'texto') return `<p class="nl-g-texto">${esc(b.txt)}</p>`;
     if (b.t === 'figuras') {
         return `<div class="nl-g-figuras">${(b.items || []).map(f => `
-            <figure class="nl-g-fig">${svgSeguro(f.svg)}
-                <figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? ` ${esc(f.pie)}` : ''}</figcaption>
-            </figure>`).join('')}</div>`;
+            <figure class="nl-g-fig">${svgSeguro(f.svg)}${pieFig(f)}</figure>`).join('')}</div>`;
     }
     if (b.t === 'imagenes') {
-        return `<div class="nl-g-figuras nl-g-figuras--fotos">${(b.items || []).map(f => {
-            const src = /^data:image\/(jpeg|png|webp);base64,/.test(String(f.src || '')) ? f.src : '';
-            return `<figure class="nl-g-fig">${src ? `<img src="${src}" alt="">` : ''}
-                <figcaption>${f.titulo ? `<strong>${esc(f.titulo)}</strong>` : ''}${f.pie ? ` ${esc(f.pie)}` : ''}</figcaption>
-            </figure>`;
+        const items = b.items || [];
+        return `<div class="nl-g-figuras nl-g-figuras--fotos${items.length === 1 ? ' is-una' : ''}">${items.map(f => {
+            const src = String(f.src || '');
+            const img = src.startsWith('idb:') ? `<img data-idb="${esc(src.slice(4))}" alt="">`
+                : /^data:image\/(jpeg|png|webp);base64,/.test(src) ? `<img src="${src}" alt="">` : '';
+            return `<figure class="nl-g-fig">${img}${pieFig(f)}</figure>`;
         }).join('')}</div>`;
     }
     return '';
 }
 
-export function renderSeccion(s, numero) {
-    const fecha = s.fecha ? new Date(s.fecha).toLocaleDateString('es-CL') : '';
+/** Una sección de nivel: `titulo` es el nombre del nivel en data/practicos.php ('' = sin subtítulo). */
+export function renderSeccion(s, titulo, car = carrera()) {
     return `<section class="nl-g-sec">
-        <header class="nl-g-sec__head">
-            <h2>${numero ? numero + '. ' : ''}${esc(s.titulo)}</h2>
-            ${s.subtitulo ? `<p class="nl-g-sec__sub">${esc(s.subtitulo)}</p>` : ''}
-        </header>
-        ${(s.bloques || []).map(renderBloque).join('')}
-        <p class="nl-g-sec__nota">${s.nota ? esc(s.nota) + ' · ' : ''}${fecha ? 'Agregada el ' + fecha : ''}</p>
+        ${titulo === '' ? '' : `<h3>${esc(titulo || s.titulo)}</h3>`}
+        ${(s.bloques || []).map(b => renderBloque(b, car)).join('')}
+        ${s.nota ? `<p class="nl-g-sec__nota">${esc(s.nota)}</p>` : ''}
     </section>`;
+}
+
+/** Carga las imágenes guardadas en IndexedDB. Resuelve cuando todas están listas. */
+export async function hidratarImagenes(cont) {
+    const imgs = Array.from(cont.querySelectorAll('img[data-idb]'));
+    await Promise.all(imgs.map(async im => {
+        let src = null;
+        try { src = await imgLeer(im.dataset.idb); } catch { src = null; }
+        if (!src) { im.closest('figure')?.classList.add('is-sin-img'); im.remove(); return; }
+        im.src = src;
+        im.removeAttribute('data-idb');
+        if (!im.complete) await new Promise(r => { im.onload = im.onerror = r; });
+    }));
 }
