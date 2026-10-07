@@ -76,7 +76,7 @@ $conexion = function () use ($carreras) {
         </div>
     </div>
     <aside class="nl-mesa__panel">
-        <?= $instrucciones('Toca un número de la imagen (o un círculo de aquí abajo). Escribe de memoria el nombre de esa estructura y presiona Enter: verás la respuesta correcta. Luego elige su función entre las alternativas. <strong>Verde</strong>: nombre y función correctos. <strong style="color:#FFC2B8">Salmón</strong>: el nombre quedó por repasar. <strong style="color:#FCD34D">Naranjo</strong>: la estructura que estás respondiendo.') ?>
+        <?= $instrucciones('Toca un número de la imagen (o un círculo de aquí abajo). Escribe de memoria el nombre de esa estructura y presiona Enter: verás la respuesta correcta. Luego elige su función entre las alternativas. <strong>Verde</strong>: nombre y función correctos. <strong style="color:#FFB4AE">Rojo</strong>: el nombre quedó por repasar. <strong style="color:#FCD34D">Naranjo</strong>: la estructura que estás respondiendo.') ?>
         <div class="nl-lab__estado">
             <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
             <span class="nl-lab__errores" id="nl-lab-errores"></span>

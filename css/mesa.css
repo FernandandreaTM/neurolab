@@ -242,13 +242,13 @@
 .nl-ficha__acciones:empty { display: none; }
 
 /* "Por repasar": salmón suave (distinto del naranjo de la estructura activa) */
-.nl-mesa { --repasar: #E8806F; --repasar-claro: #FFC2B8; }
+.nl-mesa { --repasar: #E0524A; --repasar-claro: #FFB4AE; }
 .nl-mesa .nl-lab__punto.is-repasar,
 .nl-mesa .nl-lab__diana.is-repasar { background: var(--repasar); }
-.nl-mesa .nl-lab__chip.is-repasar { background: rgba(232,128,111,.24); color: var(--repasar-claro); }
-.nl-mesa .nl-lab__guia-linea.is-repasar { stroke: rgba(232,128,111,.7); }
-.nl-mesa .nl-lab__forma.is-repasar { stroke: var(--repasar); fill: rgba(232,128,111,.1); }
-.nl-mesa .nl-lab__trabajo.is-repasar { border-color: rgba(232,128,111,.65); background: rgba(232,128,111,.08); }
+.nl-mesa .nl-lab__chip.is-repasar { background: rgba(224,82,74,.24); color: var(--repasar-claro); }
+.nl-mesa .nl-lab__guia-linea.is-repasar { stroke: rgba(224,82,74,.7); }
+.nl-mesa .nl-lab__forma.is-repasar { stroke: var(--repasar); fill: rgba(224,82,74,.1); }
+.nl-mesa .nl-lab__trabajo.is-repasar { border-color: rgba(224,82,74,.65); background: rgba(224,82,74,.08); }
 .nl-mesa .nl-lab__trabajo.is-repasar .nl-ficha__bloque { border-left-color: var(--repasar); }
 .nl-lab__repasar { color: var(--repasar-claro); }
 
@@ -260,4 +260,17 @@
 @keyframes nlFade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
     .nl-lab__punto.is-aparece, .nl-lab__diana.is-aparece, .nl-lab__guia-linea.is-aparece { animation: none; }
+}
+
+/* Identificación: la imagen toma su ancho real y el panel ocupa el resto (sin espacio muerto) */
+.nl-mesa:not(.nl-mesa--lamina) {
+    grid-template-columns: minmax(0, auto) minmax(360px, 1fr);
+    justify-content: center;
+}
+.nl-mesa:not(.nl-mesa--lamina) .nl-mesa__vista { align-items: stretch; }
+.nl-mesa:not(.nl-mesa--lamina) .nl-mesa__panel { max-width: 620px; }
+.nl-mesa:not(.nl-mesa--lamina) .nl-lab__canvas { width: calc(var(--alto) * var(--ar, 1.5)); max-width: 100%; }
+@media (max-width: 900px) {
+    .nl-mesa:not(.nl-mesa--lamina) { grid-template-columns: 1fr; }
+    .nl-mesa:not(.nl-mesa--lamina) .nl-lab__canvas { width: 100%; }
 }
