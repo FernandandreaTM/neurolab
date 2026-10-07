@@ -326,7 +326,7 @@ function iniciar(raiz) {
         panel.innerHTML = `
             <p class="nl-lab__cierre-tit">🎉 ¡Nivel completado!</p>
             <p>${partes.length} estructuras · ${est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}` : 'sin errores'}</p>
-            ${rep.length ? `<p class="nl-lab__alt">↺ Por repasar: ${rep.map(p => p.n + '. ' + escapar(est.partes[p.id].n)).join(' · ')}</p>` : ''}
+            ${rep.length ? `<p class="nl-lab__alt nl-lab__repasar">↺ Por repasar: ${rep.map(p => p.n + '. ' + escapar(est.partes[p.id].n)).join(' · ')}</p>` : ''}
             ${hrefSig ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefSig}">🔍 Siguiente nivel →</a>`
                       : (hrefRuta ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefRuta}">Volver a la ruta →</a>` : '')}
             ${tplCx ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tplCx.innerHTML}</details>` : ''}
