@@ -1,5 +1,5 @@
 /* NeuroLab — guia.css: "Mi guía de estudio" (pantalla e impresión/PDF)
-   Escala de letra: 1.5rem título · 1.05rem encabezados · .9rem texto. Un acento (violeta). */
+   Escala: 1.5rem título · 1.15rem actividad · .9rem texto (.8rem notas en gris). Acento violeta. */
 .nl-guia-body {
     --g-txt: #1F1A2E;
     --g-sec: #4B4560;      /* texto secundario: contraste AA sobre blanco */
@@ -55,54 +55,100 @@
 .nl-gd-meta__datos dt { font-size: .9rem; font-weight: 700; color: var(--g-sec); }
 .nl-gd-meta__datos dd { margin: 0; }
 
-#nl-guia-secciones { padding: 0 1.6rem 1rem; }
-.nl-g-act { margin-top: 1.2rem; }
+#nl-guia-secciones { padding: 0 1.6rem 1.4rem; }
+
+/* Actividad: número grande + título; separación clara entre actividades */
+.nl-g-act { margin-top: 2.2rem; }
+.nl-g-act:first-child { margin-top: 1.4rem; }
 .nl-g-act > h2 {
-    display: flex; align-items: center; gap: .55rem; margin: 0 0 .2rem;
-    font-size: 1.05rem; color: var(--g-acento); padding-bottom: .35rem; border-bottom: 2px solid var(--g-acento);
+    display: flex; align-items: center; gap: .65rem; margin: 0 0 .3rem;
+    font-size: 1.15rem; letter-spacing: -.01em; color: var(--g-txt);
 }
 .nl-g-act > h2 span {
-    display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%;
-    background: var(--g-acento); color: #fff; font-size: .9rem;
+    display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 10px; flex: none;
+    background: linear-gradient(135deg, #7C3AED, #DB2777); color: #fff; font-size: 1rem;
 }
-.nl-g-sec { padding: .6rem 0 .3rem; }
-.nl-g-sec + .nl-g-sec { border-top: 1px solid var(--g-linea); }
-.nl-g-sec h3 { margin: .2rem 0 0; font-size: 1.05rem; color: var(--g-txt); }
-.nl-g-sec__nota { margin: .4rem 0 0; color: var(--g-sec); }
-.nl-g-texto { margin: .6rem 0 0; }
-.nl-g-lista { margin: .6rem 0 0; padding-left: 1.2rem; }
+.nl-g-act > h2::after { content: ''; flex: 1; height: 2px; background: linear-gradient(90deg, var(--g-linea), transparent); }
 
-.nl-g-conexion { margin-top: .6rem; padding: .5rem .8rem; border-left: 3px solid var(--g-acento); background: var(--g-suave); border-radius: 0 8px 8px 0; }
-.nl-g-conexion p { margin: .2rem 0 0; }
+/* Nivel */
+.nl-g-sec { padding: .5rem 0 .2rem; line-height: 1.6; }
+.nl-g-sec h3 {
+    margin: .5rem 0 .2rem; font-size: .8rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--g-acento);
+}
+.nl-g-texto { margin: .5rem 0 0; }
+.nl-g-lista { margin: .5rem 0 0; padding-left: 1.2rem; }
 
+/* Imagen + lista de identificación, lado a lado */
+.nl-g-par { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1rem; align-items: start; margin-top: .4rem; }
+.nl-g-par .nl-g-figuras { margin-top: 0; position: sticky; top: 1rem; }
+.nl-g-par .nl-g-figuras--fotos.is-una { grid-template-columns: 1fr; }
+
+/* Lista de estructuras: (n) Nombre · función + para recordar */
+.nl-g-items { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.nl-g-items li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); column-gap: .5rem; padding: .35rem 0; border-bottom: 1px solid #F1EDFB; break-inside: avoid; }
+.nl-g-items li:last-child { border-bottom: 0; }
+.nl-g-items__n {
+    grid-row: span 2; display: inline-grid; place-items: center; width: 1.45rem; height: 1.45rem; margin-top: .1rem;
+    border-radius: 50%; background: #16A34A; color: #fff; font-size: .75rem; font-weight: 800;
+}
+.nl-g-items__n.is-rep { background: #E0524A; }
+.nl-g-items__nom { color: var(--g-txt); }
+.nl-g-items__txt { color: var(--g-txt); }
+.nl-g-items small, .nl-g-qa small { display: block; margin-top: .1rem; font-size: .8rem; line-height: 1.45; color: var(--g-sec); }
+
+/* Preguntas → respuesta */
+.nl-g-qa { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .55rem; }
+.nl-g-qa li { padding-left: .8rem; border-left: 3px solid var(--g-linea); break-inside: avoid; }
+.nl-g-qa strong { display: block; font-weight: 700; }
+.nl-g-qa span { color: #15803D; font-weight: 600; }
+.nl-g-qa--quiz li { position: relative; padding-left: 1.9rem; border-left: 0; }
+.nl-g-qa--quiz i { position: absolute; left: 0; top: .1rem; width: 1.3rem; height: 1.3rem; display: grid; place-items: center; border-radius: 50%; font-style: normal; font-size: .75rem; font-weight: 800; color: #fff; background: #16A34A; }
+.nl-g-qa--quiz li.is-mal i { background: #E0524A; }
+
+/* ¿Para qué te sirve? */
+.nl-g-conexion { display: flex; gap: .6rem; margin-top: .7rem; padding: .55rem .8rem; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; font-size: .86rem; line-height: 1.5; }
+.nl-g-conexion > span { font-size: 1.1rem; line-height: 1.3; }
+.nl-g-conexion strong { display: block; color: #92400E; font-size: .78rem; letter-spacing: .05em; text-transform: uppercase; }
+.nl-g-conexion p { margin: .1rem 0 0; }
+
+/* Cuadro comparativo */
 .nl-g-tabla-wrap { overflow-x: auto; }
-.nl-g-tabla { width: 100%; border-collapse: collapse; margin-top: .6rem; }
-.nl-g-tabla th, .nl-g-tabla td { border: 1px solid var(--g-linea); padding: .4rem .55rem; text-align: left; vertical-align: top; }
-.nl-g-tabla th { background: var(--g-suave); color: var(--g-txt); font-weight: 700; }
-.nl-g-ico { display: block; width: 64px; height: 64px; object-fit: contain; margin: 0 auto .25rem; }
+.nl-g-tabla { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: .5rem; border: 1px solid var(--g-linea); border-radius: 10px; overflow: hidden; }
+.nl-g-tabla th, .nl-g-tabla td { padding: .5rem .65rem; text-align: left; vertical-align: top; border-bottom: 1px solid #F1EDFB; }
+.nl-g-tabla tr:last-child > * { border-bottom: 0; }
+.nl-g-tabla thead th { background: var(--g-suave); color: var(--g-txt); font-weight: 800; }
+.nl-g-tabla tbody th { color: var(--g-acento); font-weight: 800; font-size: .82rem; width: 7.5rem; }
+.nl-g-ico { display: block; width: 56px; height: 56px; object-fit: contain; margin: 0 auto .2rem; }
 .nl-g-tabla th:has(.nl-g-ico) { text-align: center; }
 
-.nl-g-figuras { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .6rem; }
-.nl-g-figuras--fotos { grid-template-columns: repeat(2, 1fr); }
-.nl-g-figuras--fotos.is-una { grid-template-columns: minmax(0, 560px); justify-content: center; }
+/* Figuras */
+.nl-g-figuras { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .5rem; }
+.nl-g-figuras--fotos { grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: start; }
+.nl-g-figuras--fotos.is-una { grid-template-columns: minmax(0, 520px); }
 .nl-g-fig { margin: 0; border: 1px solid var(--g-linea); border-radius: 10px; padding: .45rem; background: #fff; break-inside: avoid; }
 .nl-g-fig svg, .nl-g-fig img { width: 100%; height: auto; display: block; border-radius: 6px; }
-.nl-g-fig figcaption { margin-top: .35rem; }
-.nl-g-fig figcaption strong { display: block; }
+.nl-g-fig figcaption { margin-top: .3rem; font-size: .8rem; line-height: 1.45; }
+.nl-g-fig figcaption strong { display: block; font-size: .88rem; }
 .nl-g-fig figcaption span { color: var(--g-sec); }
 .nl-g-fig.is-sin-img::before { content: 'Imagen no disponible en este navegador'; display: block; padding: 1rem; color: var(--g-sec); text-align: center; }
 
 /* Piezas del dibujo "armar neurona" sobre fondo blanco */
-.nl-g-fig .p-dend  { stroke: #7C3AED; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.nl-g-fig .p-dend  { stroke: #0D9488; stroke-width: 3.5; fill: none; stroke-linecap: round; }
 .nl-g-fig .p-axon  { stroke: #DB2777; stroke-width: 3.5; fill: none; stroke-linecap: round; }
-.nl-g-fig .p-t     { stroke: #0284C7; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.nl-g-fig .p-t     { stroke: #2563EB; stroke-width: 3.5; fill: none; stroke-linecap: round; }
 .nl-g-fig .p-mielina { fill: #E0E7FF; stroke: #818CF8; stroke-width: 1; }
 .nl-g-fig .p-boton { fill: #DB2777; }
-.nl-g-fig .p-t ~ .p-boton { fill: #0284C7; }
+.nl-g-fig .p-t ~ .p-boton { fill: #2563EB; }
 .nl-g-fig .p-soma  { fill: #8B5CF6; stroke: #5B21B6; stroke-width: 2.5; }
 .nl-g-fig .p-nucleo { fill: #2E1065; stroke: #DDD6FE; stroke-width: 1.5; }
-.nl-g-fig .p-flecha { stroke: #EA580C; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.nl-g-fig .p-flecha-punta { fill: #EA580C; }
+
+.nl-g-fig .p-flecha-halo { fill: none; stroke: rgba(245,158,11,.28); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+.nl-g-fig .p-flecha { fill: none; stroke: #F59E0B; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.nl-g-fig .p-flecha-punta { fill: #F59E0B; stroke: #fff; stroke-width: 1.2; }
+.nl-g-fig .p-etq rect { stroke: #fff; stroke-width: 1.5; }
+.nl-g-fig .p-etq text { font: 800 10px/1 Arial, sans-serif; letter-spacing: .06em; fill: #fff; }
+.nl-g-fig .p-etq--entra rect { fill: #0D9488; }
+.nl-g-fig .p-etq--sale rect { fill: #DB2777; }
 
 .nl-g-faltan { margin-top: 1.2rem; padding: .7rem 1rem; border: 1.5px dashed var(--g-linea); border-radius: 10px; color: var(--g-sec); }
 .nl-g-faltan p { margin: 0; font-weight: 700; }
@@ -119,8 +165,8 @@
     .nl-gd-banner__logos img { height: 34px; }
     .nl-gd-meta, #nl-guia-secciones { padding-left: 1rem; padding-right: 1rem; }
     .nl-gd-meta__datos { grid-template-columns: 1fr; }
-    .nl-g-figuras, .nl-g-figuras--fotos { grid-template-columns: 1fr 1fr; }
-    .nl-g-figuras--fotos { grid-template-columns: 1fr; }
+    .nl-g-figuras { grid-template-columns: 1fr 1fr; }
+    .nl-g-figuras--fotos, .nl-g-par { grid-template-columns: 1fr; }
 }
 
 @media print {
@@ -135,6 +181,11 @@
     .nl-g-act > h2, .nl-g-sec h3 { break-after: avoid; }
     .nl-g-tabla tr, .nl-g-fig { break-inside: avoid; }
     .nl-g-tabla-wrap { overflow: visible; }
-    .nl-g-figuras--fotos.is-una { grid-template-columns: 120mm; }
+    .nl-g-par { grid-template-columns: 1fr; }
+    .nl-g-par .nl-g-figuras { position: static; }
+    .nl-g-par .nl-g-figuras--fotos.is-una, .nl-g-figuras--fotos.is-una { grid-template-columns: 115mm; justify-content: center; }
+    .nl-g-figuras--fotos { grid-template-columns: repeat(2, 80mm); }
+    .nl-g-items { grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+    .nl-g-act { margin-top: 7mm; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

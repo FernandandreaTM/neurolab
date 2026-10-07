@@ -363,7 +363,7 @@ function iniciar(raiz) {
         const g = c.getContext('2d');
         g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
         g.drawImage(base, 0, 0, W, H);
-        const r = Math.max(11, W / 70);
+        const r = Math.max(14, W / 48);
         partes.forEach(p => {
             const s = est.partes[p.id];
             const col = s && !s.nombreOk ? '#E0524A' : '#16A34A';

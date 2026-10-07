@@ -17,6 +17,12 @@ import { conexionGuia as conexionCarrera } from './carrera.js';
 import { C, R, PUNTOS, LUGAR, PIEZAS, ICONOS, dibujoPieza, coordPunto } from './armar-neurona.js';
 
 const RAIZ = document.getElementById('nl-tip');
+/** Definiciones que se abren con (?) en la paleta del nivel armar. */
+const DEFS = {
+    dendrita: 'prolongación corta y ramificada que <strong>recibe</strong> información de otras neuronas. Una neurona puede tener muchas.',
+    axon: 'prolongación única que <strong>conduce y transmite</strong> la información hasta sus botones terminales. Suele tener mielina.',
+    t: '<strong>neurita</strong> es cualquier prolongación del soma (dendrita o axón) cuando no importa precisar cuál. Esta sale del soma como una sola y se divide en <strong>dos ramas</strong>, en forma de T.',
+};
 const KEY_BASE = 'nl_tipos_';
 const FILAS = [
     { k: 'morfologia',   t: 'Morfología',              c: 'Morfología' },
@@ -78,14 +84,29 @@ function zonasFlecha(piezas) {
     return z;
 }
 
-/** Trazo de la flecha: entra por una prolongación, pasa por el soma (o por la T) y sale por otra. */
-function svgFlecha(piezas, f) {
+/** Puntas: dónde termina cada prolongación elegida (para las etiquetas ENTRA / SALE). */
+function puntaZona(piezas, z) {
+    if (piezas[z.i] === 't') return rot(z.i, XB + 24, z.rama === 'central' ? C + 100 : C - 100);
+    return rot(z.i, C + (piezas[z.i] === 'axon' ? 118 : 96), C + 20);
+}
+function etiqueta(xy, txt, clase) {
+    const w = txt.length * 7.2 + 14;
+    const x = Math.min(300 - w / 2 - 2, Math.max(w / 2 + 2, xy[0])), y = Math.min(288, Math.max(12, xy[1]));
+    return `<g class="p-etq ${clase}"><rect x="${(x - w / 2).toFixed(1)}" y="${(y - 9).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9"/>` +
+           `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle">${txt}</text></g>`;
+}
+
+/**
+ * Ruta de la información: entra por una prolongación, pasa por el soma (o directo por la T)
+ * y sale por otra. Con anim: un impulso luminoso la recorre en bucle.
+ */
+function svgFlecha(piezas, f, anim = false) {
     if (!f || !f.entra || !f.sale) return '';
     let d, fin, dir;
     if (piezas[f.entra.i] === 't') {
-        const i = f.entra.i, x = XB + 11;
-        const a = rot(i, x, C - 96), b = rot(i, x, C + 92);
-        d = `M${pt(a)} L${pt(b)}`; fin = b; dir = rot(i, x, C + 80);
+        const i = f.entra.i, x = XB + 11, y0 = f.entra.rama === 'central' ? C + 92 : C - 96;
+        const a = rot(i, x, y0), b = rot(i, x, -y0 + 2 * C);
+        d = `M${pt(a)} L${pt(b)}`; fin = b; dir = rot(i, x, y0 < C ? C + 80 : C - 80);
     } else {
         const i = f.entra.i, j = f.sale.i;
         const a = rot(i, C + 88, C - 10), b = rot(i, C + R + 8, C - 10);
@@ -93,11 +114,17 @@ function svgFlecha(piezas, f) {
         d = `M${pt(a)} L${pt(b)} Q${C} ${C} ${pt(c)} L${pt(e)}`; fin = e; dir = rot(j, C + 108, C - 10);
     }
     const ang = Math.atan2(fin[1] - dir[1], fin[0] - dir[0]);
-    const punta = [[fin[0] + 4 * Math.cos(ang), fin[1] + 4 * Math.sin(ang)],
-                   [fin[0] - 9 * Math.cos(ang) + 6 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) - 6 * Math.cos(ang)],
-                   [fin[0] - 9 * Math.cos(ang) - 6 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) + 6 * Math.cos(ang)]]
+    const punta = [[fin[0] + 7 * Math.cos(ang), fin[1] + 7 * Math.sin(ang)],
+                   [fin[0] - 9 * Math.cos(ang) + 8 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) - 8 * Math.cos(ang)],
+                   [fin[0] - 9 * Math.cos(ang) - 8 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) + 8 * Math.cos(ang)]]
         .map(q => q.map(v => Math.round(v * 10) / 10).join(',')).join(' ');
-    return `<g class="p-flecha-g"><path class="p-flecha" pathLength="1" d="${d}"/><polygon class="p-flecha-punta" points="${punta}"/></g>`;
+    return `<g class="p-flecha-g${anim ? ' is-anima' : ''}">
+        <path class="p-flecha-halo" d="${d}"/>
+        <path class="p-flecha" d="${d}"/>
+        ${anim ? `<path class="p-flecha-flujo" d="${d}"/>
+        <circle class="p-impulso" r="6"><animateMotion dur="2.2s" repeatCount="indefinite" path="${d}"/></circle>` : ''}
+        <polygon class="p-flecha-punta" points="${punta}"/></g>` +
+        etiqueta(puntaZona(piezas, f.entra), 'ENTRA', 'p-etq--entra') + etiqueta(puntaZona(piezas, f.sale), 'SALE', 'p-etq--sale');
 }
 
 /** Dibujo SVG de una neurona armada (para la vista, las tarjetas y la guía), con su flecha si la tiene. */
@@ -205,6 +232,7 @@ function motorArmar(cm) {
     let verCierre = false;
     let mensaje = '';           // pista del último intento fallido
     let entra = null;           // paso 2: prolongación elegida como entrada { i, rama }
+    let defVer = '';            // definición abierta con (?) en la paleta
     const armando = () => cm.est().armando || null;   // neurona armada a la que le falta la flecha
     const enFlecha = it => !!(armando() && it && armando().id === it.id);
     const tipoDe = it => it.e.replace(/^Arma una neurona\s*/i, '').replace(/\.$/, '');
@@ -250,6 +278,9 @@ function motorArmar(cm) {
         const s = sel && cm.est().items[sel.id];
         const flecha = enFlecha(sel);
         const fija = !!s || verCierre || flecha;
+        const fl = s && s.flecha;
+        const marca = i => (fl && fl.entra.i === i) || (flecha && entra && entra.i === i) ? ' is-entra'
+            : (fl && fl.sale.i === i ? ' is-sale' : '');
         if (verCierre) {
             vista.innerHTML = `<div class="nl-tip__lienzo-caja is-galeria">${items.map(it => {
                 const g = cm.est().items[it.id];
@@ -263,15 +294,18 @@ function motorArmar(cm) {
                 : flecha ? `<p class="nl-tip__sello is-flecha">${entra ? 'Toca por dónde <strong>sale</strong>' : 'Toca por dónde <strong>entra</strong>'} la información</p>` : `
             <div class="nl-arm__paleta nl-tip__paleta" role="radiogroup" aria-label="Pieza para agregar">
               ${Object.keys(PIEZAS).map(k => `
+                <span class="nl-tip__pz nl-tip__pz--${k}">
                 <button type="button" class="nl-arm__pieza${herramienta === k ? ' active' : ''}" role="radio" aria-checked="${herramienta === k}" data-pieza="${k}">
-                  ${ICONOS[PIEZAS[k].icono]}<span>${PIEZAS[k].nombre}</span></button>`).join('')}
+                  ${ICONOS[PIEZAS[k].icono]}<span>${PIEZAS[k].nombre}</span></button><button type="button" class="nl-tip__que${defVer === k ? ' is-on' : ''}" data-def="${k}" aria-label="¿Qué es ${PIEZAS[k].nombre.toLowerCase()}?" aria-expanded="${defVer === k}">?</button></span>`).join('')}
               <button type="button" class="nl-arm__pieza${herramienta === 'quitar' ? ' active' : ''}" role="radio" aria-checked="${herramienta === 'quitar'}" data-pieza="quitar">
                 <span aria-hidden="true">✕</span><span>Quitar</span></button>
-            </div>`}
+            </div>
+            ${defVer ? `<p class="nl-tip__def nl-tip__def--${defVer}"><strong>${PIEZAS[defVer].nombre}:</strong> ${DEFS[defVer]}</p>` : ''}`}
             <svg class="nl-tip__lienzo" viewBox="0 0 300 300" role="group" aria-label="Soma de la neurona ${num(sel)}">
-              <g>${piezas.map((p, i) => p ? `<g class="pieza" transform="rotate(${i * 360 / PUNTOS} ${C} ${C})">${dibujoPieza(p)}</g>` : '').join('')}</g>
+              <g>${piezas.map((p, i) => p ? `<g class="pieza${marca(i)}" transform="rotate(${i * 360 / PUNTOS} ${C} ${C})">${dibujoPieza(p)}</g>` : '').join('')}</g>
               <circle class="p-soma" cx="${C}" cy="${C}" r="${R}"/><circle class="p-nucleo" cx="${C}" cy="${C}" r="8"/>
-              ${s && s.flecha ? svgFlecha(s.piezas, s.flecha) : ''}
+              ${s && s.flecha ? svgFlecha(s.piezas, s.flecha, true) : ''}
+              ${flecha && entra ? etiqueta(puntaZona(piezas, entra), 'ENTRA', 'p-etq--entra') : ''}
               ${flecha ? `<g class="nl-tip__zonas">${zonasFlecha(piezas).map(z => `
                   <path class="zona${entra && entra.i === z.i && entra.rama === z.rama ? ' is-entra' : ''}" d="${z.d}"
                         data-i="${z.i}" data-rama="${z.rama}" role="button" tabindex="0" aria-label="Prolongación ${LUGAR[z.i]}${z.rama ? ', rama ' + (z.rama === 'periferica' ? 'superior' : 'inferior') : ''}"/>`).join('')}</g>` : ''}
@@ -291,6 +325,10 @@ function motorArmar(cm) {
             z.addEventListener('click', tocar);
             z.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); tocar(); } });
         });
+        vista.querySelectorAll('.nl-tip__que').forEach(b => b.addEventListener('click', () => {
+            defVer = defVer === b.dataset.def ? '' : b.dataset.def;
+            pintarVista();
+        }));
         vista.querySelectorAll('.nl-arm__pieza').forEach(b => b.addEventListener('click', () => {
             herramienta = b.dataset.pieza;
             pintarVista();
@@ -403,7 +441,6 @@ function motorArmar(cm) {
         entra = null;
         pintar();
         mostrarFicha(it, e ? '✓ ¡Lo lograste!' : '🎯 ¡Correcta al primer intento!');
-        vista.querySelector('.p-flecha-g')?.classList.add('is-anima');
         if (angosta()) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 

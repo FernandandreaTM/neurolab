@@ -17,7 +17,11 @@ $instrucciones = function ($texto) use ($act) {
     ob_start(); ?>
     <details class="nl-mesa__instr" id="nl-mesa-instr">
         <summary>ⓘ Cómo se responde</summary>
-        <?php if ($texto): ?><p><?= $texto ?></p><?php endif; ?>
+        <?php if ($texto):
+            // Las palabras del código de color van en su color (verde, rojo, naranjo)
+            $texto = preg_replace_callback('#<strong(?: style="[^"]*")?>(Verde|Rojo|Naranjo)</strong>#u', function ($m) {
+                return '<strong class="nl-c-' . strtolower($m[1]) . '">' . $m[1] . '</strong>';
+            }, $texto); ?><p><?= $texto ?></p><?php endif; ?>
     </details>
     <?php return ob_get_clean();
 };

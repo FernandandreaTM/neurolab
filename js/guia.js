@@ -211,17 +211,46 @@ const pieFig = f => (f.titulo || f.pie)
 /** Ícono de tipo de neurona en la cabecera de un cuadro (sólo los de img/tipos/). */
 const icono = src => /^img\/tipos\/[a-z0-9-]+\.png(\?v=\d+)?$/.test(String(src || '')) ? `<img class="nl-g-ico" src="${src}" alt="">` : '';
 
+/* Lo que no va en la guía: estadísticas y avisos de repaso (se guardan, pero no se muestran). */
+const esEstadistica = b => b.t === 'texto' && /^(↺|Puntaje:)/.test(String(b.txt || '').trim());
+const PIES_FUERA = /^Los números corresponden a la tabla\.?$/;
+
+/** Tablas de 3-4 columnas como lista de 2: nombre en negrita · explicación + «para recordar» en gris. */
+function listaDeTabla(b) {
+    const cab = b.cab || [];
+    const filas = b.filas || [];
+    if (cab[0] === 'Nº') {          // identificación: Nº, Estructura, Función, Para recordar
+        return `<ol class="nl-g-items">${filas.map(f => `<li>
+            <span class="nl-g-items__n${/↺/.test(f[0]) ? ' is-rep' : ''}">${esc(String(f[0]).replace(/\s*↺\s*/, ''))}</span>
+            <strong class="nl-g-items__nom">${esc(f[1])}</strong>
+            <span class="nl-g-items__txt">${esc(f[2])}${f[3] ? `<small>${esc(f[3])}</small>` : ''}</span></li>`).join('')}</ol>`;
+    }
+    if (cab[0] === 'Pregunta') {    // lámina: Pregunta, Respuesta, Para recordar
+        return `<ul class="nl-g-qa">${filas.map(f => `<li><strong>${esc(f[0])}</strong>
+            <span>→ ${esc(f[1])}</span>${f[2] ? `<small>${esc(f[2])}</small>` : ''}</li>`).join('')}</ul>`;
+    }
+    if (cab[1] === 'Pregunta') {    // quiz: ✓/✗, Pregunta, Respuesta correcta, Para recordar
+        return `<ul class="nl-g-qa nl-g-qa--quiz">${filas.map(f => `<li class="${f[0] === '✗' ? 'is-mal' : 'is-ok'}">
+            <i aria-label="${f[0] === '✗' ? 'Por repasar' : 'Correcta'}">${esc(f[0])}</i><strong>${esc(f[1])}</strong>
+            <span>→ ${esc(f[2])}</span>${f[3] ? `<small>${esc(f[3])}</small>` : ''}</li>`).join('')}</ul>`;
+    }
+    return '';
+}
+
 export function renderBloque(b, car = carrera()) {
-    if (!b || !b.t) return '';
+    if (!b || !b.t || esEstadistica(b)) return '';
     if (b.t === 'tabla') {
+        const lista = listaDeTabla(b);
+        if (lista) return lista;
         return `<div class="nl-g-tabla-wrap"><table class="nl-g-tabla">
             ${b.cab ? `<thead><tr>${b.cab.map((c, i) => `<th>${icono((b.iconos || [])[i])}${esc(c)}</th>`).join('')}</tr></thead>` : ''}
-            <tbody>${(b.filas || []).map(f => `<tr>${f.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+            <tbody>${(b.filas || []).map(f => `<tr>${f.map((c, i) => i === 0 ? `<th scope="row">${esc(c)}</th>` : `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
         </table></div>`;
     }
     if (b.t === 'conexion') {
         const it = (b.items || []).filter(i => i.c === car);
-        return it.length ? `<aside class="nl-g-conexion"><strong>¿Para qué te sirve?</strong>${it.map(i => `<p>${esc(i.txt)}</p>`).join('')}</aside>` : '';
+        return it.length ? `<aside class="nl-g-conexion"><span aria-hidden="true">💡</span><div><strong>¿Para qué te sirve?</strong>${it.map(i =>
+            `<p>${esc(String(i.txt).replace(/^(Terapia Ocupacional|Fonoaudiología):\s*/, ''))}</p>`).join('')}</div></aside>` : '';
     }
     if (b.t === 'lista') return `<ul class="nl-g-lista">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
     if (b.t === 'texto') return `<p class="nl-g-texto">${esc(b.txt)}</p>`;
@@ -235,18 +264,31 @@ export function renderBloque(b, car = carrera()) {
             const src = String(f.src || '');
             const img = src.startsWith('idb:') ? `<img data-idb="${esc(src.slice(4))}" alt="">`
                 : /^data:image\/(jpeg|png|webp);base64,/.test(src) ? `<img src="${src}" alt="">` : '';
-            return `<figure class="nl-g-fig">${img}${pieFig(f)}</figure>`;
+            return `<figure class="nl-g-fig">${img}${pieFig(Object.assign({}, f, { pie: PIES_FUERA.test(f.pie || '') ? '' : f.pie }))}</figure>`;
         }).join('')}</div>`;
     }
     return '';
 }
 
-/** Una sección de nivel: `titulo` es el nombre del nivel en data/practicos.php ('' = sin subtítulo). */
+/**
+ * Una sección de nivel: `titulo` es el nombre del nivel en data/practicos.php ('' = sin subtítulo).
+ * Imagen única + lista de identificación: lado a lado en pantalla ancha.
+ */
 export function renderSeccion(s, titulo, car = carrera()) {
+    const bl = (s.bloques || []).filter(b => !esEstadistica(b));
+    const iImg = bl.findIndex(b => b.t === 'imagenes' && (b.items || []).length === 1);
+    const iLista = bl.findIndex(b => b.t === 'tabla' && (b.cab || [])[0] === 'Nº');
+    let cuerpo;
+    if (iImg >= 0 && iLista >= 0) {
+        const resto = bl.filter((_, i) => i !== iImg && i !== iLista);
+        cuerpo = `<div class="nl-g-par">${renderBloque(bl[iImg], car)}${renderBloque(bl[iLista], car)}</div>` +
+                 resto.map(b => renderBloque(b, car)).join('');
+    } else {
+        cuerpo = bl.map(b => renderBloque(b, car)).join('');
+    }
     return `<section class="nl-g-sec">
         ${titulo === '' ? '' : `<h3>${esc(titulo || s.titulo)}</h3>`}
-        ${(s.bloques || []).map(b => renderBloque(b, car)).join('')}
-        ${s.nota ? `<p class="nl-g-sec__nota">${esc(s.nota)}</p>` : ''}
+        ${cuerpo}
     </section>`;
 }
 

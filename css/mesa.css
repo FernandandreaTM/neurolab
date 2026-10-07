@@ -182,6 +182,9 @@
 .nl-mesa__instr summary { cursor: pointer; font-weight: 800; color: var(--violet-light); }
 .nl-mesa__instr p { margin: .45rem 0 0; }
 .nl-mesa__instr strong { color: #fff; }
+.nl-mesa__instr strong.nl-c-verde { color: #86EFAC; }
+.nl-mesa__instr strong.nl-c-rojo { color: #FFB4AE; }
+.nl-mesa__instr strong.nl-c-naranjo { color: #FCD34D; }
 .nl-mesa__desc { color: var(--gray-300); font-size: .8rem; }
 .nl-mesa__aviso {
     font-size: .84rem; line-height: 1.5; color: var(--gray-100);
@@ -290,39 +293,61 @@
 .nl-tip__lienzo-caja {
     position: relative; display: flex; flex-direction: column; align-items: center; gap: .4rem;
     height: var(--alto); padding: .7rem; border-radius: var(--radius, 16px);
-    background: #fff; border: 2px solid transparent;
+    background: radial-gradient(circle at 50% 55%, #fff 0 45%, #F7F4FF 100%); border: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px #EDE9FE;
     transition: border-color .3s;
 }
 .nl-tip__lienzo-caja.is-ok { border-color: #22C55E; }
 .nl-tip__lienzo-caja.is-repasar { border-color: var(--repasar); }
 .nl-tip__lienzo-caja.is-sacude { animation: nlLabMal 320ms ease; border-color: var(--repasar); }
 .nl-tip__paleta { grid-template-columns: repeat(4, auto); justify-content: center; }
-.nl-tip__paleta .nl-arm__pieza { color: #4A3A6A; background: #F5F3FF; border-color: #DDD6FE; cursor: pointer; }
+.nl-tip__paleta { display: flex; flex-wrap: wrap; gap: .4rem; }
+.nl-tip__paleta .nl-arm__pieza { color: #3B2F55; background: #fff; border: 1.5px solid #DDD6FE; cursor: pointer; box-shadow: 0 1px 2px rgba(46,16,101,.08); }
 .nl-tip__paleta .nl-arm__pieza:hover { color: #2E1065; border-color: #A78BFA; }
-.nl-tip__paleta .nl-arm__pieza.active { color: #fff; background: #7C3AED; border-color: #7C3AED; }
-.nl-tip__paleta .nl-arm__pieza.active svg path { stroke: #fff; }
+.nl-tip__pz { display: inline-flex; align-items: stretch; }
+.nl-tip__pz .nl-arm__pieza { border-radius: 10px 0 0 10px; border-right: 0; }
+.nl-tip__pz--dendrita { --pz: #0D9488; } .nl-tip__pz--axon { --pz: #DB2777; } .nl-tip__pz--t { --pz: #2563EB; }
+.nl-tip__pz .nl-arm__pieza.active { color: #fff; background: var(--pz); border-color: var(--pz); }
+.nl-tip__pz .nl-arm__pieza.active svg path, .nl-tip__pz .nl-arm__pieza.active svg rect { stroke: #fff; }
+.nl-tip__que {
+    font: 800 .78rem/1 inherit; width: 1.9rem; cursor: pointer; color: var(--pz); background: #fff;
+    border: 1.5px solid #DDD6FE; border-left: 1px dashed #DDD6FE; border-radius: 0 10px 10px 0;
+}
+.nl-tip__que:hover, .nl-tip__que.is-on { color: #fff; background: var(--pz); border-color: var(--pz); }
+.nl-tip__def {
+    margin: 0; max-width: 34rem; padding: .45rem .7rem; border-radius: 10px; font-size: .84rem; line-height: 1.45;
+    color: #2E1065; background: #fff; border: 1.5px solid #DDD6FE; border-left: 4px solid var(--pz, #7C3AED);
+}
+.nl-tip__def--dendrita { --pz: #0D9488; } .nl-tip__def--axon { --pz: #DB2777; } .nl-tip__def--t { --pz: #2563EB; }
+.nl-tip__def strong { color: var(--pz); }
 .nl-tip__lienzo { flex: 1 1 auto; min-height: 0; width: 100%; touch-action: manipulation; }
 .nl-tip__sello { margin: 0; font-weight: 800; color: #15803D; }
 .nl-tip__lienzo-caja.is-repasar .nl-tip__sello { color: #B42318; }
-/* Paso 2: sentido de la información (zonas que se tocan y flecha) */
+/* Paso 2: sentido de la información (zonas que se tocan, etiquetas y ruta del impulso) */
 .nl-tip__sello.is-flecha { color: #B45309; }
 .nl-tip__zonas .zona { fill: none; stroke: rgba(245,158,11,.001); stroke-width: 28; stroke-linecap: round; cursor: pointer; pointer-events: stroke; }
-.nl-tip__zonas .zona:hover, .nl-tip__zonas .zona:focus-visible { stroke: rgba(245,158,11,.22); outline: none; }
-.nl-tip__zonas .zona.is-entra { stroke: rgba(245,158,11,.45); }
-.nl-mesa--tipos .p-flecha, .nl-tip__mini .p-flecha { stroke: #EA580C; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.nl-mesa--tipos .p-flecha-punta { fill: #EA580C; }
-.p-flecha-g.is-anima .p-flecha { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nlFlecha 900ms ease forwards; }
-.p-flecha-g.is-anima .p-flecha-punta { opacity: 0; animation: nlFlechaPunta 200ms 850ms forwards; }
-@keyframes nlFlecha { to { stroke-dashoffset: 0; } }
-@keyframes nlFlechaPunta { to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .p-flecha-g.is-anima .p-flecha, .p-flecha-g.is-anima .p-flecha-punta { animation: none; stroke-dashoffset: 0; opacity: 1; } }
+.nl-tip__zonas .zona:hover, .nl-tip__zonas .zona:focus-visible { stroke: rgba(245,158,11,.25); outline: none; }
+.nl-tip__zonas .zona.is-entra { stroke: rgba(13,148,136,.25); }
+.nl-tip__lienzo .pieza.is-entra, .nl-tip__mini .pieza.is-entra { filter: drop-shadow(0 0 4px rgba(13,148,136,.9)); }
+.nl-tip__lienzo .pieza.is-sale { filter: drop-shadow(0 0 4px rgba(219,39,119,.8)); }
+.p-flecha-halo { fill: none; stroke: rgba(245,158,11,.28); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+.p-flecha { fill: none; stroke: #F59E0B; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.p-flecha-punta { fill: #F59E0B; stroke: #fff; stroke-width: 1.2; }
+.p-flecha-flujo { fill: none; stroke: #FEF3C7; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 3 12; animation: nlFlujo .9s linear infinite; }
+.p-impulso { fill: #FDE047; stroke: #B45309; stroke-width: 1.5; filter: drop-shadow(0 0 5px rgba(253,224,71,.95)); }
+.p-etq rect { stroke: #fff; stroke-width: 1.5; }
+.p-etq text { font: 800 10px/1 'Plus Jakarta Sans', Arial, sans-serif; letter-spacing: .06em; fill: #fff; }
+.p-etq--entra rect { fill: #0D9488; }
+.p-etq--sale rect { fill: #DB2777; }
+@keyframes nlFlujo { to { stroke-dashoffset: -15; } }
+@media (prefers-reduced-motion: reduce) { .p-flecha-flujo { animation: none; } .p-impulso { display: none; } }
 /* piezas sobre fondo blanco (mismos colores que en la guía) */
-.nl-mesa--tipos .p-dend  { stroke: #7C3AED; }
+.nl-mesa--tipos .p-dend  { stroke: #0D9488; }
 .nl-mesa--tipos .p-axon  { stroke: #DB2777; }
-.nl-mesa--tipos .p-t     { stroke: #0284C7; }
+.nl-mesa--tipos .p-t     { stroke: #2563EB; }
 .nl-mesa--tipos .p-mielina { fill: #E0E7FF; stroke: #818CF8; stroke-width: 1; opacity: 1; }
 .nl-mesa--tipos .p-boton { fill: #DB2777; }
-.nl-mesa--tipos .p-t ~ .p-boton { fill: #0284C7; }
+.nl-mesa--tipos .p-t ~ .p-boton { fill: #2563EB; }
 .nl-mesa--tipos .p-soma  { fill: #8B5CF6; stroke: #5B21B6; }
 .nl-mesa--tipos .p-nucleo { fill: #2E1065; stroke: #DDD6FE; }
 .nl-tip__lienzo .punto__aro { fill: #F5F3FF; stroke: #A78BFA; }

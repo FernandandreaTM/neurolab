@@ -106,7 +106,7 @@ INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, 
 
 INSERT OR IGNORE INTO practica_niveles (id, actividad_id, numero, titulo, instrucciones, tipo, activo) VALUES
   (1, 3, 1, 'Armar las neuronas',
-      'Elige una pieza arriba de la imagen (dendrita, axón o neurita en T) y toca un punto <strong>+</strong> alrededor del soma para agregarla; tocar de nuevo la quita. Cuando esté lista, presiona <strong>Revisar</strong> y luego marca el <strong>sentido de la información</strong>: toca la prolongación por donde entra y la prolongación por donde sale. <strong>Neurita</strong>: cualquier prolongación del soma (dendrita o axón) cuando no importa precisar cuál.',
+      '<strong>1. Arma</strong>: elige una pieza (toca su <strong>?</strong> para ver qué es) y ponla en un <strong>+</strong> alrededor del soma; luego presiona <strong>Revisar</strong>. <strong>2. Marca el sentido</strong>: toca por dónde <strong>entra</strong> y después por dónde <strong>sale</strong> la información.',
       'armar', 1),
   (2, 3, 2, 'Cuadro comparativo',
       'Lee la frase y toca la tarjeta del tipo de neurona que describe. Cada acierto escribe una celda del cuadro comparativo, fila por fila: morfología, función y localización. <strong>Rojo</strong>: esa tarjeta no era; prueba con otra.',
@@ -296,15 +296,15 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
   (8, 'Espinas dendríticas', 12.8, 11.7,
       'Protrusiones de la dendrita que reciben la mayoría de las sinapsis excitatorias. A diferencia del tronco de la dendrita (sostenido por microtúbulos), las espinas se sostienen con actina: por eso cambian de forma y número con la experiencia (plasticidad), la base celular del aprendizaje.',
       'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
-      'espina dendritica|espinas|espina', 5, 44, 1, NULL),
+      'espina dendritica|espinas|espina', 13, 2.5, 1, NULL),
   (8, 'Microtúbulos', 38.7, 26.5,
       'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
       'Forman los rieles por los que se mueve el transporte axonal.',
-      'microtubulo|microtúbulo|tubulina', 31, 44, 2, NULL),
+      'microtubulo|microtúbulo|tubulina', 41.5, 2.5, 2, NULL),
   (8, 'Neurofilamentos', 36.2, 17.9,
       'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
       'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
-      'neurofilamento|filamentos intermedios', 47, 43, 3, NULL),
+      'neurofilamento|filamentos intermedios', 32.5, 2.5, 3, NULL),
   (8, 'Proteínas motoras', 30.3, 23.7,
       'Kinesina: transporte anterógrado (del soma al terminal: vesículas, mitocondrias, proteínas nuevas). Dineína: transporte retrógrado (del terminal al soma: membranas para reciclar, material endocitado, factores tróficos). Ambas caminan sobre los microtúbulos gastando ATP.',
       'Transportan carga a lo largo del axón caminando sobre los microtúbulos, en ambos sentidos.',
@@ -312,11 +312,11 @@ INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descri
   (8, 'Filamentos de actina', 58.4, 23.7,
       'Polímeros de actina, los filamentos más delgados del citoesqueleto (microfilamentos). Se concentran en el cono de crecimiento (filopodios y lamelipodio) y en las espinas dendríticas; su armado y desarmado rápido permite que el axón avance y que las espinas cambien con la plasticidad.',
       'Forman los filopodios del cono de crecimiento y sostienen las espinas dendríticas: permiten cambios rápidos de forma.',
-      'actina|filamento de actina|+microfilamentos|microfilamento|f-actina', 66, 42, 5, 'puntos:13.0,15.9'),
+      'actina|filamento de actina|+microfilamentos|microfilamento|f-actina', 50, 2.5, 5, 'puntos:13.0,15.9'),
   (8, 'Vesículas sinápticas', 84.9, 21.1,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 90, 44, 6, NULL);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 85, 2.5, 6, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (8, 2, 'El transporte axonal depende del citoesqueleto: en los axones más largos (como los que llegan a los pies y las manos) falla primero, y por eso las neuropatías periféricas empiezan con hormigueo y torpeza distal.', 1),
   (8, 1, 'Las espinas dendríticas y su actina cambian con la práctica: es la base celular del aprendizaje, por ejemplo al adquirir o rehabilitar habilidades del habla.', 2);

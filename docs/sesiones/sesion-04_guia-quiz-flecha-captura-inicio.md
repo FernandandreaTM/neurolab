@@ -54,6 +54,17 @@
 
 **Subir:** `_partials/mesa.php css/guia.css data/practicos.php data/seed.sql guia.php js/guia.js js/tipos.js` y luego abrir `admin/seed.php`. En los navegadores que ya tenían la guía, los textos «¿Para qué te sirve?» y el cuadro con íconos se actualizan cuando se vuelve a abrir ese nivel.
 
+## 3c. Tercera ronda
+
+| Pedido | Solución | Archivos |
+|---|---|---|
+| Act. 1 nivel III: líneas cruzadas | Los 6 números en una fila sobre los círculos de zoom (altura del antiguo 4): 1 sobre A, 3·4·2 sobre B, 5 entre B y C, 6 sobre D | `data/seed.sql` (`box_x_pct`, `box_y_pct`) |
+| Tipos nivel I más estético | Color fijo por pieza (dendrita verde azulado, axón magenta, neurita en T azul) en la actividad y la guía; lienzo con fondo lila suave; paleta con **(?)** que abre la definición (dendrita, axón, neurita/T) y sale de las instrucciones, que quedan en «1. Arma · 2. Marca el sentido». Paso 2: la prolongación tocada se ilumina con la etiqueta **ENTRA**; al acertar, **ruta dorada con halo**, flujo animado y un **impulso luminoso en bucle** de la entrada a la salida, con etiquetas ENTRA / SALE (también en la guía, sin animación) | `js/tipos.js`, `css/mesa.css`, `css/guia.css`, `data/seed.sql` |
+| «Verde» en blanco en las instrucciones | Verde, Rojo y Naranjo se pintan en su color en todas las instrucciones | `_partials/mesa.php`, `css/mesa.css` |
+| Guía densa | Sin estadísticas (intentos fallidos, «por repasar», puntaje, «los números corresponden…»). Identificación como lista de 2 columnas (número en círculo verde/rojo · **nombre** · función y «para recordar» en gris), al lado de la imagen en pantalla ancha (en el PDF, debajo y a 2 columnas). Preguntas de lámina y quiz como «**pregunta** → respuesta». Cuadro comparativo con bordes suaves. «¿Para qué te sirve?» en recuadro ámbar compacto. Actividades con número grande y más aire; niveles con rótulo pequeño. Números más grandes en la imagen rotulada | `js/guia.js`, `css/guia.css`, `js/labeling.js` |
+
+**Subir:** `_partials/mesa.php css/guia.css css/mesa.css data/seed.sql js/guia.js js/labeling.js js/tipos.js` y luego `admin/seed.php`.
+
 ## 4. Pendientes
 
 1. **«LabiMed»**: no encontré la URL. Pásamela (y la de DigitalDuck si quieres incluirla) para sumarla a «Otros recursos» en `_partials/footer.php` (lista `$nl_recursos`).
