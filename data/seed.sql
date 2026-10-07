@@ -293,30 +293,30 @@ INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo
 INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES
   (8, 'imagen', 'img/neurona-nivel3-zoom.jpg', 'Ampliaciones: espina dendrítica (A), interior del axón (B), cono de crecimiento (C) y botón terminal (D)', 1);
 INSERT OR IGNORE INTO labeling_parts (actividad_id, nombre, x_pct, y_pct, descripcion, funcion, sinonimos, box_x_pct, box_y_pct, orden, forma) VALUES
-  (8, 'Espinas dendríticas', 12.8, 11.7,
+  (8, 'Espinas dendríticas', 12.8, 17.2,
       'Protrusiones de la dendrita que reciben la mayoría de las sinapsis excitatorias. A diferencia del tronco de la dendrita (sostenido por microtúbulos), las espinas se sostienen con actina: por eso cambian de forma y número con la experiencia (plasticidad), la base celular del aprendizaje.',
       'Pequeñas protrusiones que aumentan la superficie de contacto sináptico y cambian con el aprendizaje.',
-      'espina dendritica|espinas|espina', 13, 2.5, 1, NULL),
-  (8, 'Microtúbulos', 38.7, 26.5,
+      'espina dendritica|espinas|espina', 13, 4.5, 1, NULL),
+  (8, 'Microtúbulos', 38.7, 32.0,
       'Polímeros de tubulina orientados a lo largo del axón. Las proteínas motoras caminan sobre ellos gastando ATP.',
       'Forman los rieles por los que se mueve el transporte axonal.',
-      'microtubulo|microtúbulo|tubulina', 41.5, 2.5, 2, NULL),
-  (8, 'Neurofilamentos', 36.2, 17.9,
+      'microtubulo|microtúbulo|tubulina', 41.5, 4.5, 2, NULL),
+  (8, 'Neurofilamentos', 36.2, 23.4,
       'Filamentos intermedios propios de la neurona. A mayor calibre, mayor velocidad de conducción. Su cadena ligera (NfL) en sangre es marcador de daño axonal (EM, ELA).',
       'Dan soporte estructural y determinan el calibre (diámetro) del axón.',
-      'neurofilamento|filamentos intermedios', 32.5, 2.5, 3, NULL),
-  (8, 'Proteínas motoras', 30.3, 23.7,
+      'neurofilamento|filamentos intermedios', 32.5, 4.5, 3, NULL),
+  (8, 'Proteínas motoras', 30.3, 29.2,
       'Kinesina: transporte anterógrado (del soma al terminal: vesículas, mitocondrias, proteínas nuevas). Dineína: transporte retrógrado (del terminal al soma: membranas para reciclar, material endocitado, factores tróficos). Ambas caminan sobre los microtúbulos gastando ATP.',
       'Transportan carga a lo largo del axón caminando sobre los microtúbulos, en ambos sentidos.',
-      '+kinesina|+dineína|kinesina y dineina|motores moleculares|proteinas motoras', 37, 2.5, 4, 'puntos:43.8,21.4'),
-  (8, 'Filamentos de actina', 58.4, 23.7,
+      '+kinesina|+dineína|kinesina y dineina|motores moleculares|proteinas motoras', 37, 4.5, 4, 'puntos:43.8,26.9'),
+  (8, 'Filamentos de actina', 58.4, 29.2,
       'Polímeros de actina, los filamentos más delgados del citoesqueleto (microfilamentos). Se concentran en el cono de crecimiento (filopodios y lamelipodio) y en las espinas dendríticas; su armado y desarmado rápido permite que el axón avance y que las espinas cambien con la plasticidad.',
       'Forman los filopodios del cono de crecimiento y sostienen las espinas dendríticas: permiten cambios rápidos de forma.',
-      'actina|filamento de actina|+microfilamentos|microfilamento|f-actina', 50, 2.5, 5, 'puntos:13.0,15.9'),
-  (8, 'Vesículas sinápticas', 84.9, 21.1,
+      'actina|filamento de actina|+microfilamentos|microfilamento|f-actina', 50, 4.5, 5, 'puntos:13.0,21.4'),
+  (8, 'Vesículas sinápticas', 84.9, 26.6,
       'Están en el botón terminal y liberan su contenido por exocitosis cuando llega el impulso (lo verás en detalle en Sinapsis).',
       'Almacenan el neurotransmisor hasta que llega el potencial de acción.',
-      'vesiculas|vesícula sináptica|vesiculas sinapticas', 85, 2.5, 6, NULL);
+      'vesiculas|vesícula sináptica|vesiculas sinapticas', 85, 4.5, 6, NULL);
 INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, orden) VALUES
   (8, 2, 'El transporte axonal depende del citoesqueleto: en los axones más largos (como los que llegan a los pies y las manos) falla primero, y por eso las neuropatías periféricas empiezan con hormigueo y torpeza distal.', 1),
   (8, 1, 'Las espinas dendríticas y su actina cambian con la práctica: es la base celular del aprendizaje, por ejemplo al adquirir o rehabilitar habilidades del habla.', 2);

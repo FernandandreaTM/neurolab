@@ -7,7 +7,7 @@
     --g-linea: #DDD6FE;
     --g-suave: #F5F3FF;
 }
-.nl-guia-pag { max-width: 920px; margin: 0 auto; padding: 1.2rem 16px 3rem; }
+.nl-guia-pag { max-width: 1240px; margin: 0 auto; padding: 1.2rem 16px 3rem; }
 
 /* Herramientas (sólo pantalla) */
 .nl-guia-herr {
@@ -78,14 +78,15 @@
 .nl-g-texto { margin: .5rem 0 0; }
 .nl-g-lista { margin: .5rem 0 0; padding-left: 1.2rem; }
 
-/* Imagen + lista de identificación, lado a lado */
-.nl-g-par { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1rem; align-items: start; margin-top: .4rem; }
-.nl-g-par .nl-g-figuras { margin-top: 0; position: sticky; top: 1rem; }
-.nl-g-par .nl-g-figuras--fotos.is-una { grid-template-columns: 1fr; }
+/* Imagen de identificación arriba (centrada) y su lista debajo, en columnas que llenan el ancho */
+.nl-g-par { display: grid; gap: .8rem; margin-top: .4rem; }
+.nl-g-par .nl-g-figuras { margin-top: 0; }
+.nl-g-par .nl-g-figuras--fotos.is-una { grid-template-columns: minmax(0, 640px); justify-content: center; }
+.nl-g-par .nl-g-items { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 1.6rem; }
 
 /* Lista de estructuras: (n) Nombre · función + para recordar */
 .nl-g-items { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
-.nl-g-items li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); column-gap: .5rem; padding: .35rem 0; border-bottom: 1px solid #F1EDFB; break-inside: avoid; }
+.nl-g-items li { display: grid; align-content: start; grid-template-columns: 1.6rem minmax(0, 1fr); column-gap: .5rem; padding: .35rem 0; border-bottom: 1px solid #F1EDFB; break-inside: avoid; }
 .nl-g-items li:last-child { border-bottom: 0; }
 .nl-g-items__n {
     grid-row: span 2; display: inline-grid; place-items: center; width: 1.45rem; height: 1.45rem; margin-top: .1rem;
@@ -123,7 +124,7 @@
 
 /* Figuras */
 .nl-g-figuras { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .5rem; }
-.nl-g-figuras--fotos { grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: start; }
+.nl-g-figuras--fotos { grid-template-columns: repeat(auto-fill, minmax(260px, 360px)); justify-content: start; }
 .nl-g-figuras--fotos.is-una { grid-template-columns: minmax(0, 520px); }
 .nl-g-fig { margin: 0; border: 1px solid var(--g-linea); border-radius: 10px; padding: .45rem; background: #fff; break-inside: avoid; }
 .nl-g-fig svg, .nl-g-fig img { width: 100%; height: auto; display: block; border-radius: 6px; }
@@ -182,7 +183,6 @@
     .nl-g-tabla tr, .nl-g-fig { break-inside: avoid; }
     .nl-g-tabla-wrap { overflow: visible; }
     .nl-g-par { grid-template-columns: 1fr; }
-    .nl-g-par .nl-g-figuras { position: static; }
     .nl-g-par .nl-g-figuras--fotos.is-una, .nl-g-figuras--fotos.is-una { grid-template-columns: 115mm; justify-content: center; }
     .nl-g-figuras--fotos { grid-template-columns: repeat(2, 80mm); }
     .nl-g-items { grid-template-columns: 1fr 1fr; column-gap: 8mm; }

@@ -216,7 +216,7 @@ btnHtml.addEventListener('click', async () => {
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:24px 16px;background:#EEEAF6;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.nl-guia-doc{max-width:920px;margin:0 auto}
+.nl-guia-doc{max-width:1240px;margin:0 auto}
 h1,h2,h3{font-family:inherit}
 ${css}
 </style></head>
