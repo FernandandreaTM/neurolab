@@ -5,7 +5,8 @@
  * izquierda y un panel fijo a la derecha donde se responde. Lo incluye actividad.php
  * para la identificación (labeling) y para actividades con lámina + tareas.
  * Usa las variables de actividad.php: $act, $ruta, $carreras, $recursos, $tareas,
- * $esLabeling, $partesLab, $imgLab, $nivelesLab, $requiereLab, $siguienteLab.
+ * $esLabeling, $partesLab, $imgLab, $nivelesLab, $requiereLab, $siguienteLab,
+ * $esTipos, $nivelTip, $nivelesNav, $siguienteTip (tipos de neurona).
  */
 $volver = $ruta !== ''
     ? ['practico.php?p=' . rawurlencode($ruta), '← Ruta del práctico']
@@ -35,7 +36,18 @@ $conexion = function () use ($carreras) {
 ?>
 <header class="nl-mesa-head container">
     <a href="<?= htmlspecialchars($volver[0]) ?>" class="nl-act-back"><?= $volver[1] ?></a>
-    <h1><?= htmlspecialchars($act['titulo']) ?></h1>
+    <h1><?= htmlspecialchars($act['titulo']) ?><?= $esTipos ? ' · Nivel ' . $nivelTip['romano'] . ': ' . htmlspecialchars(mb_strtolower($nivelTip['titulo'], 'UTF-8')) : '' ?></h1>
+    <?php if ($esTipos && count($nivelesNav) > 1): ?>
+    <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
+        <?php foreach ($nivelesNav as $nv): ?>
+            <?php if ($nv['actual']): ?>
+                <span class="nl-lab__nivel is-actual" aria-current="page"><?= htmlspecialchars($nv['etq']) ?></span>
+            <?php else: ?>
+                <a class="nl-lab__nivel" title="<?= htmlspecialchars($nv['titulo']) ?>" href="<?= htmlspecialchars($nv['href']) ?>"><?= htmlspecialchars($nv['etq']) ?></a>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </nav>
+    <?php endif; ?>
     <?php if ($esLabeling && $nivelesLab): ?>
     <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
         <?php foreach ($nivelesLab as $k => $nv):
@@ -86,6 +98,48 @@ $conexion = function () use ($carreras) {
         <?= $conexion() ?>
         <div class="nl-lab__trabajo" id="nl-lab-feedback" role="status" aria-live="polite"></div>
     </aside>
+</div>
+
+<?php elseif ($esTipos):
+    // Tipos de neurona: nivel "armar" (lienzo + piezas) o "elegir" (frase + tarjetas y cuadro comparativo)
+    $itemsTip = array_map(function ($it) {
+        return ['id' => (int)$it['id'], 'e' => $it['enunciado'], 'fila' => $it['fila'] ?? ''];
+    }, $nivelTip['items']);
+    $tiposTip = ['Bipolar', 'Pseudounipolar', 'Multipolar'];   // columnas del cuadro, en orden
+?>
+<div class="nl-mesa nl-mesa--tipos container" id="nl-tip"
+     data-slug="<?= htmlspecialchars($act['slug']) ?>"
+     data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
+     data-nivel="<?= (int)$nivelTip['id'] ?>"
+     data-numero="<?= (int)$nivelTip['numero'] ?>"
+     data-romano="<?= htmlspecialchars($nivelTip['romano']) ?>"
+     data-titulo-nivel="<?= htmlspecialchars($nivelTip['titulo']) ?>"
+     data-tipo="<?= htmlspecialchars($nivelTip['tipo']) ?>"
+     data-requiere="<?= htmlspecialchars($nivelTip['requiere']) ?>"
+     data-siguiente="<?= htmlspecialchars($siguienteTip) ?>"
+     data-items="<?= htmlspecialchars(json_encode($itemsTip, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-tipos="<?= htmlspecialchars(json_encode($tiposTip, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+    <div class="nl-lab__candado" hidden>
+        <strong>🔒 Nivel bloqueado</strong>
+        <p>Completa primero el nivel anterior para desbloquear este.</p>
+    </div>
+    <div class="nl-mesa__vista">
+        <div class="nl-tip__vista" id="nl-tip-vista"></div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?= $instrucciones($nivelTip['instrucciones']) ?>
+        <div class="nl-lab__estado">
+            <span class="nl-lab__contador" id="nl-tip-contador">0 / <?= count($itemsTip) ?></span>
+            <span class="nl-lab__errores" id="nl-tip-errores"></span>
+            <button type="button" class="nl-lab__reset" id="nl-tip-reset">Empezar de nuevo</button>
+        </div>
+        <div class="nl-tip__progreso" id="nl-tip-progreso"></div>
+        <?= $conexion() ?>
+        <div class="nl-lab__trabajo" id="nl-tip-trabajo" role="status" aria-live="polite"></div>
+    </aside>
+    <template id="nl-tip-iconos">
+        <?php foreach ($tiposTip as $t): ?><span data-tipo="<?= htmlspecialchars($t) ?>"><?= nl_icono_neurona($t) ?></span><?php endforeach; ?>
+    </template>
 </div>
 
 <?php else:

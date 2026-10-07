@@ -43,6 +43,12 @@ try {
         }
     }
 
+    foreach (['fila' => 'TEXT', 'celda' => 'TEXT', 'nota' => 'TEXT'] as $col => $tipo) {
+        if (add_column_if_missing($pdo, 'practica_items', $col, $tipo)) {
+            $aplicadas[] = 'practica_items.' . $col;
+        }
+    }
+
     echo "<h2 style='font-family:sans-serif;color:#1A0E2E'>NeuroLab — migración OK</h2>";
     echo "<p style='font-family:sans-serif'>Base creada/actualizada en <code>{$dbPath}</code></p>";
     if ($aplicadas) {

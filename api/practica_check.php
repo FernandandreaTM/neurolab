@@ -10,7 +10,7 @@
  * Nivel "armar":      POST item_id, construccion   (JSON de 8 posiciones alrededor
  *                     del soma: null | "dendrita" | "axon" | "t", en orden horario
  *                     partiendo desde la derecha)
- * ->   { "correcto": true,  "respuesta": "Bipolar", "feedback": "..." }
+ * ->   { "correcto": true,  "respuesta": "Bipolar", "feedback": "...", "celda": "...", "nota": "..." }
  *      { "correcto": false, "feedback": "..." }
  */
 error_reporting(0);
@@ -130,7 +130,7 @@ if ($itemId <= 0) {
 try {
     $pdo = get_db();
     $st  = $pdo->prepare("
-        SELECT i.id, i.nivel_id, i.respuesta, i.sinonimos, i.pista, i.explicacion, n.tipo AS nivel_tipo
+        SELECT i.id, i.nivel_id, i.respuesta, i.sinonimos, i.pista, i.explicacion, i.celda, i.nota, n.tipo AS nivel_tipo
         FROM practica_items i
         JOIN practica_niveles n ON n.id = i.nivel_id
         WHERE i.id = ? AND n.activo = 1
@@ -158,6 +158,8 @@ try {
                 'correcto'  => true,
                 'respuesta' => $item['respuesta'],
                 'feedback'  => $item['explicacion'] ? $item['explicacion'] : '¡Correcto!',
+                'celda'     => (string)$item['celda'],
+                'nota'      => (string)$item['nota'],
             ]);
         }
         nl_prac_json([
@@ -177,6 +179,8 @@ try {
             'correcto'  => true,
             'respuesta' => $item['respuesta'],
             'feedback'  => $item['explicacion'] ? $item['explicacion'] : '¡Correcto!',
+            'celda'     => (string)$item['celda'],
+            'nota'      => (string)$item['nota'],
         ]);
     }
 

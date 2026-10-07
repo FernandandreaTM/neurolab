@@ -274,3 +274,56 @@
     .nl-mesa:not(.nl-mesa--lamina) { grid-template-columns: 1fr; }
     .nl-mesa:not(.nl-mesa--lamina) .nl-lab__canvas { width: 100%; }
 }
+
+/* --- Tipos de neurona (js/tipos.js): misma mesa; vista = lienzo o frase + tarjetas --- */
+.nl-mesa--tipos .nl-tip__vista { width: var(--alto); max-width: 100%; animation: nlFade .5s ease; }
+.nl-mesa--tipos[data-tipo="elegir"] .nl-tip__vista { width: calc(var(--alto) * 1.3); }
+.nl-tip__lienzo-caja {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: .4rem;
+    height: var(--alto); padding: .7rem; border-radius: var(--radius, 16px);
+    background: #fff; border: 2px solid transparent;
+    transition: border-color .3s;
+}
+.nl-tip__lienzo-caja.is-ok { border-color: #22C55E; }
+.nl-tip__lienzo-caja.is-repasar { border-color: var(--repasar); }
+.nl-tip__lienzo-caja.is-sacude { animation: nlLabMal 320ms ease; border-color: var(--repasar); }
+.nl-tip__paleta { grid-template-columns: repeat(4, auto); justify-content: center; }
+.nl-tip__paleta .nl-arm__pieza { color: #4A3A6A; background: #F5F3FF; border-color: #DDD6FE; cursor: pointer; }
+.nl-tip__paleta .nl-arm__pieza:hover { color: #2E1065; border-color: #A78BFA; }
+.nl-tip__paleta .nl-arm__pieza.active { color: #fff; background: #7C3AED; border-color: #7C3AED; }
+.nl-tip__paleta .nl-arm__pieza.active svg path { stroke: #fff; }
+.nl-tip__lienzo { flex: 1 1 auto; min-height: 0; width: 100%; touch-action: manipulation; }
+.nl-tip__sello { margin: 0; font-weight: 800; color: #15803D; }
+.nl-tip__lienzo-caja.is-repasar .nl-tip__sello { color: #B42318; }
+/* piezas sobre fondo blanco (mismos colores que en la guía) */
+.nl-mesa--tipos .p-dend  { stroke: #7C3AED; }
+.nl-mesa--tipos .p-axon  { stroke: #DB2777; }
+.nl-mesa--tipos .p-t     { stroke: #0284C7; }
+.nl-mesa--tipos .p-mielina { fill: #E0E7FF; stroke: #818CF8; stroke-width: 1; opacity: 1; }
+.nl-mesa--tipos .p-boton { fill: #DB2777; }
+.nl-mesa--tipos .p-t ~ .p-boton { fill: #0284C7; }
+.nl-mesa--tipos .p-soma  { fill: #8B5CF6; stroke: #5B21B6; }
+.nl-mesa--tipos .p-nucleo { fill: #2E1065; stroke: #DDD6FE; }
+.nl-tip__lienzo .punto__aro { fill: #F5F3FF; stroke: #A78BFA; }
+.nl-tip__lienzo .punto__mas { stroke: #7C3AED; }
+.nl-tip__lienzo .punto.is-lleno .punto__aro { fill: rgba(245,243,255,.85); stroke: #C4B5FD; }
+.nl-tip__lienzo .punto:hover .punto__aro,
+.nl-tip__lienzo .punto:focus-visible .punto__aro { fill: #F59E0B; stroke: #B45309; stroke-dasharray: none; }
+.nl-tip__lienzo .punto:hover .punto__mas, .nl-tip__lienzo .punto:focus-visible .punto__mas { stroke: #fff; }
+.nl-tip__resumen { font-size: .85rem; color: var(--gray-300); }
+/* Al cerrar: las neuronas armadas lado a lado */
+.nl-tip__lienzo-caja.is-galeria { flex-direction: row; flex-wrap: wrap; justify-content: center; align-content: center; height: auto; min-height: 40vh; }
+.nl-tip__mini { margin: 0; width: calc(33% - .4rem); min-width: 150px; text-align: center; border-radius: 12px; border: 2px solid #DDD6FE; padding: .3rem; }
+.nl-tip__mini.is-ok { border-color: #86EFAC; }
+.nl-tip__mini.is-repasar { border-color: #FFB4AE; }
+.nl-tip__mini svg { width: 100%; height: auto; display: block; }
+.nl-tip__mini figcaption { font-size: .85rem; font-weight: 700; color: #2E1065; }
+
+@media (max-width: 900px) {
+    .nl-mesa--tipos .nl-tip__vista, .nl-mesa--tipos[data-tipo="elegir"] .nl-tip__vista { width: 100%; }
+    .nl-tip__lienzo-caja { height: auto; }
+    .nl-tip__lienzo { width: min(100%, 52vh); }
+    .nl-tip__paleta { grid-template-columns: repeat(2, 1fr); width: 100%; }
+}
+.nl-mesa.nl-mesa--tipos { grid-template-columns: auto minmax(360px, 620px); }
+@media (max-width: 900px) { .nl-mesa.nl-mesa--tipos { grid-template-columns: 1fr; } }

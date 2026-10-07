@@ -113,13 +113,46 @@ try {
         }
     }
 
+    // --- Tipos de neurona en mesa de trabajo: un nivel por página (&nivel=N) ---
+    $esTipos = ($act['tipo'] === 'comparador') && !empty($niveles);
+    $nivelTip = null; $nivelesNav = []; $siguienteTip = '';
+    if ($esTipos) {
+        $jugables = array_values(array_filter($niveles, function ($n) { return (int)$n['activo'] && !empty($n['items']); }));
+        if (!$jugables) { $esTipos = false; }
+    }
+    if ($esTipos) {
+        $pedido = isset($_GET['nivel']) ? (int)$_GET['nivel'] : 0;
+        $iTip = 0;
+        foreach ($jugables as $k => $n) { if ((int)$n['numero'] === $pedido) $iTip = $k; }
+        $nivelTip = $jugables[$iTip];
+        $romanos = ['I', 'II', 'III', 'IV', 'V'];
+        foreach ($jugables as $k => $n) {
+            $nivelesNav[] = [
+                'etq'    => 'Nivel ' . ($romanos[$k] ?? ($k + 1)),
+                'titulo' => $n['titulo'],
+                'href'   => 'actividad.php?slug=' . rawurlencode($act['slug']) . '&nivel=' . (int)$n['numero'] . ($ruta !== '' ? '&ruta=' . rawurlencode($ruta) : ''),
+                'actual' => $k === $iTip,
+            ];
+        }
+        $nivelTip['romano'] = $romanos[$iTip] ?? ($iTip + 1);
+        $nivelTip['requiere'] = $iTip > 0 ? $act['slug'] . ':' . (int)$jugables[$iTip - 1]['numero'] : '';
+        $siguienteTip = isset($jugables[$iTip + 1]) ? $nivelesNav[$iTip + 1]['href'] : '';
+        if ($nivelTip['tipo'] === 'elegir') {
+            // Fila del cuadro de cada frase (no revela la respuesta: sólo morfología/función/localización)
+            $sf = $pdo->prepare("SELECT id, fila FROM practica_items WHERE nivel_id = ?");
+            $sf->execute([$nivelTip['id']]);
+            $filas = $sf->fetchAll(PDO::FETCH_KEY_PAIR);
+            foreach ($nivelTip['items'] as $k => $it) { $nivelTip['items'][$k]['fila'] = $filas[$it['id']] ?? ''; }
+        }
+    }
+
     // Quiz sin recurso visual: se muestra en el panel principal (no en la columna lateral)
     $quizEnStage = ($act['tipo'] === 'quiz') && empty($recursos) && !empty($quicesData);
 
     // Mesa de trabajo (vista + panel): identificación, o lámina con tareas
     $tieneIframe = false;
     foreach ($recursos as $r) { if ($r['tipo'] === 'iframe_url') { $tieneIframe = true; break; } }
-    $modoMesa = $esLabeling || (is_array($tareas) && $tieneIframe);
+    $modoMesa = $esLabeling || $esTipos || (is_array($tareas) && $tieneIframe);
 
     $active_page = 'actividad';
     ?>
@@ -244,7 +277,7 @@ try {
 
     <?php endif; ?>
 
-    <?php if (!empty($niveles)): ?>
+    <?php if (!empty($niveles) && !$esTipos): ?>
     <section class="nl-prac container" id="nl-prac" data-slug="<?= htmlspecialchars($act['slug']) ?>">
         <div class="nl-prac__head">
             <span class="label">Práctica</span>
@@ -354,7 +387,9 @@ try {
 
     <?php include '_partials/footer.php'; ?>
     <script type="module" src="js/activity.js?v=<?= nl_ver('js/activity.js') ?>"></script>
-    <?php if (!empty($niveles)): ?>
+    <?php if ($esTipos): ?>
+    <script type="module" src="js/tipos.js?v=<?= nl_ver('js/tipos.js') ?>"></script>
+    <?php elseif (!empty($niveles)): ?>
     <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
     <?php endif; ?>
     <?php if (is_array($tareas)): ?>

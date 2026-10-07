@@ -123,6 +123,9 @@ CREATE TABLE IF NOT EXISTS practica_items (
     pista         TEXT,                      -- se muestra al equivocarse, sin decir la respuesta
     explicacion   TEXT,                      -- se muestra al acertar
     orden         INTEGER NOT NULL DEFAULT 0,
+    fila          TEXT,                      -- fila del cuadro comparativo que completa (morfologia | funcion | localizacion)
+    celda         TEXT,                      -- texto breve que se escribe en esa celda al acertar
+    nota          TEXT,                      -- "Para recordar" de la ficha
     FOREIGN KEY (nivel_id) REFERENCES practica_niveles(id)
 );
 

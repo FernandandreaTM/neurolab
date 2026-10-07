@@ -1,6 +1,7 @@
 /**
  * NeuroLab — armar-neurona.js
  * Motor del nivel "armar" de la práctica por niveles (lo usa js/practica.js).
+ * La geometría y el dibujo de las piezas también los usa js/tipos.js (mesa de trabajo).
  *
  * Cada ítem pide un tipo de neurona ("Arma una neurona bipolar"). El estudiante
  * elige una pieza (dendrita, axón o neurita en T) y toca uno de los 8 puntos
@@ -13,20 +14,20 @@
 /* ---------------------------------------------------------------
    Geometría
    --------------------------------------------------------------- */
-const C = 150;          // centro del lienzo (viewBox 0 0 300 300)
-const R = 24;           // radio del soma
-const PUNTOS = 8;       // posiciones alrededor del soma, cada 45°
-const LUGAR = ['a la derecha', 'abajo a la derecha', 'abajo', 'abajo a la izquierda',
+export const C = 150;          // centro del lienzo (viewBox 0 0 300 300)
+export const R = 24;           // radio del soma
+export const PUNTOS = 8;       // posiciones alrededor del soma, cada 45°
+export const LUGAR = ['a la derecha', 'abajo a la derecha', 'abajo', 'abajo a la izquierda',
                'a la izquierda', 'arriba a la izquierda', 'arriba', 'arriba a la derecha'];
 
-const PIEZAS = {
+export const PIEZAS = {
     dendrita: { nombre: 'Dendrita',      plural: 'dendritas', icono: 'ic-dend' },
     axon:     { nombre: 'Axón',          plural: 'axones',    icono: 'ic-axon' },
     t:        { nombre: 'Neurita en T',  plural: 'neuritas en T', icono: 'ic-t' },
 };
 
 /* Cada pieza se dibuja apuntando a la derecha y después se gira a su posición. */
-function dibujoPieza(tipo) {
+export function dibujoPieza(tipo) {
     const x0 = C + R;
     if (tipo === 'dendrita') {
         return `<path class="p-dend" d="
@@ -70,13 +71,13 @@ function dibujoPieza(tipo) {
     return '';
 }
 
-function coordPunto(i, radio) {
+export function coordPunto(i, radio) {
     const a = (i * 360 / PUNTOS) * Math.PI / 180;
     return [C + radio * Math.cos(a), C + radio * Math.sin(a)];
 }
 
 /* Íconos chicos para los botones de la paleta */
-const ICONOS = {
+export const ICONOS = {
     'ic-dend': '<svg viewBox="0 0 28 16" aria-hidden="true"><path class="p-dend" d="M2 8 H16 M11 8 L17 2 M11 8 L17 14 M16 8 L26 4 M16 8 L26 12"/></svg>',
     'ic-axon': '<svg viewBox="0 0 28 16" aria-hidden="true"><path class="p-axon" d="M2 8 H22 M22 8 L26 4 M22 8 L26 12"/><rect class="p-mielina" x="8" y="5" width="7" height="6" rx="2"/></svg>',
     'ic-t':    '<svg viewBox="0 0 28 16" aria-hidden="true"><path class="p-t" d="M2 8 H14 M14 1 V15"/></svg>',
