@@ -53,27 +53,45 @@ Quitadas por repetir actividades: preguntas 11–14 y 17–21 del banco anterior
 
 **Notas:** las 4 capturas de la lámina ocupan ~0,9 MB del almacenamiento del navegador (límite ~5 MB): si varios grupos usan el mismo equipo, «Empezar de nuevo» o borrar la guía. El progreso de la versión anterior de las actividades 2 y 3 no se conserva (claves nuevas).
 
-## 5. Pendientes / ideas
+## 5. Observaciones de Fer en producción → trabajo de la sesión 04
 
-1. Fer revisa en producción la redacción de los casos del quiz (§3) y de los textos «Para recordar» de la act. 2.
-2. El badge de la ruta dice «ETMP097 Neurobiología · Terapia Ocupacional»: si el práctico también es para Fono, generalizar el texto en `data/practicos.php`.
-3. `js/practica.js` y `js/tareas.js` quedan solo como respaldo (ya no los usa ninguna actividad del práctico): se pueden borrar más adelante.
-4. Células II: lámina de médula (glía + circuito reflejo), reutilizando `lamina.js` (captura → recorte → etiquetas) y el armado de `tipos.js` para dibujar el circuito.
+| # | Pedido | Diagnóstico / propuesta para partir |
+|---|---|---|
+| 1 | **Guía**: no se limpia ni se actualiza (aparecen las fotos nuevas de la lámina **y** las viejas); no salen la neurona rotulada (act. 1) ni los dibujos de los tipos (act. 2); le faltan banner, logos y un formato más estilizado pero imprimible; hay textos muy claros sobre blanco y demasiados tamaños de letra; títulos y subtítulos repiten lo mismo; debe exportar **solo la carrera activa** | La guía (`nl_guia` en localStorage) conserva secciones de claves antiguas (`lamina-neurona-piramidal` sin `:n`, `comparador-tipos-neurona:3`…): `guia.php` debe mostrar **solo las claves de `data/practicos.php`** y purgar las demás (o versionar la guía). Revisar por qué no se ven `imagenes`/`figuras` en producción (¿`svgSeguro` filtra el SVG?, ¿la sección se guardó antes de existir la imagen?, ¿archivos JS/CSS sin subir o caché?). Rediseño: encabezado con banner + logos NeuroLab/UACh/TecMedHUB, fondo blanco, acentos en un solo color, escala de 3 tamaños de letra, grises con contraste AA; quitar subtítulos redundantes; secciones de la otra carrera (quiz y «¿Para qué sirve?») fuera también del PDF |
+| 2 | **Lámina, nivel I (corte de rata)**: aviso del propósito al iniciar | Tarjeta inicial que se pliega (o desplegable fijo «¿Por qué un cerebro de rata?»): el objetivo **no es aprender anatomía de la rata**, sino orientarse para **interpretar las imágenes reales** de los niveles siguientes; la anatomía no es idéntica a la humana, pero hay estructuras equivalentes reconocibles y **las funciones son las mismas** |
+| 3 | **Lámina, nivel III**: se centró demasiado en la tinción y poco en **comparar e interpretar** («ahora entiendo por qué en Golgi no veo la capa granular»); distractores débiles (la correcta es la más larga o la más explicada) | Reescribir las preguntas como interpretación de lo observado: qué ves en cada captura → por qué. Igualar el largo y el nivel de detalle de las 4 alternativas (distractores plausibles). **Opcional, si no complica mucho:** buscar en las mismas láminas neuronas de la **corteza** o del **hipocampo**. Las muy frondosas del hipocampo con Golgi suelen ser las **piramidales de CA1/CA3** (dendritas apicales y basales muy ramificadas) y las **granulares del giro dentado** (árbol en abanico, sin dendritas basales): **verificar en la lámina**. Si complica, pasarlo al práctico 2 junto con un circuito de corteza |
+| 4 | **Página principal y navegación**: agregar el práctico al inicio y que se llegue navegando; arreglar los logos y el nav (que no se ven bien; usar como referencia el nav del repo **digitalduck** de Fer); en el pie separar **otros recursos educativos** (p. ej. LabiMed) de **contacto** (Instagram de TecMedHUB); agregar a las ayudantes en las atribuciones, al estilo de https://tecmedhub.org/hitomonteverde/libro.html | Ayudantes: **Kaira Santos**, estudiante de Psicología, https://github.com/kamarisss · **Marcelo Rojas**, estudiante de Enfermería, https://github.com/mikaelroxas-glitch. Pedir acceso al repo digitalduck (o la URL del sitio) al empezar. Unificar `_partials/nav.php` (sitio) y `_partials/barra.php` (actividades) en un solo estilo |
+| 5 | **Dirección de la información** (el quiz la pregunta y ninguna actividad la trabaja) | En **Tipos de neurona, nivel I**: después de armar cada neurona correctamente, un segundo paso: **dibujar/colocar la flecha** del sentido de la información (de dendrita a terminal axonal; en la pseudounipolar, de la rama periférica a la central). Se revisa en `api/practica_check.php`; la flecha queda en el dibujo de la guía |
+| 6 | **Recortador** demasiado complicado (tomar pantallazo → pegar → recortar) | El navegador no puede leer los píxeles del iframe de otro sitio, pero sí puede **capturar la pestaña** con permiso del estudiante (`navigator.mediaDevices.getDisplayMedia`, opción `preferCurrentTab`): un botón **«📷 Capturar»** → el navegador pide «compartir esta pestaña» → se toma un cuadro → se abre directo el recorte. Funciona en Chrome/Edge de escritorio; en celular y Safari queda «Subir imagen» como respaldo. Elimina el paso de pegar |
+| 7 | **Quiz final** desordenado y con temas repetidos poco relevantes (p. ej. dos preguntas de transporte anterógrado/retrógrado) | Orden **lógico y progresivo** (no al azar): estructura → organelos → flujo de información → conducción/mielina → tipos y localización → casos clínicos (común → carrera). Fusionar las dos de transporte axonal en una; revisar otras redundantes y que cada pregunta aporte un concepto distinto; distractores de largo parejo |
+
+## 6. Otros pendientes
+
+1. El badge de la ruta dice «ETMP097 Neurobiología · Terapia Ocupacional»: generalizar si el práctico también es para Fono.
+2. `js/practica.js` y `js/tareas.js` quedan solo como respaldo: borrar cuando se confirme que nada los usa.
+3. Células II: lámina de médula (glía + circuito reflejo), reutilizando `lamina.js` y el armado de `tipos.js`.
 
 ---
 
-## 6. Prompt para la sesión 04
+## 7. Prompt para la sesión 04
 
 ```
 Retomo NeuroLab (C:\repo\neurolab). Lee docs/sesiones/sesion-03_actividades-2-3-carrera-quiz.md completo
-(y si hace falta, la sesión 02 para los principios de diseño de la mesa de trabajo).
-Estado: el práctico Células nerviosas I está completo (4 actividades en mesa de trabajo, barra con switch
-TO/Fono, quiz por pools, guía con imágenes). Primero: revisa conmigo lo que observé en producción
-(sección 4, punto 4 del reporte) y corrige lo que encuentre.
-Luego: diseñar el práctico Células nerviosas II (circuitos y glía) con la misma dinámica. Lámina de médula
-espinal para ver glía y para que dibujen el circuito reflejo (neurona sensitiva → interneurona → motoneurona).
-Antes de programar: propón en una tabla las actividades (vista, panel, pasos, retroalimentación, cierre,
-qué va a la guía, pool del quiz común/TO/Fono) y resuelve conmigo las decisiones abiertas.
-Implementa por partes, probando con PHP 8.3 + Playwright en 1366×660 y celular; commits locales con mi
-autoría; dime exactamente qué subir. Al cerrar, escribe docs/sesiones/sesion-04_*.md con reporte + prompt siguiente.
+(y la sesión 02 para los principios de diseño de la mesa de trabajo).
+Tarea: resolver las 7 observaciones de la sección 5, en este orden de prioridad:
+ 1) Guía: limpiar secciones viejas (mostrar solo las claves de data/practicos.php), arreglar las imágenes que no
+    salen (neurona rotulada, dibujos de tipos), rediseño imprimible con banner y logos, contraste y escala de letra,
+    sin títulos/subtítulos redundantes, y exportar solo la carrera activa.
+ 7) Quiz: orden lógico y progresivo, sin preguntas repetidas (transporte axonal) y distractores de largo parejo.
+ 5) Tipos de neurona nivel I: tras armar, marcar con flecha el sentido de la información.
+ 6) Lámina: botón «Capturar» con getDisplayMedia (pestaña actual) → recorte directo; subir imagen como respaldo.
+ 3) Lámina nivel III: preguntas de comparar/interpretar, distractores parejos; evaluar neuronas de corteza o
+    hipocampo (si complica, dejarlo para el práctico 2).
+ 2) Lámina nivel I: aviso plegable del propósito del corte de rata.
+ 4) Página principal: enlace al práctico, nav nuevo (pídeme acceso al repo digitalduck como referencia), pie con
+    «Otros recursos» separado de «Contacto» y atribuciones con las ayudantes (Kaira Santos y Marcelo Rojas, con su GitHub).
+Antes de programar: propón en una tabla el diseño de la guía, el orden del quiz y la mecánica de la flecha, y
+resuelve conmigo las decisiones abiertas. Implementa por partes, probando con PHP 8.3 + Playwright en 1366×660 y
+celular; commits locales con mi autoría; dime exactamente qué subir. Al cerrar, escribe
+docs/sesiones/sesion-04_*.md con reporte + prompt siguiente.
 ```
