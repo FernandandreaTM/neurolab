@@ -205,3 +205,18 @@
 .nl-tar__final .nl-lab__conexion { margin-top: .4rem; font-weight: 400; }
 .nl-tar__final .nl-guia-ok { display: block; margin-top: .3rem; font-weight: 400; }
 .nl-tar__ruta { margin-left: .4rem; color: #86EFAC; font-weight: 700; }
+
+/* Línea guía gris del número a la estructura (naranja en la activa) */
+.nl-lab__guia-linea { stroke: rgba(90, 80, 110, .55); stroke-width: 1.2; }
+.nl-lab__guia-linea.is-ok { stroke: rgba(22, 163, 74, .55); }
+.nl-lab__guia-linea.is-repasar { stroke: rgba(217, 119, 6, .6); }
+.nl-lab__guia-linea.is-sel { stroke: #F59E0B; stroke-width: 2.2; }
+.nl-lab__diana {
+    position: absolute; transform: translate(-50%, -50%);
+    width: .55em; height: .55em; border-radius: 50%;
+    background: rgba(90, 80, 110, .75); border: .1em solid #fff;
+    pointer-events: none;
+}
+.nl-lab__diana.is-ok { background: #16A34A; }
+.nl-lab__diana.is-repasar { background: #D97706; }
+.nl-lab__diana.is-sel { background: #F59E0B; width: .8em; height: .8em; box-shadow: 0 0 0 .25em rgba(245,158,11,.35); }
