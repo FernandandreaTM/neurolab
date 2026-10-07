@@ -48,6 +48,7 @@ Abre http://localhost:8000 → **Práctico Células nerviosas I** → haz al men
 | `docs/sesiones/sesion-04_*.md` | Último estado y decisiones de diseño |
 | `docs/sesiones/sesion-02_*.md` | Principios de la mesa de trabajo (cómo se arma una actividad) |
 | `data/practicos.php` | Cómo se define una ruta de práctico |
+| `docs/practico-2_tareas.md` | **Tareas disponibles del práctico II** |
 
 ## 6. Empezar una tarea nueva
 
