@@ -3,7 +3,8 @@
  * Quiz de cierre en mesa de trabajo (misma organización que las actividades):
  * la pregunta en la vista (alternativas o tarjetas con dibujo), el avance y la explicación en el panel.
  *
- * Pool: preguntas con carrera 'comun' + las de la carrera activa (js/carrera.js, TO por defecto).
+ * Pool: preguntas con carrera 'comun' + las de la carrera activa (js/carrera.js, TO por defecto),
+ * en orden fijo: conceptos → casos comunes → casos de la carrera.
  * Una sola oportunidad por pregunta. Avance en localStorage nl_quiz_<slug>_<carrera>.
  * Al terminar: markDone(slug) y la sección (puntaje + tabla) se guarda sola en la guía.
  */
@@ -52,14 +53,11 @@ function iniciar(raiz) {
         pool = todas.filter(q => q.carrera === 'comun' || q.carrera === car);
         try { est = JSON.parse(localStorage.getItem(key()) || 'null'); } catch { est = null; }
         const ids = pool.map(q => q.id);
-        if (!est || !Array.isArray(est.orden) || est.orden.length !== ids.length || !ids.every(id => est.orden.includes(id))) {
-            // orden al azar, pero los casos con tarjetas se reparten entre las demás
-            const normales = barajar(pool.filter(q => !q.tarjetas)).map(q => q.id);
-            const casos = barajar(pool.filter(q => q.tarjetas)).map(q => q.id);
-            const orden = [];
-            const paso = Math.max(1, Math.floor(normales.length / (casos.length || 1)));
-            normales.forEach((id, i) => { orden.push(id); if ((i + 1) % paso === 0 && casos.length) orden.push(casos.shift()); });
-            est = { orden: orden.concat(casos), resp: {}, opc: {} };
+        if (!est || !Array.isArray(est.orden) || est.orden.length !== ids.length || !ids.every((id, i) => est.orden[i] === id)) {
+            // orden fijo y progresivo: conceptos (banco) → casos comunes → casos de la carrera
+            const peso = x => x.carrera !== 'comun' ? 2 : (x.tarjetas ? 1 : 0);
+            const orden = pool.map((x, i) => [peso(x), i, x.id]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(a => a[2]);
+            est = { orden, resp: {}, opc: {} };
             guardar();
         }
         sel = est.orden.find(id => est.resp[id] == null) || null;
