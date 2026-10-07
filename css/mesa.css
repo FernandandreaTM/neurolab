@@ -296,6 +296,18 @@
 .nl-tip__lienzo { flex: 1 1 auto; min-height: 0; width: 100%; touch-action: manipulation; }
 .nl-tip__sello { margin: 0; font-weight: 800; color: #15803D; }
 .nl-tip__lienzo-caja.is-repasar .nl-tip__sello { color: #B42318; }
+/* Paso 2: sentido de la información (zonas que se tocan y flecha) */
+.nl-tip__sello.is-flecha { color: #B45309; }
+.nl-tip__zonas .zona { fill: none; stroke: rgba(245,158,11,.001); stroke-width: 28; stroke-linecap: round; cursor: pointer; pointer-events: stroke; }
+.nl-tip__zonas .zona:hover, .nl-tip__zonas .zona:focus-visible { stroke: rgba(245,158,11,.22); outline: none; }
+.nl-tip__zonas .zona.is-entra { stroke: rgba(245,158,11,.45); }
+.nl-mesa--tipos .p-flecha, .nl-tip__mini .p-flecha { stroke: #EA580C; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.nl-mesa--tipos .p-flecha-punta { fill: #EA580C; }
+.p-flecha-g.is-anima .p-flecha { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nlFlecha 900ms ease forwards; }
+.p-flecha-g.is-anima .p-flecha-punta { opacity: 0; animation: nlFlechaPunta 200ms 850ms forwards; }
+@keyframes nlFlecha { to { stroke-dashoffset: 0; } }
+@keyframes nlFlechaPunta { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .p-flecha-g.is-anima .p-flecha, .p-flecha-g.is-anima .p-flecha-punta { animation: none; stroke-dashoffset: 0; opacity: 1; } }
 /* piezas sobre fondo blanco (mismos colores que en la guía) */
 .nl-mesa--tipos .p-dend  { stroke: #7C3AED; }
 .nl-mesa--tipos .p-axon  { stroke: #DB2777; }

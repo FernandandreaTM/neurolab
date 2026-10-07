@@ -11,6 +11,9 @@
  *                     del soma: null | "dendrita" | "axon" | "t", en orden horario
  *                     partiendo desde la derecha)
  * ->   { "correcto": true,  "respuesta": "Bipolar", "feedback": "...", "celda": "...", "nota": "..." }
+ *      Con además POST flecha = {"entra":{"i":0,"rama":""},"sale":{"i":4,"rama":""}} (rama: periferica|central
+ *      para la neurita en T) se revisa el sentido de la información en la neurona ya armada:
+ * ->   { "correcto": true, "feedback": "..." } | { "correcto": false, "feedback": "..." }
  *      { "correcto": false, "feedback": "..." }
  */
 error_reporting(0);
@@ -74,6 +77,33 @@ function nl_prac_calza($limpia, $validas) {
  *   pseudounipolar -> 1 sola neurita que se bifurca en T
  *   multipolar     -> 1 único axón y múltiples dendritas (2 o más)
  */
+/** Sentido de la información en una neurona ya armada: entra por una prolongación y sale por otra. */
+function nl_prac_evalua_flecha($tipo, $piezas, $f) {
+    $pieza = function ($k) use ($piezas, $f) {
+        $i = isset($f[$k]['i']) ? (int)$f[$k]['i'] : -1;
+        $p = $piezas[$i] ?? null;
+        $rama = isset($f[$k]['rama']) ? (string)$f[$k]['rama'] : '';
+        return $p === 't' ? 't-' . ($rama === 'central' ? 'central' : 'periferica') : $p;
+    };
+    $entra = $pieza('entra');
+    $sale  = $pieza('sale');
+    if (!$entra || !$sale) return [false, 'Toca dos prolongaciones del dibujo: primero por donde entra y luego por donde sale.'];
+    if ($tipo === 'pseudounipolar') {
+        if ($entra === 't-periferica' && $sale === 't-central') {
+            return [true, 'La información viene de los receptores por la rama periférica y sigue directo por la rama central hacia la médula o el tronco: no necesita pasar por el soma.'];
+        }
+        if ($entra === 't-central' && $sale === 't-periferica') return [false, 'Al revés: la rama con los botones terminales es la que entrega la información en el SNC.'];
+        return [false, 'Fíjate en los extremos de la T: una rama termina en receptores (periferia) y la otra en botones terminales (SNC).'];
+    }
+    if ($entra === 'dendrita' && $sale === 'axon') {
+        return [true, 'Entra por las dendritas, se integra en el soma y el cono axónico, y sale por el axón hasta los botones terminales.'];
+    }
+    if ($entra === 'axon' && $sale === 'dendrita') return [false, 'Al revés: el axón es la prolongación que lleva la información hacia afuera, hasta sus botones terminales.'];
+    if ($entra === 'axon') return [false, 'El axón no recibe: es la salida de la neurona.'];
+    if ($sale === 'dendrita') return [false, 'Las dendritas reciben información; ¿por dónde sale hacia la neurona siguiente?'];
+    return [false, 'Busca la prolongación que recibe y la que transmite.'];
+}
+
 function nl_prac_evalua_armado($tipo, $piezas) {
     $n = ['dendrita' => 0, 'axon' => 0, 't' => 0];
     $pos = ['dendrita' => [], 'axon' => []];
@@ -152,7 +182,13 @@ try {
             return in_array($p, ['dendrita', 'axon', 't'], true) ? $p : null;
         }, $piezas));
 
-        list($ok, $msg) = nl_prac_evalua_armado(nl_prac_normaliza($item['respuesta']), $piezas);
+        $tipo = nl_prac_normaliza($item['respuesta']);
+        list($ok, $msg) = nl_prac_evalua_armado($tipo, $piezas);
+        if ($ok && isset($_POST['flecha'])) {
+            $f = json_decode((string)$_POST['flecha'], true);
+            list($okF, $msgF) = nl_prac_evalua_flecha($tipo, $piezas, is_array($f) ? $f : []);
+            nl_prac_json(['correcto' => $okF, 'feedback' => $msgF]);
+        }
         if ($ok) {
             nl_prac_json([
                 'correcto'  => true,

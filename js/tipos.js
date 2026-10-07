@@ -52,11 +52,60 @@ async function revisar(itemId, campos) {
     } catch { return { correcto: false, feedback: 'No pudimos revisar tu respuesta. ¿Hay conexión?', red: true }; }
 }
 
-/** Dibujo SVG de una neurona armada (para la vista, las tarjetas y la guía). */
-export function svgNeurona(piezas, clase = '') {
+/* ---------------------------------------------------------------
+   Flecha del sentido de la información (nivel armar, paso 2)
+   flecha = { entra: { i, rama }, sale: { i, rama } }; rama 'periferica' | 'central' en la neurita en T
+   --------------------------------------------------------------- */
+const XB = C + 58;   // bifurcación de la neurita en T (armar-neurona.js)
+function rot(i, x, y) {
+    const a = i * 2 * Math.PI / PUNTOS, dx = x - C, dy = y - C;
+    return [C + dx * Math.cos(a) - dy * Math.sin(a), C + dx * Math.sin(a) + dy * Math.cos(a)].map(v => Math.round(v * 10) / 10);
+}
+const pt = p => p.join(' ');
+
+/** Zonas que se pueden tocar en el paso 2: una por prolongación (dos en la neurita en T). */
+function zonasFlecha(piezas) {
+    const z = [];
+    piezas.forEach((p, i) => {
+        if (!p) return;
+        if (p === 't') {
+            z.push({ i, rama: 'periferica', d: `M${pt(rot(i, XB, C - 10))} L${pt(rot(i, XB, C - 116))}` });
+            z.push({ i, rama: 'central', d: `M${pt(rot(i, XB, C + 10))} L${pt(rot(i, XB, C + 112))}` });
+        } else {
+            z.push({ i, rama: '', d: `M${pt(rot(i, C + R + 4, C))} L${pt(rot(i, C + (p === 'axon' ? 134 : 98), C))}` });
+        }
+    });
+    return z;
+}
+
+/** Trazo de la flecha: entra por una prolongación, pasa por el soma (o por la T) y sale por otra. */
+function svgFlecha(piezas, f) {
+    if (!f || !f.entra || !f.sale) return '';
+    let d, fin, dir;
+    if (piezas[f.entra.i] === 't') {
+        const i = f.entra.i, x = XB + 11;
+        const a = rot(i, x, C - 96), b = rot(i, x, C + 92);
+        d = `M${pt(a)} L${pt(b)}`; fin = b; dir = rot(i, x, C + 80);
+    } else {
+        const i = f.entra.i, j = f.sale.i;
+        const a = rot(i, C + 88, C - 10), b = rot(i, C + R + 8, C - 10);
+        const c = rot(j, C + R + 8, C - 10), e = rot(j, C + 120, C - 10);
+        d = `M${pt(a)} L${pt(b)} Q${C} ${C} ${pt(c)} L${pt(e)}`; fin = e; dir = rot(j, C + 108, C - 10);
+    }
+    const ang = Math.atan2(fin[1] - dir[1], fin[0] - dir[0]);
+    const punta = [[fin[0] + 4 * Math.cos(ang), fin[1] + 4 * Math.sin(ang)],
+                   [fin[0] - 9 * Math.cos(ang) + 6 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) - 6 * Math.cos(ang)],
+                   [fin[0] - 9 * Math.cos(ang) - 6 * Math.sin(ang), fin[1] - 9 * Math.sin(ang) + 6 * Math.cos(ang)]]
+        .map(q => q.map(v => Math.round(v * 10) / 10).join(',')).join(' ');
+    return `<g class="p-flecha-g"><path class="p-flecha" pathLength="1" d="${d}"/><polygon class="p-flecha-punta" points="${punta}"/></g>`;
+}
+
+/** Dibujo SVG de una neurona armada (para la vista, las tarjetas y la guía), con su flecha si la tiene. */
+export function svgNeurona(piezas, clase = '', flecha = null) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" class="${clase}">` +
         piezas.map((p, i) => p ? `<g transform="rotate(${i * 360 / PUNTOS} ${C} ${C})">${dibujoPieza(p)}</g>` : '').join('') +
-        `<circle class="p-soma" cx="${C}" cy="${C}" r="${R}"/><circle class="p-nucleo" cx="${C}" cy="${C}" r="8"/></svg>`;
+        `<circle class="p-soma" cx="${C}" cy="${C}" r="${R}"/><circle class="p-nucleo" cx="${C}" cy="${C}" r="8"/>` +
+        svgFlecha(piezas, flecha) + '</svg>';
 }
 
 const angosta = () => window.matchMedia('(max-width: 900px)').matches;
@@ -155,6 +204,9 @@ function motorArmar(cm) {
     let herramienta = 'dendrita';
     let verCierre = false;
     let mensaje = '';           // pista del último intento fallido
+    let entra = null;           // paso 2: prolongación elegida como entrada { i, rama }
+    const armando = () => cm.est().armando || null;   // neurona armada a la que le falta la flecha
+    const enFlecha = it => !!(armando() && it && armando().id === it.id);
     const tipoDe = it => it.e.replace(/^Arma una neurona\s*/i, '').replace(/\.$/, '');
     const num = it => items.indexOf(it) + 1;
 
@@ -175,12 +227,19 @@ function motorArmar(cm) {
     function seleccionar(it) {
         if (!it) return;
         const s = cm.est().items[it.id];
+        if (armando() && armando().id !== it.id) {
+            avisar('Termina primero la neurona ' + num(items.find(x => x.id === armando().id)) + ': marca por dónde entra y sale la información.');
+            return;
+        }
         if (!s && sel && !cm.est().items[sel.id] && sel !== it && piezas.some(Boolean)) {
             // no se pierde una neurona a medio armar: primero se termina
             avisar('Termina primero esta neurona (presiona Revisar).');
             return;
         }
-        if (sel !== it) { piezas = s ? s.piezas.slice() : new Array(PUNTOS).fill(null); mensaje = ''; herramienta = 'dendrita'; }
+        if (sel !== it) {
+            piezas = s ? s.piezas.slice() : enFlecha(it) ? armando().piezas.slice() : new Array(PUNTOS).fill(null);
+            mensaje = ''; herramienta = 'dendrita'; entra = null;
+        }
         sel = it;
         verCierre = false;
         pintar();
@@ -189,17 +248,19 @@ function motorArmar(cm) {
     /* --- Vista: paleta arriba + lienzo grande --- */
     function pintarVista() {
         const s = sel && cm.est().items[sel.id];
-        const fija = !!s || verCierre;
+        const flecha = enFlecha(sel);
+        const fija = !!s || verCierre || flecha;
         if (verCierre) {
             vista.innerHTML = `<div class="nl-tip__lienzo-caja is-galeria">${items.map(it => {
                 const g = cm.est().items[it.id];
-                return `<figure class="nl-tip__mini${clase(it)}">${svgNeurona(g.piezas)}<figcaption>${num(it)}. ${escapar(g.r)}</figcaption></figure>`;
+                return `<figure class="nl-tip__mini${clase(it)}">${svgNeurona(g.piezas, '', g.flecha)}<figcaption>${num(it)}. ${escapar(g.r)}</figcaption></figure>`;
             }).join('')}</div>`;
             return;
         }
         vista.innerHTML = `
           <div class="nl-tip__lienzo-caja${s ? (s.e ? ' is-repasar' : ' is-ok') : ''}">
-            ${fija ? `<p class="nl-tip__sello">✓ Neurona ${escapar(s.r.toLowerCase())}</p>` : `
+            ${s ? `<p class="nl-tip__sello">✓ Neurona ${escapar(s.r.toLowerCase())}</p>`
+                : flecha ? `<p class="nl-tip__sello is-flecha">${entra ? 'Toca por dónde <strong>sale</strong>' : 'Toca por dónde <strong>entra</strong>'} la información</p>` : `
             <div class="nl-arm__paleta nl-tip__paleta" role="radiogroup" aria-label="Pieza para agregar">
               ${Object.keys(PIEZAS).map(k => `
                 <button type="button" class="nl-arm__pieza${herramienta === k ? ' active' : ''}" role="radio" aria-checked="${herramienta === k}" data-pieza="${k}">
@@ -210,6 +271,10 @@ function motorArmar(cm) {
             <svg class="nl-tip__lienzo" viewBox="0 0 300 300" role="group" aria-label="Soma de la neurona ${num(sel)}">
               <g>${piezas.map((p, i) => p ? `<g class="pieza" transform="rotate(${i * 360 / PUNTOS} ${C} ${C})">${dibujoPieza(p)}</g>` : '').join('')}</g>
               <circle class="p-soma" cx="${C}" cy="${C}" r="${R}"/><circle class="p-nucleo" cx="${C}" cy="${C}" r="8"/>
+              ${s && s.flecha ? svgFlecha(s.piezas, s.flecha) : ''}
+              ${flecha ? `<g class="nl-tip__zonas">${zonasFlecha(piezas).map(z => `
+                  <path class="zona${entra && entra.i === z.i && entra.rama === z.rama ? ' is-entra' : ''}" d="${z.d}"
+                        data-i="${z.i}" data-rama="${z.rama}" role="button" tabindex="0" aria-label="Prolongación ${LUGAR[z.i]}${z.rama ? ', rama ' + (z.rama === 'periferica' ? 'superior' : 'inferior') : ''}"/>`).join('')}</g>` : ''}
               <g class="nl-tip__puntos">${fija ? '' : piezas.map((p, i) => {
                   const [x, y] = coordPunto(i, R + 16);
                   return `<g class="punto${p ? ' is-lleno' : ''}" data-i="${i}" role="button" tabindex="0"
@@ -221,6 +286,11 @@ function motorArmar(cm) {
               }).join('')}</g>
             </svg>
           </div>`;
+        vista.querySelectorAll('.zona').forEach(z => {
+            const tocar = () => tocarZona({ i: Number(z.dataset.i), rama: z.dataset.rama || '' });
+            z.addEventListener('click', tocar);
+            z.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); tocar(); } });
+        });
         vista.querySelectorAll('.nl-arm__pieza').forEach(b => b.addEventListener('click', () => {
             herramienta = b.dataset.pieza;
             pintarVista();
@@ -251,6 +321,7 @@ function motorArmar(cm) {
         if (verCierre) { cm.mostrarCierre(); return; }
         const s = cm.est().items[sel.id];
         if (s) { mostrarFicha(sel); return; }
+        if (enFlecha(sel)) { panelFlecha(); return; }
         panel.className = 'nl-lab__trabajo is-pregunta';
         panel.innerHTML = `
             <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> ${escapar(sel.e)}</p>
@@ -282,11 +353,57 @@ function motorArmar(cm) {
             caja?.classList.remove('is-sacude'); void caja?.offsetWidth; caja?.classList.add('is-sacude');
             return;
         }
-        const e = (cm.est().fallos || {})[it.id] || 0;
-        cm.est().items[it.id] = { r: r.respuesta, piezas: piezas.slice(), exp: r.feedback || '', nota: r.nota || '', e };
+        // Paso 2: falta marcar el sentido de la información
+        cm.est().armando = { id: it.id, r: r.respuesta, piezas: piezas.slice(), exp: r.feedback || '', nota: r.nota || '' };
         cm.guardar();
+        entra = null; mensaje = '';
+        pintar();
+        if (angosta()) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* --- Paso 2: sentido de la información --- */
+    function panelFlecha() {
+        const a = armando();
+        const t = a.piezas.includes('t');
+        panel.className = 'nl-lab__trabajo is-pregunta';
+        panel.innerHTML = `
+            <p class="nl-lab__bien">✓ Neurona ${escapar(a.r.toLowerCase())} armada</p>
+            <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> ¿En qué sentido viaja la información?</p>
+            <ol class="nl-lam__pasos"><li class="${entra ? 'is-ok' : 'is-actual'}">Entra</li><li class="${entra ? 'is-actual' : ''}">Sale</li></ol>
+            <p class="nl-lab__ayuda">${entra ? 'Ahora toca en el dibujo la prolongación por donde <strong>sale</strong> la información.'
+                : 'Toca en el dibujo la prolongación por donde <strong>entra</strong> la información.'}${t ? ' En la neurita en T, toca una de sus dos ramas.' : ''}</p>
+            ${mensaje ? `<p class="nl-lab__q-fb">✗ ${escapar(mensaje)}</p>` : ''}
+            ${entra ? '<button type="button" class="nl-lab__nose nl-tip__otra">Elegir otra entrada</button>' : ''}`;
+        panel.querySelector('.nl-tip__otra')?.addEventListener('click', () => { entra = null; pintarVista(); panelFlecha(); });
+    }
+
+    async function tocarZona(z) {
+        if (panel.classList.contains('is-esperando')) return;
+        if (!entra) { entra = z; mensaje = ''; pintarVista(); panelFlecha(); return; }
+        if (entra.i === z.i && entra.rama === z.rama) return;
+        const a = armando(), it = sel;
+        const flecha = { entra, sale: z };
+        panel.classList.add('is-esperando');
+        const r = await revisar(it.id, { construccion: JSON.stringify(a.piezas), flecha: JSON.stringify(flecha) });
+        panel.classList.remove('is-esperando');
+        if (!r || !r.correcto) {
+            if (!(r && r.red)) { cm.est().fallos = Object.assign({}, cm.est().fallos, { [it.id]: ((cm.est().fallos || {})[it.id] || 0) + 1 }); cm.fallo(); }
+            mensaje = (r && r.feedback) || 'Intenta de nuevo.';
+            entra = null;
+            pintarVista(); panelFlecha();
+            const caja = vista.querySelector('.nl-tip__lienzo-caja');
+            caja?.classList.remove('is-sacude'); void caja?.offsetWidth; caja?.classList.add('is-sacude');
+            return;
+        }
+        const e = (cm.est().fallos || {})[it.id] || 0;
+        cm.est().items[it.id] = Object.assign({}, a, { flecha, fexp: r.feedback || '', e });
+        delete cm.est().items[it.id].id;
+        delete cm.est().armando;
+        cm.guardar();
+        entra = null;
         pintar();
         mostrarFicha(it, e ? '✓ ¡Lo lograste!' : '🎯 ¡Correcta al primer intento!');
+        vista.querySelector('.p-flecha-g')?.classList.add('is-anima');
         if (angosta()) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -298,6 +415,7 @@ function motorArmar(cm) {
             ${encabezado ? `<p class="nl-lab__bien">${encabezado}</p>` : ''}
             <p class="nl-lab__paso"><span class="nl-lab__badge">${num(it)}</span> Neurona ${escapar(s.r.toLowerCase())}</p>
             <div class="nl-ficha__bloque"><span class="nl-ficha__etq">Morfología</span><p>${escapar(s.exp)}</p></div>
+            ${s.fexp ? `<div class="nl-ficha__bloque"><span class="nl-ficha__etq">Sentido de la información</span><p>${escapar(s.fexp)}</p></div>` : ''}
             ${s.nota ? `<div class="nl-ficha__bloque nl-ficha__bloque--extra"><span class="nl-ficha__etq">Para recordar</span><p>${escapar(s.nota)}</p></div>` : ''}
             <div class="nl-ficha__acciones">
                 ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente: neurona ${num(sig)} →</button>`
@@ -329,18 +447,18 @@ function motorArmar(cm) {
             else { sel = items[0]; verCierre = true; pintar(); }
         },
         reiniciar() {
-            sel = null; verCierre = false;
+            sel = null; verCierre = false; entra = null;
             seleccionar(items[0]);
         },
         resumenCierre: () => `${items.length} neuronas armadas`,
         nombreRepaso: it => 'neurona ' + tipoDe(it),
         ayudaCierre: 'Toca un número para volver a ver cada neurona.',
-        subtituloGuia: 'Dibujo de cada tipo de neurona: soma, dendritas, axón y neuritas',
+        subtituloGuia: 'Dibujo de cada tipo de neurona con el sentido de la información',
         bloquesGuia: () => [{
             t: 'figuras',
             items: items.map(it => {
                 const s = cm.est().items[it.id];
-                return { svg: svgNeurona(s.piezas), titulo: 'Neurona ' + s.r.toLowerCase(), pie: s.exp + (s.nota ? ' ' + s.nota : '') };
+                return { svg: svgNeurona(s.piezas, '', s.flecha), titulo: 'Neurona ' + s.r.toLowerCase(), pie: s.exp + (s.fexp ? ' ' + s.fexp : '') + (s.nota ? ' ' + s.nota : '') };
             }),
         }],
     };

@@ -106,7 +106,7 @@ INSERT OR IGNORE INTO actividad_carrera (actividad_id, carrera_id, descripcion, 
 
 INSERT OR IGNORE INTO practica_niveles (id, actividad_id, numero, titulo, instrucciones, tipo, activo) VALUES
   (1, 3, 1, 'Armar las neuronas',
-      'Elige una pieza arriba de la imagen (dendrita, axón o neurita en T) y toca un punto <strong>+</strong> alrededor del soma para agregarla; tocar de nuevo la quita. Cuando esté lista, presiona <strong>Revisar</strong>. <strong>Neurita</strong>: cualquier prolongación del soma (dendrita o axón) cuando no importa precisar cuál.',
+      'Elige una pieza arriba de la imagen (dendrita, axón o neurita en T) y toca un punto <strong>+</strong> alrededor del soma para agregarla; tocar de nuevo la quita. Cuando esté lista, presiona <strong>Revisar</strong> y luego marca el <strong>sentido de la información</strong>: toca la prolongación por donde entra y la prolongación por donde sale. <strong>Neurita</strong>: cualquier prolongación del soma (dendrita o axón) cuando no importa precisar cuál.',
       'armar', 1),
   (2, 3, 2, 'Cuadro comparativo',
       'Lee la frase y toca la tarjeta del tipo de neurona que describe. Cada acierto escribe una celda del cuadro comparativo, fila por fila: morfología, función y localización. <strong>Rojo</strong>: esa tarjeta no era; prueba con otra.',

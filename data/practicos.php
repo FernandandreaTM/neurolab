@@ -22,7 +22,7 @@ return [
                         'labeling-neurona-nivel-3' => 'Nivel III: citoesqueleto y transporte']],
             ['slug' => 'comparador-tipos-neurona',
              'titulo' => 'Tipos de neurona (2 niveles)',
-             'tarea' => 'Primero arma cada tipo de neurona; luego lee frases y toca la tarjeta del tipo que describen, completando el cuadro comparativo fila por fila. Cada nivel suma una sección a tu guía.',
+             'tarea' => 'Primero arma cada tipo de neurona y marca el sentido de la información; luego lee frases y toca la tarjeta del tipo que describen, completando el cuadro comparativo fila por fila. Cada nivel suma una sección a tu guía.',
              'guia' => ['comparador-tipos-neurona:1' => 'Nivel I: dibujos de los tipos de neurona',
                         'comparador-tipos-neurona:2' => 'Nivel II: cuadro comparativo']],
             ['slug' => 'lamina-neurona-piramidal',
