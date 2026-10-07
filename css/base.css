@@ -334,3 +334,47 @@ p {
    }, { threshold: 0.12 });
    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 */
+
+/* =========================================================
+   Barra superior común (_partials/barra.php) y modo de carrera
+   ========================================================= */
+.nl-barra { position: relative; z-index: 20; background: rgba(15,8,32,.72); border-bottom: 1px solid rgba(139,92,246,.22); backdrop-filter: blur(10px); }
+.nl-barra__in {
+    max-width: 1500px; margin: 0 auto; padding: .45rem 1.5rem; min-height: 54px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem;
+}
+.nl-barra__logo { display: flex; align-items: center; gap: .5rem; flex: none; }
+.nl-barra__logo-nl { height: 32px; width: auto; display: block; }
+.nl-barra__logo-uach { height: 26px; width: auto; display: block; opacity: .85; }
+.nl-barra__volver { flex: none; font-size: .82rem; font-weight: 700; color: var(--violet-light); text-decoration: none; padding: .3rem .6rem; border-radius: 8px; }
+.nl-barra__volver:hover { background: rgba(139,92,246,.15); }
+.nl-barra__tit { flex: 1 1 260px; min-width: 0; margin: 0; font-size: clamp(.98rem, 1.6vw, 1.2rem); font-weight: 800; line-height: 1.25; color: var(--white, #fff); }
+.nl-barra__niveles { display: flex; gap: .3rem; flex: none; }
+.nl-barra__nivel {
+    font-size: .78rem; font-weight: 700; padding: .3rem .75rem; border-radius: 99px; text-decoration: none;
+    border: 1.5px solid var(--gray-700); color: var(--gray-300); white-space: nowrap;
+}
+.nl-barra__nivel:hover { border-color: var(--violet); color: var(--violet-light); }
+.nl-barra__nivel.is-actual { background: var(--violet); border-color: var(--violet); color: #fff; }
+.nl-barra__der { display: flex; align-items: center; gap: .6rem; margin-left: auto; flex: none; }
+.nl-carrera { display: inline-flex; padding: 3px; gap: 2px; border-radius: 99px; background: rgba(255,255,255,.07); border: 1px solid var(--gray-700); }
+.nl-carrera__op {
+    font: inherit; font-size: .78rem; font-weight: 800; padding: .28rem .8rem; border-radius: 99px; border: 0; cursor: pointer;
+    color: var(--gray-300); background: none; transition: background .2s, color .2s;
+}
+.nl-carrera__op.active { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; box-shadow: 0 2px 8px rgba(139,92,246,.4); }
+.nl-barra__guia { font-size: .82rem; font-weight: 700; color: var(--gray-100); text-decoration: none; padding: .3rem .6rem; border-radius: 8px; border: 1px solid var(--gray-700); white-space: nowrap; }
+.nl-barra__guia:hover { border-color: var(--violet); }
+@media (max-width: 900px) {
+    .nl-barra__in { padding: .45rem 1rem; }
+    .nl-barra__logo-uach { display: none; }
+    .nl-barra__tit { order: 5; flex-basis: 100%; font-size: 1rem; }
+    .nl-barra__niveles { order: 6; }
+    .nl-barra__guia span { display: none; }
+}
+@media print { .nl-barra { display: none; } }
+
+/* Modo de carrera: se oculta lo de la otra carrera */
+html[data-carrera="terapia-ocupacional"] [data-carrera="fonoaudiologia"],
+html[data-carrera="fonoaudiologia"] [data-carrera="terapia-ocupacional"] { display: none !important; }
+.nl-barra__logo-uach { background: #fff; padding: 2px 6px; border-radius: 6px; opacity: 1; height: 34px; }

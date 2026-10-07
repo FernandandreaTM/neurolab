@@ -14,6 +14,7 @@
  *   { t: 'texto',   txt: '...' }
  *   { t: 'figuras', items: [{ svg: '<svg…>', titulo: '...', pie: '...' }] }
  *   { t: 'imagenes', items: [{ src: 'data:image/jpeg;base64,…', titulo: '...', pie: '...' }] }
+ *   { t: 'conexion', items: [{ c: 'terapia-ocupacional', txt: '...' }] }  (se ve sólo la carrera activa)
  */
 const KEY = 'nl_guia';
 
@@ -96,6 +97,10 @@ export function renderBloque(b) {
             ${b.cab ? `<thead><tr>${b.cab.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>` : ''}
             <tbody>${(b.filas || []).map(f => `<tr>${f.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
         </table></div>`;
+    }
+    if (b.t === 'conexion') {
+        return `<div class="nl-g-conexion"><p class="nl-g-texto">💡 ¿Para qué te sirve?</p>${(b.items || []).map(i =>
+            `<p class="nl-g-texto" data-carrera="${esc(i.c)}">${esc(i.txt)}</p>`).join('')}</div>`;
     }
     if (b.t === 'lista') return `<ul class="nl-g-lista">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
     if (b.t === 'texto') return `<p class="nl-g-texto">${esc(b.txt)}</p>`;

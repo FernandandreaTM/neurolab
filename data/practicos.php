@@ -33,7 +33,7 @@ return [
                         'lamina-neurona-piramidal:3' => 'Nivel III: cerebelo con Golgi y cresil violeta']],
             ['slug' => 'quiz-celulas-nerviosas-1',
              'titulo' => 'Quiz de cierre',
-             'tarea' => 'Comprueba lo que aprendiste. Tu resultado y las explicaciones de cada pregunta quedan en tu guía.',
+             'tarea' => '22 preguntas: un pool común y casos de tu carrera (elige TO o Fono arriba), algunos con tarjetas. Tu resultado y las explicaciones quedan en tu guía.',
              'guia' => ['quiz-celulas-nerviosas-1' => 'Quiz de cierre']],
         ],
     ],

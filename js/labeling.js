@@ -15,6 +15,7 @@
  */
 import { markDone, isDone } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
+import { conexionGuia as conexionCarrera } from './carrera.js';
 
 const RAIZ = document.getElementById('nl-lab');
 const KEY_BASE = 'nl_lab2_';
@@ -348,12 +349,7 @@ function iniciar(raiz) {
         });
     }
 
-    /** Texto de "para qué sirve" (por carrera) para la guía. */
-    function conexionGuia() {
-        if (!tplCx) return [];
-        const items = Array.from(tplCx.content.querySelectorAll('p')).map(p => p.textContent.replace(/\s+/g, ' ').trim());
-        return items.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items }] : [];
-    }
+    const conexionGuia = () => conexionCarrera(tplCx);
 
     /** Imagen del nivel con todas las estructuras numeradas (para la guía). */
     async function imagenRotulada() {

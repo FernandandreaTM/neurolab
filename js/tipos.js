@@ -13,6 +13,7 @@
  */
 import { markDone, isDone } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
+import { conexionGuia as conexionCarrera } from './carrera.js';
 import { C, R, PUNTOS, LUGAR, PIEZAS, ICONOS, dibujoPieza, coordPunto } from './armar-neurona.js';
 
 const RAIZ = document.getElementById('nl-tip');
@@ -112,11 +113,7 @@ function iniciar(raiz) {
             <p class="nl-guia-ok">✓ Guardado en tu guía de estudio · <a href="${urlGuia()}">Ver guía</a></p>`;
     }
 
-    function conexionGuia() {
-        if (!tplCx) return [];
-        const li = Array.from(tplCx.content.querySelectorAll('p')).map(p => p.textContent.replace(/\s+/g, ' ').trim());
-        return li.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items: li }] : [];
-    }
+    const conexionGuia = () => conexionCarrera(tplCx);
 
     function actualizar() {
         const hechas = items.filter(it => est.items[it.id]).length;

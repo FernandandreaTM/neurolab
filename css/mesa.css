@@ -11,12 +11,13 @@
 .nl-mesa-head .nl-lab__niveles { padding: 0; }
 
 .nl-mesa {
-    --alto: calc(100vh - 92px);
+    --alto: calc(100vh - 84px);
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 1rem;
     align-items: start;
     max-width: 1500px;
+    padding-top: .6rem;
     padding-bottom: 1rem;
 }
 .nl-mesa--lamina { grid-template-columns: minmax(0, 1fr) 400px; }
@@ -487,3 +488,38 @@
     .nl-lam__lienzo img { max-height: 65vh; }
     .nl-lam__mini { max-width: 100%; }
 }
+
+/* --- Quiz en mesa (js/quiz-mesa.js) --- */
+.nl-quiz__caja { justify-content: flex-start; padding-top: 2rem; }
+.nl-quiz__pool { margin-left: .5rem; padding: .1rem .5rem; border-radius: 99px; font-size: .68rem; letter-spacing: .04em; background: #EDE9FE; color: #5B21B6; }
+.nl-quiz__pool.is-terapia-ocupacional, .nl-quiz__pool.is-fonoaudiologia { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; }
+.nl-quiz__ops { display: flex; flex-direction: column; gap: .55rem; }
+.nl-quiz__op {
+    display: flex; align-items: center; gap: .7rem; text-align: left; width: 100%;
+    padding: .7rem .9rem; border-radius: 12px; border: 2px solid #DDD6FE; background: #F5F3FF;
+    font: inherit; font-size: .98rem; font-weight: 600; line-height: 1.4; color: #1A0E2E; cursor: pointer;
+    transition: border-color .15s, transform .15s;
+}
+.nl-quiz__op:not([disabled]):hover { border-color: #F59E0B; transform: translateX(3px); }
+.nl-quiz__op .nl-lab__alt-letra { flex: none; }
+.nl-quiz__op.is-ok { border-color: #22C55E; background: #DCFCE7; color: #14532D; }
+.nl-quiz__op.is-mal { border-color: var(--repasar); background: #FFF1F0; color: #7F1D1D; }
+.nl-quiz__op.is-apagada { opacity: .45; }
+.nl-quiz__op[disabled] { cursor: default; }
+.nl-quiz__chip { width: 1.75rem; height: 1.75rem; font-size: .72rem; }
+.nl-quiz__chip[disabled] { opacity: .45; cursor: default; }
+.nl-quiz__puntos { font-size: .8rem; font-weight: 700; color: #86EFAC; }
+.nl-quiz__res { align-items: center; text-align: center; justify-content: center; }
+.nl-quiz__nota { margin: 0; font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 800; line-height: 1; color: #5B21B6; }
+.nl-quiz__nota span { font-size: .4em; color: #8B7AA8; }
+.nl-quiz__barra { width: min(420px, 90%); height: 12px; border-radius: 99px; background: #EDE9FE; overflow: hidden; }
+.nl-quiz__barra i { display: block; height: 100%; background: linear-gradient(90deg, #8B5CF6, #22C55E); }
+.nl-quiz__msj { margin: 0; font-size: 1.05rem; font-weight: 700; color: #2E1065; }
+@media (max-width: 900px) { .nl-quiz__caja { padding-top: 1rem; } .nl-quiz__op { font-size: .9rem; } }
+.nl-quiz__op .nl-lab__alt-letra {
+    display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+    background: #DDD6FE; color: #4C1D95; font-size: .8rem; font-weight: 800; opacity: 1;
+}
+.nl-quiz__op.is-ok .nl-lab__alt-letra { background: #22C55E; color: #fff; }
+.nl-quiz__op.is-mal .nl-lab__alt-letra { background: var(--repasar); color: #fff; }
+.nl-tip__dorso strong, .nl-tip__carta-nom { hyphens: manual; overflow-wrap: anywhere; }

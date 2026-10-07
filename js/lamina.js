@@ -15,6 +15,7 @@
  */
 import { markDone, isDone } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
+import { conexionGuia } from './carrera.js';
 
 const RAIZ = document.getElementById('nl-lam');
 const KEY_BASE = 'nl_lam_';
@@ -517,7 +518,6 @@ function iniciar(raiz) {
             try { imagenes.push({ src: await anotada(s.img, s.pines), titulo: c.titulo, pie: 'Reconocí: ' + c.etiquetas.join(', ') + '.' }); }
             catch { /* sin imagen: queda el resto de la sección */ }
         }
-        const cx = tplCx ? Array.from(tplCx.content.querySelectorAll('p')).map(p => p.textContent.replace(/\s+/g, ' ').trim()) : [];
         sumarAGuia(clave, {
             titulo: d.titulo,
             subtitulo: 'Capturas de la lámina etiquetadas y preguntas',
@@ -527,7 +527,7 @@ function iniciar(raiz) {
                       { t: 'tabla', cab: ['Pregunta', 'Respuesta', 'Para recordar'],
                         filas: caps.flatMap(c => c.preguntas.map(q => [q.p, q.ops[q.ok], q.exp || ''])) }]
                 .concat(porRepasar().length ? [{ t: 'texto', txt: '↺ Por repasar: ' + porRepasar().map(c => c.titulo).join(', ') + '.' }] : [])
-                .concat(cx.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items: cx }] : []),
+                .concat(conexionGuia(tplCx)),
         });
     }
 

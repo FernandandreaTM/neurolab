@@ -8,6 +8,7 @@
  */
 error_reporting(0);
 require_once __DIR__ . '/_partials/rutas.php';
+require_once __DIR__ . '/_partials/barra.php';
 
 $clave = isset($_GET['p']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['p']) : '';
 $ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
@@ -29,15 +30,9 @@ $titulo = $ruta ? $ruta['titulo'] : 'NeuroLab';
 </head>
 <body>
 <div class="bg-mesh"></div>
+<?php nl_barra(['volver' => $ruta ? ['practico.php?p=' . rawurlencode($clave), '← Ruta'] : ['atlas.php', '← Atlas'], 'titulo' => 'Mi guía de estudio']); ?>
 
 <main class="container nl-guia-pag">
-    <nav class="nl-guia-pag__nav">
-        <?php if ($ruta): ?>
-            <a href="practico.php?p=<?= rawurlencode($clave) ?>">← Volver a la ruta del práctico</a>
-        <?php else: ?>
-            <a href="atlas.php">← Volver al atlas</a>
-        <?php endif; ?>
-    </nav>
 
     <article class="nl-guia-doc">
         <header class="nl-guia-doc__head">

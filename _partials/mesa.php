@@ -6,7 +6,7 @@
  * para la identificación (labeling) y para actividades con lámina + tareas.
  * Usa las variables de actividad.php: $act, $ruta, $carreras, $recursos, $tareas,
  * $esLabeling, $partesLab, $imgLab, $nivelesLab, $requiereLab, $siguienteLab,
- * $esTipos, $nivelTip, $nivelesNav, $siguienteTip (tipos de neurona).
+ * $esTipos, $nivelTip, $nivelesNav, $siguienteTip (tipos de neurona); la barra superior es _partials/barra.php.
  */
 $volver = $ruta !== ''
     ? ['practico.php?p=' . rawurlencode($ruta), '← Ruta del práctico']
@@ -28,43 +28,34 @@ $conexion = function () use ($carreras) {
     ob_start(); ?>
     <template id="nl-conexion-tpl">
         <?php foreach ($carreras as $c): ?>
-            <p data-carrera="<?= htmlspecialchars($c['carrera_nombre']) ?>"><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
+            <p data-carrera="<?= htmlspecialchars($c['carrera_slug']) ?>"><strong><?= htmlspecialchars($c['carrera_nombre']) ?>:</strong> <?= htmlspecialchars($c['descripcion'] ?? '') ?></p>
         <?php endforeach; ?>
     </template>
     <?php return ob_get_clean();
 };
 ?>
-<header class="nl-mesa-head container">
-    <a href="<?= htmlspecialchars($volver[0]) ?>" class="nl-act-back"><?= $volver[1] ?></a>
-    <?php $nivelH1 = $esTipos ? $nivelTip : ($lamPorNiveles ? $nivelLam : null); ?>
-    <h1><?= htmlspecialchars($act['titulo']) ?><?= $nivelH1 ? ' · Nivel ' . $nivelH1['romano'] . ': ' . htmlspecialchars(mb_strtolower(mb_substr($nivelH1['titulo'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($nivelH1['titulo'], 1, null, 'UTF-8')) : '' ?></h1>
-    <?php if (count($nivelesNav) > 1): ?>
-    <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
-        <?php foreach ($nivelesNav as $nv): ?>
-            <?php if ($nv['actual']): ?>
-                <span class="nl-lab__nivel is-actual" aria-current="page"><?= htmlspecialchars($nv['etq']) ?></span>
-            <?php else: ?>
-                <a class="nl-lab__nivel" title="<?= htmlspecialchars($nv['titulo']) ?>" href="<?= htmlspecialchars($nv['href']) ?>"><?= htmlspecialchars($nv['etq']) ?></a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </nav>
-    <?php endif; ?>
-    <?php if ($esLabeling && $nivelesLab): ?>
-    <nav class="nl-lab__niveles" aria-label="Niveles de la actividad">
-        <?php foreach ($nivelesLab as $k => $nv):
-            $partesT = explode('·', $nv['titulo'], 2);
-            $etq = trim(end($partesT));
-            $etq = preg_replace('/:.*/', '', $etq);   // "Nivel II: organelos…" -> "Nivel II"
-        ?>
-            <?php if ($nv['slug'] === $act['slug']): ?>
-                <span class="nl-lab__nivel is-actual" aria-current="page"><?= htmlspecialchars($etq) ?></span>
-            <?php elseif ((int)$nv['activo']): ?>
-                <a class="nl-lab__nivel" title="<?= htmlspecialchars($nv['titulo']) ?>" href="actividad.php?slug=<?= rawurlencode($nv['slug']) ?><?= $ruta !== '' ? '&amp;ruta=' . rawurlencode($ruta) : '' ?>"><?= htmlspecialchars($etq) ?></a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </nav>
-    <?php endif; ?>
-</header>
+<?php
+$nivelH1 = $esTipos ? $nivelTip : ($lamPorNiveles ? $nivelLam : null);
+$navBarra = $nivelesNav;
+if (!$navBarra && $esLabeling && $nivelesLab) {
+    foreach ($nivelesLab as $nv) {
+        if (!(int)$nv['activo'] && $nv['slug'] !== $act['slug']) continue;
+        $partesT = explode('·', $nv['titulo'], 2);
+        $navBarra[] = [
+            'etq'    => preg_replace('/:.*/', '', trim(end($partesT))),   // "Nivel II: organelos…" -> "Nivel II"
+            'titulo' => $nv['titulo'],
+            'href'   => 'actividad.php?slug=' . rawurlencode($nv['slug']) . ($ruta !== '' ? '&ruta=' . rawurlencode($ruta) : ''),
+            'actual' => $nv['slug'] === $act['slug'],
+        ];
+    }
+}
+nl_barra([
+    'volver'  => [$volver[0], $ruta !== '' ? '← Ruta' : '← Atlas'],
+    'titulo'  => $act['titulo'] . ($nivelH1 ? ' · Nivel ' . $nivelH1['romano'] . ': ' . mb_strtolower(mb_substr($nivelH1['titulo'], 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($nivelH1['titulo'], 1, null, 'UTF-8') : ''),
+    'niveles' => $navBarra,
+    'guia'    => 'guia.php' . ($ruta !== '' ? '?p=' . rawurlencode($ruta) : ''),
+]);
+?>
 
 <?php if ($esLabeling):
     $dim = @getimagesize(__DIR__ . '/../' . $imgLab);
@@ -142,6 +133,29 @@ $conexion = function () use ($carreras) {
     </aside>
     <template id="nl-tip-iconos">
         <?php foreach ($tiposTip as $t): ?><span data-tipo="<?= htmlspecialchars($t) ?>"><?= nl_icono_neurona($t) ?></span><?php endforeach; ?>
+    </template>
+</div>
+
+<?php elseif ($esQuiz): ?>
+<div class="nl-mesa nl-mesa--tipos nl-mesa--quiz container" id="nl-quiz" data-tipo="elegir"
+     data-slug="<?= htmlspecialchars($act['slug']) ?>"
+     data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
+     data-preguntas="<?= htmlspecialchars(json_encode($preguntasQuiz, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+    <div class="nl-mesa__vista">
+        <div class="nl-tip__vista" id="nl-quiz-vista"></div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?= $instrucciones('Una sola oportunidad por pregunta. Las preguntas son un <strong>pool común</strong> más casos de <strong>tu carrera</strong> (cámbiala con el botón TO / Fono de arriba). Algunas se responden tocando una <strong>tarjeta</strong>. <strong>Verde</strong>: correcta. <strong>Rojo</strong>: por repasar.') ?>
+        <div class="nl-lab__estado">
+            <span class="nl-lab__contador" id="nl-quiz-contador"></span>
+            <span class="nl-quiz__puntos" id="nl-quiz-puntos"></span>
+            <button type="button" class="nl-lab__reset" id="nl-quiz-reset">Empezar de nuevo</button>
+        </div>
+        <div class="nl-lab__chips" id="nl-quiz-chips"></div>
+        <div class="nl-lab__trabajo" id="nl-quiz-trabajo" role="status" aria-live="polite"></div>
+    </aside>
+    <template id="nl-tip-iconos">
+        <?php foreach (['Bipolar', 'Pseudounipolar', 'Multipolar', 'Piramidal', 'Purkinje', 'Motoneurona'] as $t): ?><span data-tipo="<?= htmlspecialchars($t) ?>"><?= nl_icono_neurona($t) ?></span><?php endforeach; ?>
     </template>
 </div>
 

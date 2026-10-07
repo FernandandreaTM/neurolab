@@ -7,6 +7,7 @@
  */
 error_reporting(0);
 require_once __DIR__ . '/_partials/rutas.php';
+require_once __DIR__ . '/_partials/barra.php';
 
 $clave = isset($_GET['p']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['p']) : '';
 $ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
@@ -28,6 +29,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
 </head>
 <body>
 <div class="bg-mesh"></div>
+<?php nl_barra(['volver' => ['atlas.php', '← Atlas'], 'guia' => $ruta ? 'guia.php?p=' . rawurlencode($clave) : '']); ?>
 
 <main class="container nl-ruta">
 <?php if (!$ruta): ?>

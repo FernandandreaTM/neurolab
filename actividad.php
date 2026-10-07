@@ -2,6 +2,7 @@
 error_reporting(0);
 require_once __DIR__ . '/api/db.php';
 require_once __DIR__ . '/_partials/iconos_neurona.php';
+require_once __DIR__ . '/_partials/barra.php';
 
 $slug = $_GET['slug'] ?? '';
 $ruta = isset($_GET['ruta']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['ruta']) : '';
@@ -170,7 +171,18 @@ try {
     // Mesa de trabajo (vista + panel): identificación, o lámina con tareas
     $tieneIframe = false;
     foreach ($recursos as $r) { if ($r['tipo'] === 'iframe_url') { $tieneIframe = true; break; } }
-    $modoMesa = $esLabeling || $esTipos || $esLamina || (is_array($tareas) && $tieneIframe);
+    // Quiz en mesa de trabajo: pool común + pool de la carrera activa (js/quiz-mesa.js)
+    $esQuiz = ($act['tipo'] === 'quiz') && !empty($quicesData);
+    $preguntasQuiz = [];
+    if ($esQuiz) {
+        $preguntasQuiz = json_decode((string)$quicesData[0]['datos_json'], true) ?: [];
+        foreach ($preguntasQuiz as $k => $q) {
+            if (!isset($q['id'])) $preguntasQuiz[$k]['id'] = 'q' . ($k + 1);
+            if (!isset($q['carrera'])) $preguntasQuiz[$k]['carrera'] = 'comun';
+        }
+        if (!$preguntasQuiz) $esQuiz = false;
+    }
+    $modoMesa = $esLabeling || $esTipos || $esLamina || $esQuiz || (is_array($tareas) && $tieneIframe);
 
     $active_page = 'actividad';
     ?>
@@ -198,18 +210,11 @@ try {
     <?php if ($modoMesa): ?>
     <?php include __DIR__ . '/_partials/mesa.php'; ?>
     <?php else: ?>
-    <div class="nl-act-header container">
-        <?php if ($ruta !== ''): ?>
-        <a href="practico.php?p=<?= htmlspecialchars(rawurlencode($ruta)) ?>" class="nl-act-back">← Volver a la ruta del práctico</a>
-        <?php else: ?>
-        <a href="atlas.php" class="nl-act-back">← Volver al atlas</a>
-        <?php endif; ?>
-        <div class="nl-act-meta">
-            <span class="badge badge-violet"><?= htmlspecialchars(tipoLabel($act['tipo'])) ?></span>
-            <span class="text-muted text-sm">slug: <?= htmlspecialchars($act['slug']) ?></span>
-        </div>
-        <h1><?= htmlspecialchars($act['titulo']) ?></h1>
-    </div>
+    <?php nl_barra([
+        'volver' => $ruta !== '' ? ['practico.php?p=' . rawurlencode($ruta), '← Ruta'] : ['atlas.php', '← Atlas'],
+        'titulo' => $act['titulo'],
+        'guia'   => 'guia.php' . ($ruta !== '' ? '?p=' . rawurlencode($ruta) : ''),
+    ]); ?>
 
     <div class="nl-act-layout container">
         <!-- IZQUIERDA: recurso (imagen / iframe / 3D) + tabs -->
@@ -404,7 +409,11 @@ try {
     <?php endif; ?>
 
     <?php include '_partials/footer.php'; ?>
+    <?php if ($esQuiz): ?>
+    <script type="module" src="js/quiz-mesa.js?v=<?= nl_ver('js/quiz-mesa.js') ?>"></script>
+    <?php else: ?>
     <script type="module" src="js/activity.js?v=<?= nl_ver('js/activity.js') ?>"></script>
+    <?php endif; ?>
     <?php if ($esTipos): ?>
     <script type="module" src="js/tipos.js?v=<?= nl_ver('js/tipos.js') ?>"></script>
     <?php elseif (!empty($niveles)): ?>
