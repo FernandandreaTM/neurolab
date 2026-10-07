@@ -42,6 +42,18 @@
 
 **Notas:** quien ya terminó Tipos de neurona nivel I con la versión anterior conserva sus neuronas **sin flecha**; con «Empezar de nuevo» la hace. Las respuestas que ya estaban dadas en la lámina nivel III quedan marcadas aunque cambió el texto.
 
+## 3b. Segunda ronda (revisión de Fer en producción)
+
+| Pedido | Solución | Archivos |
+|---|---|---|
+| «¿Para qué te sirve?» repetido entre niveles (act. 2 y 3) y sin sentido en lámina I | Textos **propios de cada nivel** en `data/practicos.php` (`'conexion' => [clave => textos]`): tipos I (sentido de la información), tipos II (forma y ubicación orientan la evaluación), lámina II (piramidal vs. Purkinje), lámina III (tinciones y plasticidad). Lámina I: `null` (no se muestra). Si un nivel no está ahí, se usa el texto de la actividad (panel admin) | `data/practicos.php`, `_partials/mesa.php` |
+| Lámina II: faltaba la sustancia blanca y la pista adelantaba la capa celular | Purkinje: «Dónde buscar» sin mencionar capas; etiqueta **Sustancia blanca**; preguntas: ubicación del soma → **sustancia blanca** → «bajo la hilera hay una capa que se ve vacía, ¿qué crees que hay?» (deducen que es la granular, que la plata no tiñe) → función. En el nivel III la primera pregunta con Golgi pasa a la capa molecular (para no repetir) | `data/seed.sql` |
+| Act. 1: no salía la neurona rotulada | En producción, con un navegador limpio, la imagen sí se guarda. En los navegadores donde la sección se guardó cuando el almacenamiento estaba lleno, la imagen faltaba. Ahora **la guía se repara sola**: si una sección de identificación no tiene imagen, abre ese nivel en un marco oculto, la vuelve a dibujar y la guarda | `guia.php` |
+| Íconos de los tipos en el cuadro comparativo | La cabecera del cuadro en la guía lleva el ícono de cada tipo (`img/tipos/*.png`) | `js/tipos.js`, `js/guia.js`, `css/guia.css` |
+| Descargar la guía en HTML | Botón principal **«⬇ Descargar guía (HTML)»**, arriba de «Imprimir o guardar PDF»: un solo archivo `guia-<práctico>-<integrantes>.html` con estilos e imágenes adentro (se abre sin conexión y también se imprime) | `guia.php`, `css/guia.css` |
+
+**Subir:** `_partials/mesa.php css/guia.css data/practicos.php data/seed.sql guia.php js/guia.js js/tipos.js` y luego abrir `admin/seed.php`. En los navegadores que ya tenían la guía, los textos «¿Para qué te sirve?» y el cuadro con íconos se actualizan cuando se vuelve a abrir ese nivel.
+
 ## 4. Pendientes
 
 1. **«LabiMed»**: no encontré la URL. Pásamela (y la de DigitalDuck si quieres incluirla) para sumarla a «Otros recursos» en `_partials/footer.php` (lista `$nl_recursos`).
