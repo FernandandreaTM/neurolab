@@ -70,7 +70,7 @@ $conexion = function () use ($carreras) {
     </div>
     <div class="nl-mesa__vista">
         <div class="nl-lab__canvas" id="nl-lab-canvas">
-            <img src="<?= htmlspecialchars($imgLab) ?>" alt="Ilustración de una neurona para identificar sus estructuras" class="nl-lab__img">
+            <img src="<?= htmlspecialchars($imgLab) ?>?v=<?= @filemtime(__DIR__ . '/../' . $imgLab) ?: 1 ?>" alt="Ilustración de una neurona para identificar sus estructuras" class="nl-lab__img">
             <svg class="nl-lab__lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
             <div class="nl-lab__capa" id="nl-lab-capa"></div>
         </div>

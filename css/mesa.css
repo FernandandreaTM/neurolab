@@ -220,3 +220,23 @@
 .nl-lab__diana.is-ok { background: #16A34A; }
 .nl-lab__diana.is-repasar { background: #D97706; }
 .nl-lab__diana.is-sel { background: #F59E0B; width: .8em; height: .8em; box-shadow: 0 0 0 .25em rgba(245,158,11,.35); }
+
+/* Ficha de una estructura: bloques separados para leer con calma */
+.nl-ficha__tambien { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; font-size: .78rem; color: var(--gray-500); }
+.nl-ficha__tambien span {
+    padding: .1rem .55rem; border-radius: 99px; font-size: .78rem;
+    background: rgba(255,255,255,.07); color: var(--gray-100);
+}
+.nl-ficha__bloque {
+    padding: .6rem .75rem; border-radius: 10px;
+    background: rgba(255,255,255,.05); border-left: 3px solid var(--violet);
+}
+.nl-ficha__bloque--extra { background: transparent; border-left-color: var(--gray-700); }
+.nl-ficha__bloque p { margin: .2rem 0 0; font-size: .88rem; line-height: 1.55; }
+.nl-ficha__bloque--extra p { color: var(--gray-300); font-size: .84rem; }
+.nl-ficha__etq { font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--violet-light); }
+.nl-ficha__bloque--extra .nl-ficha__etq { color: var(--gray-500); }
+.nl-lab__trabajo.is-ok .nl-ficha__bloque { border-left-color: #22C55E; }
+.nl-lab__trabajo.is-repasar .nl-ficha__bloque { border-left-color: #D97706; }
+.nl-ficha__acciones { display: flex; flex-wrap: wrap; gap: .4rem; padding-top: .2rem; }
+.nl-ficha__acciones:empty { display: none; }

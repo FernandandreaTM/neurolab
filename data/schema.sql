@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS labeling_parts (
     x_pct         REAL    NOT NULL,          -- punto de la estructura, en % del ancho (0-100)
     y_pct         REAL    NOT NULL,          -- idem, en % del alto
     descripcion   TEXT,                      -- retroalimentación al acertar / pista al fallar
-    sinonimos     TEXT,                      -- otras respuestas válidas, separadas por |
+    sinonimos     TEXT,                      -- otras respuestas válidas, separadas por |; las que empiezan con + se muestran en "También"
     funcion       TEXT,                      -- función breve (sin nombrar la parte): alternativa correcta del quiz
     forma         TEXT,                      -- NULL = punto · elipse:cx,cy,rx,ry · corchete:x1,y1,x2,y2 · puntos:x,y;x,y (en %)
     box_x_pct     REAL,                      -- centro del rectángulo; NULL = sobre el punto

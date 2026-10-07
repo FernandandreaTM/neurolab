@@ -41,8 +41,8 @@ function nl_raiz($t) {
 }
 
 /**
- * Sinónimos para mostrar: sin repetir el nombre ni variantes que sólo
- * difieren en tildes o plural; de cada grupo queda la forma con tildes.
+ * Nombres alternativos para mostrar ("También"): sólo los sinónimos marcados con "+"
+ * en labeling_parts.sinonimos, sin repetir el nombre ni variantes de tildes o plural.
  */
 function nl_alternativas($nombre, $sinonimos) {
     $base   = nl_raiz(nl_normaliza($nombre));
@@ -50,7 +50,9 @@ function nl_alternativas($nombre, $sinonimos) {
     $grupos = [];
     foreach (explode('|', (string)$sinonimos) as $alt) {
         $alt = trim($alt);
-        if ($alt === '') continue;
+        // Sólo se muestran los marcados con "+" (nombres de uso frecuente); el resto se acepta pero no se muestra
+        if ($alt === '' || $alt[0] !== '+') continue;
+        $alt = ltrim($alt, '+ ');
         $k = nl_raiz(nl_normaliza($alt));
         if ($k === '' || isset($vistos[$k])) continue;
         // Fragmentos del propio nombre ("nódulo" en "nódulo de Ranvier") no son otro nombre.

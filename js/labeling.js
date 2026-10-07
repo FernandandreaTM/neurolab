@@ -242,8 +242,7 @@ function iniciar(raiz) {
         const p = partes.find(x => x.id === a.id);
         panel.className = 'nl-lab__trabajo is-pregunta';
         panel.innerHTML =
-            `<p class="nl-lab__paso"><span class="nl-lab__badge">${p.n}</span> ${escapar(a.n)}
-                <span class="nl-lab__estado-nombre ${a.nombreOk ? 'ok' : 'rep'}">${a.nombreOk ? '✓ nombre' : '↺ nombre por repasar'}</span></p>
+            `<p class="nl-lab__paso"><span class="nl-lab__badge">${p.n}</span> ${escapar(a.n)}</p>
              ${!a.nombreOk && a.a.length ? `<p class="nl-lab__alt">También: ${a.a.map(escapar).join(' · ')}</p>` : ''}
              <p class="nl-lab__q">¿Cuál es su <strong>función</strong>?</p>
              <div class="nl-lab__alts">
@@ -290,12 +289,19 @@ function iniciar(raiz) {
         panel.innerHTML =
             `${encabezado ? `<p class="nl-lab__bien">${encabezado}</p>` : ''}
              <p class="nl-lab__paso"><span class="nl-lab__badge">${p.n}</span> ${escapar(s.n)}</p>
-             ${s.a && s.a.length ? `<p class="nl-lab__alt">También: ${s.a.map(escapar).join(' · ')}</p>` : ''}
-             ${!s.nombreOk ? `<p class="nl-lab__tuya">↺ Nombre por repasar${s.r ? ' (escribiste: ' + escapar(s.r) + ')' : ''}</p>` : ''}
-             <p class="nl-lab__funcion"><span class="nl-lab__etq">Función</span> ${escapar(s.f)}</p>
-             ${s.d && s.d !== s.f ? `<p class="nl-lab__detalle">${escapar(s.d)}</p>` : ''}
-             ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente: estructura ${sig.n} →</button>` : ''}
-             ${completa() ? `<button type="button" class="btn btn-ghost btn-sm nl-lab__volver">← Resumen del nivel</button>` : ''}`;
+             ${s.a && s.a.length ? `<p class="nl-ficha__tambien">También: ${s.a.map(t => `<span>${escapar(t)}</span>`).join('')}</p>` : ''}
+             <div class="nl-ficha__bloque">
+                <span class="nl-ficha__etq">Función</span>
+                <p>${escapar(s.f)}</p>
+             </div>
+             ${s.d && s.d !== s.f ? `<div class="nl-ficha__bloque nl-ficha__bloque--extra">
+                <span class="nl-ficha__etq">Para recordar</span>
+                <p>${escapar(s.d)}</p>
+             </div>` : ''}
+             <div class="nl-ficha__acciones">
+                ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-lab__sig">Siguiente: estructura ${sig.n} →</button>` : ''}
+                ${completa() ? `<button type="button" class="btn btn-ghost btn-sm nl-lab__volver">← Resumen del nivel</button>` : ''}
+             </div>`;
         panel.querySelector('.nl-lab__sig')?.addEventListener('click', () => seleccionar(sig.id));
         panel.querySelector('.nl-lab__volver')?.addEventListener('click', () => { verCierre = true; sel = null; pintarTodo(); });
     }
