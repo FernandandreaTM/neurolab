@@ -28,3 +28,6 @@ desktop.ini
 
 # Imágenes originales (alta resolución) antes de optimizar
 img/_fuentes/
+
+# Clave del modo docente (se crea en el servidor a partir de data/docente.ejemplo.php)
+data/docente.php

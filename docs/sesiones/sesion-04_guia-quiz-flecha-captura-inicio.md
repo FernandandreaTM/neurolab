@@ -65,6 +65,14 @@
 
 **Subir:** `_partials/mesa.php css/guia.css css/mesa.css data/seed.sql js/guia.js js/labeling.js js/tipos.js` y luego `admin/seed.php`.
 
+## 3d. Cuarta ronda
+
+| Pedido | Solución | Archivos |
+|---|---|---|
+| Act. 1 nivel III: números cortados arriba | Imagen bajada (aprovecha el blanco de abajo) y coordenadas ajustadas: los 6 números se ven completos sobre los círculos | `img/neurona-nivel3-zoom.jpg`, `data/seed.sql` |
+| Guía en HTML estrecha y con columna vacía | Hasta 1240 px de ancho; la imagen de identificación va centrada arriba y la lista debajo en 2-3 columnas | `css/guia.css`, `guia.php` |
+| **Modo docente** (autocompletar) | `docente.php?clave=<clave>` activa una cookie en ese navegador (180 días; `docente.php?salir=1` la quita). La clave vive en `data/docente.php`, que **no va a git** (plantilla: `data/docente.ejemplo.php`). Con el modo activo: en cada nivel, **⚡ Autocompletar** (abajo a la izquierda); en la ruta, **⚡ Completar todo el práctico** (recorre los 9 niveles en marcos ocultos, ~1 min, y abre la guía) y **↺ Reiniciar avance y guía**. La lámina se completa con una imagen de ejemplo. Las respuestas salen de `api/autocompletar.php`, que responde 403 sin la cookie: los estudiantes no ven ni pueden usar nada de esto | `docente.php`, `_partials/docente.php`, `_partials/barra.php`, `api/autocompletar.php`, `api/practica_lib.php`, `api/practica_check.php`, `js/docente.js`, `data/docente.ejemplo.php`, `.gitignore` |
+
 ## 4. Pendientes
 
 1. **«LabiMed»**: no encontré la URL. Pásamela (y la de DigitalDuck si quieres incluirla) para sumarla a «Otros recursos» en `_partials/footer.php` (lista `$nl_recursos`).

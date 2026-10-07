@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/docente.php';
 /**
  * NeuroLab — _partials/barra.php
  * Barra superior común (actividad, ruta del práctico, guía): logo, volver, título,
@@ -64,5 +65,6 @@ function nl_barra(array $o) {
         </div>
     </header>
     <script type="module">import './js/carrera.js';</script>
+    <?= nl_docente_script() ?>
     <?php
 }
