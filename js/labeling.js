@@ -355,20 +355,54 @@ function iniciar(raiz) {
         return items.length ? [{ t: 'texto', txt: '💡 ¿Para qué sirve?' }, { t: 'lista', items }] : [];
     }
 
+    /** Imagen del nivel con todas las estructuras numeradas (para la guía). */
+    async function imagenRotulada() {
+        const base = canvas.querySelector('img');
+        if (!base) return '';
+        if (!base.complete) await new Promise(ok => { base.onload = ok; base.onerror = ok; });
+        const W = Math.min(1000, base.naturalWidth || 1000);
+        const H = Math.round(W * (base.naturalHeight || 1) / (base.naturalWidth || 1));
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const g = c.getContext('2d');
+        g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+        g.drawImage(base, 0, 0, W, H);
+        const r = Math.max(11, W / 70);
+        partes.forEach(p => {
+            const s = est.partes[p.id];
+            const col = s && !s.nombreOk ? '#E0524A' : '#16A34A';
+            const bx = W * p.bx / 100, by = H * p.by / 100;
+            anclas(p).forEach(([x, y]) => {
+                const ax = W * x / 100, ay = H * y / 100;
+                if (ax === bx && ay === by) return;
+                g.strokeStyle = 'rgba(70,60,90,.75)'; g.lineWidth = Math.max(1.5, W / 600);
+                g.beginPath(); g.moveTo(bx, by); g.lineTo(ax, ay); g.stroke();
+                g.fillStyle = col; g.beginPath(); g.arc(ax, ay, r / 3, 0, Math.PI * 2); g.fill();
+            });
+            g.fillStyle = col; g.strokeStyle = '#fff'; g.lineWidth = 2;
+            g.beginPath(); g.arc(bx, by, r, 0, Math.PI * 2); g.fill(); g.stroke();
+            g.fillStyle = '#fff'; g.font = `bold ${Math.round(r * 1.1)}px Arial, sans-serif`;
+            g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText(String(p.n), bx, by + 1);
+        });
+        return c.toDataURL('image/jpeg', 0.8);
+    }
+    let imgGuia = null;      // se dibuja una vez por visita, al completar
+
     function seccionGuia() {
         return {
             titulo,
             subtitulo: 'Identificación de estructuras y su función',
             slug,
             nota: `${partes.length} estructuras · ${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}`,
-            bloques: [{
+            bloques: (imgGuia ? [{ t: 'imagenes', items: [{ src: imgGuia, titulo: '', pie: 'Los números corresponden a la tabla.' }] }] : []).concat([{
                 t: 'tabla',
                 cab: ['Nº', 'Estructura', 'Función', 'Para recordar'],
                 filas: partes.map(p => {
                     const s = est.partes[p.id];
                     return [String(p.n) + (s.nombreOk ? '' : ' ↺'), s.n, s.f, s.d && s.d !== s.f ? s.d : ''];
                 }),
-            }].concat(porRepasar().length ? [{ t: 'texto',
+            }]).concat(porRepasar().length ? [{ t: 'texto',
                 txt: '↺ Nombres por repasar: ' + porRepasar().map(p => est.partes[p.id].n).join(', ') + '.' }] : []).concat(conexionGuia()),
         };
     }
@@ -381,12 +415,17 @@ function iniciar(raiz) {
         if (hechas === partes.length) {
             if (clave) markDone(clave);
             sumarAGuia(clave, seccionGuia());     // se guarda solo (y se actualiza)
+            if (imgGuia === null) {
+                imgGuia = '';
+                imagenRotulada().then(src => { imgGuia = src; if (src) sumarAGuia(clave, seccionGuia()); }).catch(() => {});
+            }
         }
     }
 
     btnReset?.addEventListener('click', () => {
         if ((Object.keys(est.partes).length || est.activa) && !confirm('Esto borra todas tus respuestas de esta actividad. ¿Seguro?')) return;
         est = { partes: {}, err: 0 };
+        imgGuia = null;
         sel = partes[0].id;
         verCierre = false;
         guardar();
