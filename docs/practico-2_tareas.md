@@ -37,28 +37,77 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 ## Tareas para ayudantes
 
-Elige una tarea, escribe tu nombre en **Tomada por** en tu primer commit y trabaja en la rama indicada. Una tarea a la vez. Lo técnico nuevo (arrastrar neuronas sobre la captura y corregir por zonas) lo hace Fernanda.
+Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. Fernanda revisa, mergea y sube al servidor. Lo técnico nuevo (arrastrar neuronas sobre la captura y corregir por zonas) lo hace Fernanda.
 
-| Tarea | Qué entregar | Rama | Programar | Tomada por |
-|---|---|---|---|---|
-| A. Dónde buscar | Por cada nivel con lámina: link de histologyguide con `x`, `y`, `z` del campo exacto + pista corta (1 línea) | `feat/p2-donde-buscar` | No | |
-| B. Esquemas de glía | Esquema SNC y esquema SNP (imagen < 300 KB con números) + por célula: nombre, función, «para recordar» | `feat/p2-esquemas-glia` | Poco | |
-| C. Preguntas de láminas | 2–3 preguntas por nivel (comparar e interpretar), 4 alternativas de largo parejo, explicación de la correcta | `feat/p2-preguntas-laminas` | No | |
-| D. Tarjetas SNC/SNP | 8–10 frases que llevan a una célula + filas del cuadro comparativo | `feat/p2-tarjetas-glia` | Poco | |
-| E. Íconos de glía | PNG transparente por célula, mismo estilo que `img/tipos/` | `feat/p2-iconos-glia` | No | |
-| F. ¿Para qué te sirve? | 1 texto por nivel en versión TO y Fono (2–3 líneas, situación clínica concreta) | `feat/p2-para-que-sirve` | No | |
-| G. Quiz de cierre | 15–18 preguntas: conceptos → casos comunes → casos de la carrera; sin repetir el práctico I | `feat/p2-quiz` | Poco | |
-| H. ¿Dónde se cortó el arco? | 6–8 casos (mitad TO, mitad Fono): síntoma → tramo lesionado → explicación | `feat/p2-casos-arco` | No | |
+| Tarea | Qué queda en el sitio | Rama |
+|---|---|---|
+| A. Dónde buscar | En cada nivel con lámina: link al campo exacto (`x`, `y`, `z`) + pista corta | `feat/p2-donde-buscar` |
+| B. Esquemas de glía | Esquema SNC y SNP con números + nombre, función y «para recordar» de cada célula | `feat/p2-esquemas-glia` |
+| C. Preguntas de láminas | 2–3 preguntas por nivel (comparar, interpretar), alternativas de largo parejo, explicación | `feat/p2-preguntas-laminas` |
+| D. Tarjetas SNC/SNP | 8–10 frases que llevan a una célula + filas del cuadro comparativo | `feat/p2-tarjetas-glia` |
+| E. Íconos de glía | Un ícono por célula, mismo estilo que los de tipos de neurona | `feat/p2-iconos-glia` |
+| F. ¿Para qué te sirve? | Un texto por nivel en versión TO y Fono (2–3 líneas, situación clínica concreta) | `feat/p2-para-que-sirve` |
+| G. Quiz de cierre | 15–18 preguntas: conceptos → casos comunes → casos de la carrera | `feat/p2-quiz` |
+| H. ¿Dónde se cortó el arco? | 6–8 casos (mitad TO, mitad Fono): síntoma → tramo lesionado → explicación | `feat/p2-casos-arco` |
 
-### Formato de entrega
+**¿Quién tiene qué tarea?** La que tenga un Pull Request abierto en GitHub (pestaña *Pull requests*). Antes de elegir, revisa ahí que nadie la haya tomado. Una tarea a la vez.
 
-- Textos: un `.md` en `docs/p2/<tarea>.md` (ej. `docs/p2/C-preguntas-laminas.md`) con tablas. Fernanda los pasa a `seed.sql`.
-- Imágenes: `img/p2/`, optimizadas, nombre en minúsculas con guiones.
-- Fuentes: si usas un libro o paper, cítalo al final del `.md`.
-- Al terminar: Pull Request a `main`, asignado a FernandandreaTM.
+## Cómo trabajar una tarea
 
-### Criterios
+| Paso | Dónde | Qué haces |
+|---|---|---|
+| 1. Actualizar | GitHub Desktop | Rama `main` → **Fetch origin** → **Pull origin** |
+| 2. Crear la rama | GitHub Desktop | **Current branch → New branch** → nombre de la tabla (ej. `feat/p2-quiz`), basada en `main` → **Publish branch** |
+| 3. Tomar la tarea | GitHub Desktop + GitHub | Haz un primer commit pequeño (ej. el borrador de tu primera pregunta), **Push origin** → **Create Pull Request** → en GitHub elige **Create draft pull request**. Así queda tomada |
+| 4. Trabajar | Claude Desktop | Abre la carpeta del repo y pega el prompt de abajo. Claude busca y edita los archivos; tú revisas y decides |
+| 5. Probar | Navegador | Pídele a Claude que levante el sitio en local y revisa tu actividad en http://localhost:8000 |
+| 6. Guardar avance | GitHub Desktop | Revisa en **Changes** qué archivos cambió Claude → escribe el mensaje → **Commit to feat/…** → **Push origin**. Commits chicos, cada vez que algo funcione |
+| 7. Entregar | GitHub | En tu PR: **Ready for review** y avísale a Fernanda |
 
-- Nada que ya se pregunte en el práctico I (revisa `data/seed.sql` y la guía del práctico I).
+- **Ramas, commits y push: siempre en GitHub Desktop.** Es más fácil ver qué se cambió. No se lo pidas a Claude ni lo hagas en la página de GitHub.
+- **Mensaje de commit:** en imperativo, describe lo que se ve en el sitio (ej. `Agrega preguntas del nivel II de glía SNC`).
+- Si GitHub Desktop muestra conflicto o *diverged*: no fuerces nada; toma una captura y avísale a Fernanda.
+
+## Prompt para Claude Desktop
+
+Cópialo, reemplaza lo que está entre `< >` y pégalo al iniciar un chat nuevo con la carpeta del repo abierta.
+
+```
+Vamos a trabajar en NeuroLab, en la rama <feat/p2-...> (ya creada; yo hago los commits en GitHub Desktop).
+
+Antes de cambiar nada, lee:
+- README.md (qué es el proyecto y dónde está cada cosa)
+- docs/practico-2_tareas.md (ruta del práctico II y mi tarea)
+- docs/sesiones/sesion-02_*.md y sesion-04_*.md (cómo se arman las actividades en la mesa de trabajo y las decisiones de estilo)
+
+Mi tarea es la <letra y nombre>: <descripción de la tabla>.
+
+Quiero replicar exactamente la forma de trabajo del práctico I: mismas mecánicas de mesa de
+trabajo, mismo tono y largo de los textos, textos para TO y Fono cuando corresponda, y que lo
+que hagan los estudiantes quede en su guía. No repitas preguntas o contenidos del práctico I.
+
+Trabajemos así:
+1. Dime qué archivos vas a tocar y por qué, y propónme el contenido en una tabla. No edites todavía.
+2. Cuando lo apruebe, edita los archivos directamente.
+3. Levanta el sitio en local y dime exactamente dónde mirar para probarlo.
+4. Al terminar cada parte, dame un mensaje de commit corto en imperativo.
+
+No toques data/docente.php ni data/neurolab.db, no cambies el funcionamiento de las
+actividades existentes y no hagas commits ni push.
+```
+
+**Si la tarea tiene imágenes (B y E)**, agrega al prompt:
+
+```
+Para las imágenes, dame el prompt para ChatGPT siguiendo el estilo de docs/prompts-imagenes.md
+(qué imagen de referencia adjuntar, formato, colores, sin texto ni números). Cuando te pase la
+imagen generada, optimízala (< 300 KB), guárdala con el nombre correcto, agrega su prompt a
+docs/prompts-imagenes.md y ubica los números sobre ella como en las actividades del práctico I.
+```
+
+## Criterios
+
+- Nada que ya se pregunte en el práctico I.
 - Frases cortas, lenguaje de estudiante de 2.º año.
 - Cada pregunta debe obligar a **mirar** la lámina o **razonar**, no solo recordar una definición.
+- Si usas un libro o paper, cítalo en la descripción del Pull Request.
