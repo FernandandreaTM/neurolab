@@ -4,6 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin — NeuroLab</title>
+<link rel="icon" href="../img/favicon.ico" sizes="any">
+<link rel="icon" href="../img/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="stylesheet" href="../css/base.css">
 <style>
 .nl-admin-wrap { padding: 3rem 0 3rem; max-width: 800px; margin: 0 auto; }
@@ -67,6 +69,6 @@
     <p class="text-muted text-sm mt-4">Próximas herramientas: CRUD actividades, CRUD quices (con importador Aiken), CRUD carreras, gestión de recursos.</p>
 </div>
 
-<?php include __DIR__ . '/../_partials/footer.php'; ?>
+<?php $nl_base = '../'; include __DIR__ . '/../_partials/footer.php'; ?>
 </body>
 </html>

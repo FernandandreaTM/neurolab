@@ -28,7 +28,9 @@ $asig = $ruta ? preg_replace('/\s*·.*$/', '', $ruta['asignatura']) : '';
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" href="img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="stylesheet" href="css/base.css?v=<?= nl_v('css/base.css') ?>">
 <link rel="stylesheet" href="css/guia.css?v=<?= nl_v('css/guia.css') ?>">
 </head>
@@ -56,7 +58,7 @@ $asig = $ruta ? preg_replace('/\s*·.*$/', '', $ruta['asignatura']) : '';
     <article class="nl-guia-doc">
         <header class="nl-gd-banner">
             <div class="nl-gd-banner__marca">
-                <img src="img/logo.svg" alt="" class="nl-gd-banner__nl">
+                <img src="img/logo/neurolab-blanco-160.png" alt="" class="nl-gd-banner__nl">
                 <div><strong>NeuroLab</strong><span>Guía de estudio</span></div>
             </div>
             <div class="nl-gd-banner__logos">

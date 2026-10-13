@@ -39,7 +39,9 @@ $ruta1 = is_array($rutas) ? (string)array_key_first($rutas) : '';
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Modo docente — NeuroLab</title>
-<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" href="img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="stylesheet" href="css/base.css">
 <style>
 .nl-doc { max-width: 560px; margin: 12vh auto; padding: 1.6rem; border-radius: 16px; background: var(--navy-mid); border: 1px solid rgba(167,139,250,.35); }

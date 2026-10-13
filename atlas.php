@@ -10,7 +10,9 @@ $active_page = 'atlas';
 <title>Atlas — NeuroLab</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/atlas.css">
-<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" href="img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <style>
 /* Layout mínimo del atlas (paleta morada) */
 .nl-atlas-header { padding: 3rem 0 2rem; text-align: center; }

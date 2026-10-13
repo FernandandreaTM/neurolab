@@ -40,7 +40,7 @@
     background: linear-gradient(120deg, #3B0764 0%, #5B21B6 55%, #9D174D 100%);
 }
 .nl-gd-banner__marca { display: flex; align-items: center; gap: .7rem; }
-.nl-gd-banner__nl { width: 44px; height: 44px; }
+.nl-gd-banner__nl { height: 50px; width: auto; display: block; }
 .nl-gd-banner__marca strong { display: block; font-size: 1.05rem; font-weight: 800; letter-spacing: .02em; }
 .nl-gd-banner__marca span { display: block; font-size: .9rem; opacity: .9; }
 .nl-gd-banner__logos { display: flex; align-items: center; gap: .5rem; background: #fff; border-radius: 10px; padding: .3rem .6rem; }

@@ -447,6 +447,7 @@ html[data-carrera="fonoaudiologia"] [data-carrera="terapia-ocupacional"] { displ
 .nl-pie p { margin: 0; color: #DDD6FE; }
 .nl-pie ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
 .nl-pie li span { color: #A99BC6; font-size: .82rem; }
+.nl-pie__logo-nl { height: 72px; width: auto; display: block; margin-bottom: .6rem; }
 .nl-pie__logos { display: flex; align-items: center; gap: .8rem; margin-top: .8rem; }
 .nl-pie__logos img { height: 44px; width: auto; }
 .nl-pie__logo-tmh { border-radius: 8px; background: #fff; padding: 2px; }

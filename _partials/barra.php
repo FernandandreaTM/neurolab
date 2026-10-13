@@ -33,7 +33,7 @@ function nl_barra(array $o) {
     <header class="nl-barra">
         <div class="nl-barra__in">
             <a class="nl-barra__logo" href="index.php" title="NeuroLab — inicio">
-                <img src="img/logo.svg" alt="NeuroLab" class="nl-barra__logo-nl">
+                <img src="img/logo/neurolab-blanco-160.png" alt="NeuroLab" class="nl-barra__logo-nl">
                 <img src="img/uach-blanco.png" alt="Universidad Austral de Chile" class="nl-barra__logo-uach">
             </a>
             <?php if (!empty($o['volver'])): ?>

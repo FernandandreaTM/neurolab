@@ -2,7 +2,9 @@
 /**
  * NeuroLab — _partials/footer.php
  * Pie común: otros recursos educativos, contacto y equipo (con sus perfiles de GitHub).
+ * $nl_base: prefijo de rutas para páginas en subcarpetas (ej. admin/ usa '../').
  */
+$nl_base = $nl_base ?? '';
 $nl_equipo = [
     ['Fernanda López-Moncada', 'Docente · diseño y contenidos', 'FernandandreaTM'],
     ['Kaira Santos', 'Ayudante · estudiante de Psicología', 'kamarisss'],
@@ -17,11 +19,11 @@ $nl_recursos = [
 <footer class="nl-pie">
   <div class="nl-pie__in">
     <div class="nl-pie__col nl-pie__marca">
-      <p class="nl-pie__tit">NeuroLab</p>
+      <img src="<?= $nl_base ?>img/logo/neurolab-blanco-texto-160.png" alt="NeuroLab" class="nl-pie__logo-nl">
       <p>Actividades autoguiadas de neurobiología. Universidad Austral de Chile, Sede Puerto Montt.</p>
       <div class="nl-pie__logos">
-        <img src="img/uach-blanco.png" alt="Universidad Austral de Chile">
-        <img src="img/tecmedhub-logo.jpg" alt="TecMedHUB" class="nl-pie__logo-tmh">
+        <img src="<?= $nl_base ?>img/uach-blanco.png" alt="Universidad Austral de Chile">
+        <img src="<?= $nl_base ?>img/tecmedhub-logo.jpg" alt="TecMedHUB" class="nl-pie__logo-tmh">
       </div>
     </div>
     <div class="nl-pie__col">
