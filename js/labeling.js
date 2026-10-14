@@ -13,7 +13,7 @@
  * Respuestas en api/labeling_check.php (no van en el HTML). Avance: localStorage nl_lab2_<slug>.
  * Con ?calibrar=1, un clic sobre la imagen muestra coordenadas en % (para labeling_parts).
  */
-import { markDone, isDone } from './progress.js';
+import { markDone, isDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia as conexionCarrera } from './carrera.js';
 
@@ -74,7 +74,7 @@ function iniciar(raiz) {
 
     // Nivel que exige completar el anterior
     const requiere = raiz.dataset.requiere || '';
-    if (requiere && !isDone(requiere)) {
+    if (bloqueado(requiere)) {
         raiz.classList.add('is-bloqueada');
         raiz.querySelector('.nl-lab__candado')?.removeAttribute('hidden');
         return;

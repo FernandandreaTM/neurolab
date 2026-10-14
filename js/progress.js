@@ -4,6 +4,17 @@
 
 const KEY = 'nl_progress';
 
+/**
+ * Bloqueo por nivel: si es true, un nivel exige completar el anterior.
+ * Con false se puede abrir cualquier nivel (útil mientras se revisan actividades).
+ */
+export const BLOQUEO_NIVELES = true;
+
+/** ¿Está bloqueado un nivel que requiere completar `requiere`? */
+export function bloqueado(requiere) {
+    return BLOQUEO_NIVELES && !!requiere && !isDone(requiere);
+}
+
 export function getProgress() {
     try {
         return JSON.parse(localStorage.getItem(KEY) || '{}');

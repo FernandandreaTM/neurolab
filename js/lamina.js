@@ -14,7 +14,7 @@
  * Avance en localStorage (nl_lam_<clave>). Al completar: markDone(clave) y la sección
  * (capturas anotadas + preguntas) se guarda sola en la guía.
  */
-import { markDone, isDone } from './progress.js';
+import { markDone, isDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia } from './carrera.js';
 
@@ -145,7 +145,7 @@ function iniciar(raiz) {
     const btnsTin  = Array.from(raiz.querySelectorAll('.nl-lam__tincion'));
     const btnsVer  = Array.from(raiz.querySelectorAll('.nl-lam__ver-btn'));
 
-    if (d.requiere && !isDone(d.requiere)) {
+    if (bloqueado(d.requiere)) {
         raiz.classList.add('is-bloqueada');
         raiz.querySelector('.nl-lab__candado')?.removeAttribute('hidden');
         return;

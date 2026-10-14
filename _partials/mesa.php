@@ -83,6 +83,10 @@ nl_barra([
 
 <?php if ($esLabeling):
     $dim = @getimagesize(__DIR__ . '/../' . $imgLab);
+    if (!$dim && preg_match('/\.svg$/i', $imgLab)   // SVG: proporción desde el viewBox
+        && preg_match('/viewBox="[\d.\s-]*?\s([\d.]+)\s+([\d.]+)"/', (string)@file_get_contents(__DIR__ . '/../' . $imgLab, false, null, 0, 400), $vb)) {
+        $dim = [(float)$vb[1], (float)$vb[2]];
+    }
     $ar  = $dim ? round($dim[0] / $dim[1], 4) : 1.5;
 ?>
 <div class="nl-mesa container" id="nl-lab"

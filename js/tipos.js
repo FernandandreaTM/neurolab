@@ -11,7 +11,7 @@
  * Al completar: markDone('<slug>:<número>') (desbloquea el siguiente nivel) y la sección
  * se guarda sola en la guía con la clave '<slug>:<número>'.
  */
-import { markDone, isDone } from './progress.js';
+import { markDone, isDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia as conexionCarrera } from './carrera.js';
 import { C, R, PUNTOS, LUGAR, PIEZAS, ICONOS, dibujoPieza, coordPunto } from './armar-neurona.js';
@@ -153,7 +153,7 @@ function iniciar(raiz) {
     const instr    = raiz.querySelector('#nl-mesa-instr');
     const tplCx    = document.getElementById('nl-conexion-tpl');
 
-    if (d.requiere && !isDone(d.requiere)) {
+    if (bloqueado(d.requiere)) {
         raiz.classList.add('is-bloqueada');
         raiz.querySelector('.nl-lab__candado')?.removeAttribute('hidden');
         return;

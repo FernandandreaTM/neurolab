@@ -12,7 +12,7 @@
  * El avance de cada nivel se guarda en localStorage (nl_practica_<nivelId>) y un
  * nivel se desbloquea cuando el anterior está completo.
  */
-import { markDone } from './progress.js';
+import { markDone, BLOQUEO_NIVELES } from './progress.js';
 import { prepararArmar } from './armar-neurona.js';
 import { botonGuia } from './guia.js';
 
@@ -68,6 +68,7 @@ function iniciar(raiz) {
 
     /** Un nivel jugable está bloqueado si el nivel jugable anterior no está completo. */
     function bloqueado(n) {
+        if (!BLOQUEO_NIVELES) return false;
         const i = jugables.indexOf(n);
         return i > 0 && !completo(jugables[i - 1]);
     }

@@ -58,7 +58,7 @@ try {
         // Ojo: la respuesta NO se selecciona; se revisa en api/practica_check.php
         $si = $pdo->prepare("SELECT id, enunciado FROM practica_items WHERE nivel_id = ? ORDER BY orden, id");
         // Nivel "elegir": los botones son todas las respuestas posibles del nivel (sin decir cuál va en cada ítem)
-        $so = $pdo->prepare("SELECT DISTINCT respuesta FROM practica_items WHERE nivel_id = ? ORDER BY respuesta");
+        $so = $pdo->prepare("SELECT respuesta FROM practica_items WHERE nivel_id = ? GROUP BY respuesta ORDER BY MIN(orden), MIN(id)");
         foreach ($niveles as $k => $n) {
             $si->execute([$n['id']]);
             $niveles[$k]['items'] = $si->fetchAll();

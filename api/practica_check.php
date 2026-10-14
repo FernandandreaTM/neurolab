@@ -205,7 +205,7 @@ try {
     }
 
     $pista = $item['pista'] ? ' Pista: ' . $item['pista'] : '';
-    if ($esOpcion) {
+    if ($esOpcion || $item['nivel_tipo'] === 'elegir') {
         nl_prac_json(['correcto' => false, 'feedback' => 'Todavía no.' . $pista]);
     }
 

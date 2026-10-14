@@ -16,6 +16,12 @@ if ($clave === '') {
 }
 $ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
 $secciones = $ruta ? nl_secciones_ruta($ruta) : [];
+// Claves válidas de la guía = las de TODOS los prácticos + las de esta ruta (abrir la guía de un
+// práctico no borra lo trabajado en otro).
+$clavesValidas = array_column($secciones, 'clave');
+foreach ((require __DIR__ . '/data/practicos.php') as $kR => $rR) {
+    foreach (($rR['pasos'] ?? []) as $pR) foreach (array_keys($pR['guia'] ?? []) as $cR) $clavesValidas[] = $cR;
+}
 $titulo = $ruta ? $ruta['titulo'] : 'NeuroLab';
 $asig = $ruta ? preg_replace('/\s*·.*$/', '', $ruta['asignatura']) : '';
 ?>
@@ -232,7 +238,7 @@ ${css}
     btnHtml.disabled = false;
 });
 
-limpiarGuia(RUTA.map(s => s.clave)).then(pintar);
+limpiarGuia(<?= json_encode(array_values(array_unique($clavesValidas))) ?>).then(pintar);
 </script>
 </body>
 </html>
