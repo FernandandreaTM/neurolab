@@ -452,12 +452,12 @@ p {
 .nl-pie__logo-tmh { border-radius: 8px; background: #fff; padding: 2px; }
 .nl-pie__fuentes { margin-top: .7rem !important; font-size: .82rem; }
 .nl-pie__equipo { max-width: 1240px; margin: 0 auto; padding: 1.2rem 16px 1.6rem; border-top: 1px solid rgba(167,139,250,.15); }
-.nl-pie__equipo ul { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .8rem; margin-top: .3rem; }
+.nl-pie__equipo ul { grid-template-columns: 1.3fr 1.1fr 1.1fr 1fr 1fr; align-items: start; gap: .8rem; margin-top: .3rem; }
 .nl-pie__equipo li { display: flex; align-items: center; gap: .6rem; }
 .nl-pie__equipo img { width: 40px; height: 40px; border-radius: 50%; background: #2A1A4A; flex: none; }
 .nl-pie__equipo li span { display: flex; flex-direction: column; font-size: .82rem; color: #A99BC6; }
 .nl-pie__equipo li strong { color: #fff; font-size: .88rem; }
-.nl-pie__copy { margin-top: 1rem !important; font-size: .8rem; color: #A99BC6 !important; }
+.nl-pie__copy { margin-top: .4rem !important; font-size: .8rem; color: #A99BC6 !important; }
 @media (max-width: 760px) { .nl-pie__in { grid-template-columns: 1fr; } }
 @media print { .nl-pie, .nl-nav { display: none !important; } }
 
@@ -497,3 +497,10 @@ p {
 .nl-ficha__docente dt { color: var(--gray-300); font-weight: 700; }
 .nl-act-html .nl-ficha { padding: 0; }
 .nl-act-recurso-pane:has(.nl-ficha) { min-height: 0; }
+
+/* Pie: columnas de contacto y «Experiencia digital» sobre el copyright */
+.nl-pie__equipo img { object-fit: cover; }
+.nl-pie .nl-pie__exp { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(167,139,250,.12); font-size: .82rem; font-weight: 700; color: var(--violet-light); }
+@media (max-width: 1100px) { .nl-pie__equipo ul { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .nl-pie__equipo ul { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .nl-pie__equipo ul { grid-template-columns: 1fr; } }

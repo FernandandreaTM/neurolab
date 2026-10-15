@@ -281,21 +281,24 @@ if (file_exists($db_path)) {
     display: flex; align-items: center; justify-content: center;
     width: 96px; height: 96px;
     background: #fff;
-    border: 2px solid var(--gray-700);
+    border: 1px solid rgba(255,255,255,.18);
     border-radius: 50%;
     overflow: hidden;
     transition: border-color var(--t-base), transform var(--t-base);
     text-decoration: none;
     flex-shrink: 0;
-    padding: 12px;
+    padding: 8px;
 }
-.nl-recurso-logo:hover {
+.nl-recurso { display: flex; flex-direction: column; align-items: center; gap: .45rem; text-decoration: none; }
+.nl-recurso__nom { font-size: .8rem; font-weight: 700; color: var(--gray-300); }
+.nl-recurso:hover .nl-recurso__nom { color: var(--violet-light); }
+.nl-recurso:hover .nl-recurso-logo {
     border-color: var(--violet);
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 .nl-recurso-logo img {
-    width: 100%; height: 100%;
+    width: 100%; height: 100%; padding: 2px;
     object-fit: contain; display: block;
     transition: transform var(--t-fast);
 }
@@ -466,15 +469,19 @@ if (file_exists($db_path)) {
     <h2 class="reveal">Visita nuestros otros recursos educativos</h2>
     <p class="lead reveal">Explora las plataformas de TecMedHUB desarrolladas para la enseñanza en ciencias de la salud.</p>
     <div class="nl-recursos-logos stagger">
-      <a href="https://tmeduca.org/ferlopezmoncada/cellview" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
-        <img src="img/logo-cellview.svg" alt="CellView">
+      <?php foreach ([
+          ['TMeduca', 'https://tmeduca.org/', 'tmeduca.png'],
+          ['DigitalDuck', 'https://tmeduca.org/ferlopezmoncada/DigitalDuck/', 'digitalduck.png'],
+          ['GenLAB', 'https://tmeduca.org/ferlopezmoncada/genlab/', 'genlab.png'],
+          ['CellView', 'https://tmeduca.org/ferlopezmoncada/cellview', 'cellview.png'],
+          ['LABIM3D', 'https://tmeduca.org/ferlopezmoncada/labim3d', 'labim3d.png'],
+          ['LABIMATHS', 'https://tmeduca.org/ferlopezmoncada/labimaths', 'labimaths.png'],
+      ] as $r): ?>
+      <a href="<?= $r[1] ?>" target="_blank" rel="noopener" class="nl-recurso reveal" title="<?= $r[0] ?>">
+        <span class="nl-recurso-logo"><img src="img/recursos/<?= $r[2] ?>" alt=""></span>
+        <span class="nl-recurso__nom"><?= $r[0] ?></span>
       </a>
-      <a href="https://tmeduca.org/ferlopezmoncada/labim3d" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
-        <img src="img/logo-labim3d.png" alt="LABIM3D">
-      </a>
-      <a href="https://tmeduca.org/ferlopezmoncada/labimaths" target="_blank" rel="noopener" class="nl-recurso-logo reveal">
-        <img src="img/logo-labimaths.png" alt="LABIMATHS">
-      </a>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
