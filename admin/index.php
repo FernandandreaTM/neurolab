@@ -59,6 +59,14 @@
 
     <div class="nl-admin-card">
         <div>
+            <h3>🧪 Pool de actividades</h3>
+            <p>Estados de revisión, notas y armado de prácticos con vista previa (modo docente).</p>
+        </div>
+        <a href="../pool.php" class="btn btn-ghost btn-sm">Abrir el pool →</a>
+    </div>
+
+    <div class="nl-admin-card">
+        <div>
             <h3>📋 Estado de la BD</h3>
             <p>
             <?php

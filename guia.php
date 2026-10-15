@@ -10,14 +10,15 @@ require_once __DIR__ . '/_partials/rutas.php';
 require_once __DIR__ . '/_partials/barra.php';
 
 $clave = isset($_GET['p']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['p']) : '';
-if ($clave === '') {
+if ($clave === '' && !isset($_GET['armar'])) {
     $rutas = require __DIR__ . '/data/practicos.php';
     $clave = (string)array_key_first($rutas);
 }
-$ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
+$ruta  = ($clave !== '' || isset($_GET['armar'])) ? nl_cargar_ruta($clave) : null;
+$qRuta = $ruta ? nl_ruta_param($clave, $ruta) : '';
 $secciones = $ruta ? nl_secciones_ruta($ruta) : [];
-// Claves válidas de la guía = las de TODOS los prácticos + las de esta ruta (abrir la guía de un
-// práctico no borra lo trabajado en otro).
+// Claves válidas de la guía = las de TODOS los prácticos + las de esta ruta (así abrir la guía de un
+// práctico no borra lo trabajado en otro, ni en una vista previa armada desde el pool).
 $clavesValidas = array_column($secciones, 'clave');
 foreach ((require __DIR__ . '/data/practicos.php') as $kR => $rR) {
     foreach (($rR['pasos'] ?? []) as $pR) foreach (array_keys($pR['guia'] ?? []) as $cR) $clavesValidas[] = $cR;
@@ -42,7 +43,7 @@ $asig = $ruta ? preg_replace('/\s*·.*$/', '', $ruta['asignatura']) : '';
 </head>
 <body class="nl-guia-body">
 <div class="bg-mesh"></div>
-<?php nl_barra(['volver' => $ruta ? ['practico.php?p=' . rawurlencode($clave), '← Ruta'] : ['index.php', '← Inicio'], 'titulo' => 'Mi guía de estudio']); ?>
+<?php nl_barra(['volver' => $ruta ? ['practico.php?' . $qRuta, '← Ruta'] : ['index.php', '← Inicio'], 'titulo' => 'Mi guía de estudio']); ?>
 
 <main class="nl-guia-pag">
     <div class="nl-guia-herr">

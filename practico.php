@@ -3,14 +3,16 @@
  * NeuroLab — practico.php
  * Ruta de un práctico: por dónde partir y en qué orden avanzar. Cada paso enlaza
  * una actividad y muestra qué secciones de "Mi guía" desbloquea.
- * Las rutas están en data/practicos.php.   URL: practico.php?p=celulas-1
+ * Las rutas están en data/practicos.php.   URL: practico.php?p=<clave> · vista previa desde el pool: practico.php?armar=slug1,slug2
  */
 error_reporting(0);
 require_once __DIR__ . '/_partials/rutas.php';
 require_once __DIR__ . '/_partials/barra.php';
+require_once __DIR__ . '/_partials/pool.php';
 
 $clave = isset($_GET['p']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['p']) : '';
-$ruta  = $clave !== '' ? nl_cargar_ruta($clave) : null;
+$ruta  = ($clave !== '' || isset($_GET['armar'])) ? nl_cargar_ruta($clave) : null;
+$qRuta = $ruta ? nl_ruta_param($clave, $ruta) : '';
 $secciones = $ruta ? nl_secciones_ruta($ruta) : [];
 $seccionesActivas = array_values(array_filter($secciones, function ($s) { return $s['activo']; }));
 ?>
@@ -31,7 +33,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
 </head>
 <body>
 <div class="bg-mesh"></div>
-<?php nl_barra(['volver' => ['index.php', '← Inicio'], 'guia' => $ruta ? 'guia.php?p=' . rawurlencode($clave) : '']); ?>
+<?php nl_barra(['volver' => ['index.php', '← Inicio'], 'guia' => $ruta ? 'guia.php?' . $qRuta : '']); ?>
 
 <main class="container nl-ruta">
 <?php if (!$ruta): ?>
@@ -51,12 +53,12 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
             <span id="nl-ruta-guia-n">0 / <?= count($seccionesActivas) ?> secciones desbloqueadas</span>
             <div class="nl-ruta__barra"><div class="nl-ruta__barra-fill" id="nl-ruta-barra"></div></div>
         </div>
-        <a class="btn btn-primary btn-sm" href="guia.php?p=<?= rawurlencode($clave) ?>">Ver y descargar mi guía →</a>
+        <a class="btn btn-primary btn-sm" href="guia.php?<?= htmlspecialchars($qRuta) ?>">Ver y descargar mi guía →</a>
     </div>
 
     <ol class="nl-ruta__pasos">
     <?php foreach ($ruta['pasos'] as $i => $p):
-        $href = 'actividad.php?slug=' . rawurlencode($p['slug']) . '&ruta=' . rawurlencode($clave);
+        $href = 'actividad.php?slug=' . rawurlencode($p['slug']) . ($clave !== '' ? '&ruta=' . rawurlencode($clave) : '');
         $guia = $p['guia'] ?? [];
     ?>
         <li class="nl-paso<?= $p['activo'] ? '' : ' is-pronto' ?>" data-slug="<?= htmlspecialchars($p['slug']) ?>">
@@ -90,7 +92,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
             <div class="nl-paso__cuerpo">
                 <div class="nl-paso__top"><h2>Descarga tu guía de estudio</h2></div>
                 <p class="nl-paso__tarea">Revisa tu guía, anota los integrantes del grupo y descárgala en PDF para estudiar.</p>
-                <a class="btn btn-primary btn-sm" href="guia.php?p=<?= rawurlencode($clave) ?>">📘 Abrir mi guía</a>
+                <a class="btn btn-primary btn-sm" href="guia.php?<?= htmlspecialchars($qRuta) ?>">📘 Abrir mi guía</a>
             </div>
         </li>
     </ol>

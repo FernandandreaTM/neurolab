@@ -4,10 +4,11 @@
  * Navegación del sitio (inicio, atlas, temas), al estilo de DigitalDuck: logos a la izquierda,
  * enlaces, menú «Prácticos» con las rutas de data/practicos.php y «Mi guía». En celular, menú plegable.
  * Las páginas de trabajo (actividad, ruta, guía) usan _partials/barra.php.
- * $active_page: 'home' | 'atlas' | 'tema'
+ * $active_page: 'home' | 'atlas' | 'tema' | 'pool'   (el enlace «Pool» sólo aparece en modo docente)
  */
 $active_page = $active_page ?? 'home';
 require_once __DIR__ . '/carreras.php';
+require_once __DIR__ . '/docente.php';
 echo nl_carreras_script();
 $nl_rutas_nav = @include __DIR__ . '/../data/practicos.php';
 if (!is_array($nl_rutas_nav)) $nl_rutas_nav = [];
@@ -25,6 +26,9 @@ if (!is_array($nl_rutas_nav)) $nl_rutas_nav = [];
     <nav class="nl-nav__menu" id="nl-nav-menu" aria-label="Principal">
       <a href="index.php" class="nl-nav__link<?= $active_page === 'home' ? ' is-activo' : '' ?>">Inicio</a>
       <a href="atlas.php" class="nl-nav__link<?= $active_page === 'atlas' ? ' is-activo' : '' ?>">Atlas</a>
+      <?php if (nl_es_docente() || $active_page === 'pool'): ?>
+      <a href="pool.php" class="nl-nav__link<?= $active_page === 'pool' ? ' is-activo' : '' ?>">Pool</a>
+      <?php endif; ?>
       <div class="nl-nav__drop">
         <button type="button" class="nl-nav__pill" aria-haspopup="true" aria-expanded="false">🧪 Prácticos <span class="nl-nav__caret">▾</span></button>
         <div class="nl-nav__drop-menu">
