@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS practica_items (
     fila          TEXT,                      -- fila del cuadro comparativo que completa (morfologia | funcion | localizacion)
     celda         TEXT,                      -- texto breve que se escribe en esa celda al acertar
     nota          TEXT,                      -- "Para recordar" de la ficha
+    datos         TEXT,                      -- JSON público del ítem ({ img, pie }); ver js/mesa-practica.js
     FOREIGN KEY (nivel_id) REFERENCES practica_niveles(id)
 );
 

@@ -28,8 +28,9 @@ $instrucciones = function ($texto) use ($act) {
 
 /* «¿Para qué te sirve?» propio del nivel: data/practicos.php ('conexion' => [clave => textos | null]).
    Si el nivel no está ahí, se usa el de la actividad (actividad_carrera). null = el nivel no lo muestra. */
-$claveMesa = !empty($esTipos) && $nivelTip ? $act['slug'] . ':' . (int)$nivelTip['numero']
-           : (!empty($lamPorNiveles) && $nivelLam ? $nivelLam['clave'] : (!empty($claveLab) ? $claveLab : $act['slug']));
+$claveMesa = !empty($esPractica) && $nivelPrac ? $act['slug'] . ':' . (int)$nivelPrac['numero']
+           : (!empty($esTipos) && $nivelTip ? $act['slug'] . ':' . (int)$nivelTip['numero']
+           : (!empty($lamPorNiveles) && $nivelLam ? $nivelLam['clave'] : (!empty($claveLab) ? $claveLab : $act['slug'])));
 $cxNivel = ['hay' => false, 'textos' => null];
 foreach (((@include __DIR__ . '/../data/practicos.php') ?: []) as $rr) {
     foreach (($rr['pasos'] ?? []) as $pp) {
@@ -59,7 +60,7 @@ $conexion = function () use ($carreras, $cxNivel) {
 };
 ?>
 <?php
-$nivelH1 = $esTipos ? $nivelTip : ($lamPorNiveles ? $nivelLam : null);
+$nivelH1 = $esTipos ? $nivelTip : (!empty($esPractica) ? (count($nivelesNav) > 1 ? $nivelPrac : null) : ($lamPorNiveles ? $nivelLam : null));
 $navBarra = $nivelesNav;
 if (!$navBarra && $esLabeling && $nivelesLab) {
     foreach ($nivelesLab as $nv) {
@@ -240,6 +241,48 @@ nl_barra([
         <div class="nl-lab__chips nl-lam__caps" id="nl-lam-caps"></div>
         <?= $conexion() ?>
         <div class="nl-lab__trabajo" id="nl-lam-trabajo" role="status" aria-live="polite"></div>
+    </aside>
+</div>
+
+<?php elseif (!empty($esPractica)):
+    // Práctica en mesa de trabajo (js/mesa-practica.js): completar (escribir) o elegir (tarjetas).
+    // Las respuestas no viajan al navegador: se revisan en api/practica_check.php.
+    $itemsP = array_map(function ($it) {
+        return ['id' => (int)$it['id'], 'e' => $it['enunciado'], 'fila' => (string)($it['fila'] ?? ''),
+                'd' => json_decode((string)($it['datos'] ?? ''), true) ?: new stdClass()];
+    }, $nivelPrac['items']);
+?>
+<div class="nl-mesa nl-mesa--tipos container" id="nl-mprac"
+     data-slug="<?= htmlspecialchars($act['slug']) ?>"
+     data-titulo="<?= htmlspecialchars($act['titulo']) ?>"
+     data-nivel="<?= (int)$nivelPrac['id'] ?>"
+     data-numero="<?= (int)$nivelPrac['numero'] ?>"
+     data-romano="<?= htmlspecialchars($nivelPrac['romano']) ?>"
+     data-titulo-nivel="<?= htmlspecialchars($nivelPrac['titulo']) ?>"
+     data-tipo="<?= htmlspecialchars($nivelPrac['tipo'] ?: 'completar') ?>"
+     data-ultimo="<?= $nivelPrac['ultimo'] ? '1' : '' ?>"
+     data-requiere="<?= htmlspecialchars($nivelPrac['requiere']) ?>"
+     data-siguiente="<?= htmlspecialchars($siguientePrac) ?>"
+     data-items="<?= htmlspecialchars(json_encode($itemsP, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-opciones="<?= htmlspecialchars(json_encode(array_values($nivelPrac['opciones'] ?? []), JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+    <div class="nl-lab__candado" hidden>
+        <strong>🔒 Nivel bloqueado</strong>
+        <p>Completa primero el nivel anterior para desbloquear este.</p>
+    </div>
+    <div class="nl-mesa__vista">
+        <div class="nl-tip__vista" id="nl-mprac-vista"></div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?= $instrucciones($nivelPrac['instrucciones']) ?>
+        <div class="nl-lab__estado">
+            <span class="nl-lab__contador" id="nl-mprac-contador">0 / <?= count($itemsP) ?></span>
+            <span class="nl-lab__errores" id="nl-mprac-errores"></span>
+            <button type="button" class="nl-lab__reset" id="nl-mprac-reset">Empezar de nuevo</button>
+        </div>
+        <div class="nl-lab__chips" id="nl-mprac-chips"></div>
+        <div class="nl-tip__progreso" id="nl-mprac-progreso"></div>
+        <?= $conexion() ?>
+        <div class="nl-lab__trabajo" id="nl-mprac-trabajo" role="status" aria-live="polite"></div>
     </aside>
 </div>
 

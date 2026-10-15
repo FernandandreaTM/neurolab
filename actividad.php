@@ -64,7 +64,7 @@ try {
         $sn->execute([$act['id']]);
         $niveles = $sn->fetchAll();
         // Ojo: la respuesta NO se selecciona; se revisa en api/practica_check.php
-        $si = $pdo->prepare("SELECT id, enunciado FROM practica_items WHERE nivel_id = ? ORDER BY orden, id");
+        $si = $pdo->prepare("SELECT id, enunciado, fila, datos FROM practica_items WHERE nivel_id = ? ORDER BY orden, id");
         // Nivel "elegir": los botones son todas las respuestas posibles del nivel (sin decir cuál va en cada ítem)
         $so = $pdo->prepare("SELECT respuesta FROM practica_items WHERE nivel_id = ? GROUP BY respuesta ORDER BY MIN(orden), MIN(id)");
         foreach ($niveles as $k => $n) {
@@ -173,6 +173,24 @@ try {
         }
     }
 
+    // --- Práctica por niveles en mesa de trabajo (completar · elegir; js/mesa-practica.js): un nivel por página ---
+    $esPractica = false; $nivelPrac = null; $siguientePrac = '';
+    if (!$esTipos && !empty($niveles)) {
+        $jugP = array_values(array_filter($niveles, function ($n) { return (int)$n['activo'] && !empty($n['items']); }));
+        if ($jugP) {
+            $esPractica = true;
+            $pedido = isset($_GET['nivel']) ? (int)$_GET['nivel'] : 0;
+            $iP = 0;
+            foreach ($jugP as $k => $n) { if ((int)$n['numero'] === $pedido) $iP = $k; }
+            $nivelPrac = $jugP[$iP];
+            $nivelesNav = nl_nav_niveles($act['slug'], $ruta, array_map(function ($n) { return [(int)$n['numero'], $n['titulo']]; }, $jugP), $iP);
+            $nivelPrac['romano'] = nl_romano($iP);
+            $nivelPrac['requiere'] = $iP > 0 ? $act['slug'] . ':' . (int)$jugP[$iP - 1]['numero'] : '';
+            $siguientePrac = isset($jugP[$iP + 1]) ? $nivelesNav[$iP + 1]['href'] : '';
+            $nivelPrac['ultimo'] = !isset($jugP[$iP + 1]);
+        }
+    }
+
     // Quiz sin recurso visual: se muestra en el panel principal (no en la columna lateral)
     $quizEnStage = ($act['tipo'] === 'quiz') && empty($recursos) && !empty($quicesData);
 
@@ -192,7 +210,7 @@ try {
     }
     // Todo va en mesa de trabajo (vista a la izquierda, panel a la derecha). Lo que no tiene motor
     // propio usa la mesa genérica: recursos (imagen, simulador, ficha) en la vista y la tarea en el panel.
-    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esQuiz || (is_array($tareas) && $tieneIframe));
+    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
     $modoMesa = !(is_array($tareas) && !$tieneIframe);
     // Sin motor propio: si la actividad no está lista (o no tiene recurso), la ficha va como pestaña
     $sinMotor = $esGenerica;
@@ -332,7 +350,7 @@ try {
 
     <?php endif; ?>
 
-    <?php if (!empty($niveles) && !$esTipos): ?>
+    <?php if (!empty($niveles) && !$esTipos && !$esPractica): ?>
     <section class="nl-prac container" id="nl-prac" data-slug="<?= htmlspecialchars($act['slug']) ?>">
         <div class="nl-prac__head">
             <span class="label">Práctica</span>
@@ -448,6 +466,8 @@ try {
     <?php endif; ?>
     <?php if ($esTipos): ?>
     <script type="module" src="js/tipos.js?v=<?= nl_ver('js/tipos.js') ?>"></script>
+    <?php elseif ($esPractica): ?>
+    <script type="module" src="js/mesa-practica.js?v=<?= nl_ver('js/mesa-practica.js') ?>"></script>
     <?php elseif (!empty($niveles)): ?>
     <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
     <?php endif; ?>

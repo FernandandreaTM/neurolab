@@ -578,8 +578,18 @@
 .nl-tip__dorso strong, .nl-tip__carta-nom { hyphens: manual; overflow-wrap: anywhere; }
 
 /* ============================================================
-   NeuroLab — mesa genérica (actividades sin motor propio)
+   NeuroLab — práctica en mesa (js/mesa-practica.js) y mesa genérica
    ============================================================ */
+#nl-mprac .nl-tip__vista { width: calc(var(--alto) * 1.25); }
+.nl-cartas { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.nl-cartas .nl-tip__carta-nom { font-size: clamp(.78rem, 1.15vw, .95rem); overflow-wrap: anywhere; hyphens: auto; }
+.nl-tip__hueco.is-lleno { color: #4ADE80; letter-spacing: 0; border-bottom: 2px solid rgba(74,222,128,.5); }
+.nl-mprac__fig { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+.nl-mprac__fig img { max-height: calc(var(--alto) * .38); width: auto; border-radius: 12px; background: #fff; }
+.nl-mprac__fig figcaption { font-size: .8rem; color: #6B5B86; }
+.nl-mprac__resumen td:first-child { width: 2.2rem; text-align: center; }
+
+/* Mesa genérica: recursos en la vista */
 .nl-gen__vista { align-items: stretch; }
 .nl-gen__recursos { width: 100%; }
 .nl-gen__pane { display: none; }
@@ -589,5 +599,6 @@
 .nl-gen__pane--texto_html { background: var(--navy-mid); border: 1px solid var(--gray-700); border-radius: 14px; }
 .nl-gen__vista .nl-act-tabs { margin-bottom: .5rem; }
 @media (max-width: 900px) {
+    #nl-mprac .nl-tip__vista { width: 100%; }
     .nl-gen__pane .nl-act-iframe { height: 65vh; }
 }

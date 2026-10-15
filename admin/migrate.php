@@ -43,7 +43,7 @@ try {
         }
     }
 
-    foreach (['fila' => 'TEXT', 'celda' => 'TEXT', 'nota' => 'TEXT'] as $col => $tipo) {
+    foreach (['fila' => 'TEXT', 'celda' => 'TEXT', 'nota' => 'TEXT', 'datos' => 'TEXT'] as $col => $tipo) {
         if (add_column_if_missing($pdo, 'practica_items', $col, $tipo)) {
             $aplicadas[] = 'practica_items.' . $col;
         }
