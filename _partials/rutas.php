@@ -11,12 +11,13 @@ function nl_cargar_ruta($clave) {
     if (!isset($rutas[$clave])) return null;
     $ruta = $rutas[$clave];
     try {
-        $st = get_db()->prepare("SELECT titulo, activo FROM actividades WHERE slug = ?");
+        $st = get_db()->prepare("SELECT titulo, activo, estado FROM actividades WHERE slug = ?");
         foreach ($ruta['pasos'] as $k => $p) {
             $st->execute([$p['slug']]);
             $a = $st->fetch();
             $ruta['pasos'][$k]['act_titulo'] = $a ? $a['titulo'] : '';
             $ruta['pasos'][$k]['activo']     = $a && (int)$a['activo'] === 1;
+            $ruta['pasos'][$k]['estado']     = $a ? (string)$a['estado'] : 'en_desarrollo';
         }
     } catch (Throwable $e) {
         foreach ($ruta['pasos'] as $k => $p) { $ruta['pasos'][$k]['activo'] = true; $ruta['pasos'][$k]['act_titulo'] = ''; }

@@ -46,8 +46,18 @@ CREATE TABLE IF NOT EXISTS actividades (
     slug         TEXT    NOT NULL UNIQUE,
     titulo       TEXT    NOT NULL,
     descripcion  TEXT,                       -- descripción GENERAL (común a ambas carreras)
-    tipo         TEXT    NOT NULL,           -- lamina | simulador | comparador | labeling | quiz
+    tipo         TEXT    NOT NULL,           -- lamina | simulador | comparador | labeling | quiz | practica | herramienta | ficha
     activo       INTEGER NOT NULL DEFAULT 1,
+    -- Pool de actividades (pool.php)
+    familia      TEXT,                       -- agrupa variantes de una misma actividad
+    enfoque      TEXT    NOT NULL DEFAULT 'general',
+    estado       TEXT    NOT NULL DEFAULT 'funcionando',  -- en_desarrollo | en_revision | visado | funcionando
+    objetivo     TEXT,                       -- objetivo de aprendizaje
+    mecanica     TEXT,                       -- qué hace el estudiante
+    fuente       TEXT,                       -- guía o práctico de origen
+    enlaces      TEXT,                       -- JSON [{"t": título, "u": url, "nota": …}] recursos externos
+    herramienta  TEXT,                       -- herramienta propia que la resolvería
+    notas        TEXT,                       -- notas internas de revisión (sólo modo docente)
     created_at   TEXT    NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (topic_id) REFERENCES topics(id)
 );

@@ -1,16 +1,18 @@
 <?php
 require_once __DIR__ . '/docente.php';
 require_once __DIR__ . '/carreras.php';
+require_once __DIR__ . '/pool.php';
 /**
  * NeuroLab — _partials/barra.php
  * Barra superior común (actividad, ruta del práctico, guía): logo, volver, título,
- * niveles, switch de carrera (sólo con 2+ carreras activas en la BD) y enlace a la guía.
+ * niveles, estado de la actividad (pool), switch de carrera (sólo con 2+ carreras activas en la BD) y enlace a la guía.
  * La carrera elegida la maneja js/carrera.js (localStorage nl_carrera).
  *
  * nl_barra([
  *   'volver'  => ['href', 'texto'],          // opcional
  *   'titulo'  => 'Texto del título',         // opcional
  *   'niveles' => [['etq','titulo','href','actual'], ...],  // opcional (2 o más)
+ *   'estado'  => 'en_desarrollo',            // opcional: etiqueta del pool (no se muestra si está «funcionando»)
  *   'guia'    => 'guia.php?p=…',             // opcional: enlace «Mi guía»
  * ]);
  */
@@ -42,6 +44,9 @@ function nl_barra(array $o) {
             <?php endif; ?>
             <?php if (!empty($o['titulo'])): ?>
                 <h1 class="nl-barra__tit"><?= htmlspecialchars($o['titulo']) ?></h1>
+            <?php endif; ?>
+            <?php if (!empty($o['estado']) && $o['estado'] !== 'funcionando'): ?>
+                <?= nl_badge_estado($o['estado']) ?>
             <?php endif; ?>
             <?php if (count($niveles) > 1): ?>
             <nav class="nl-barra__niveles" aria-label="Niveles de la actividad">

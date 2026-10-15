@@ -34,6 +34,9 @@ const ICONO_TIPO = {
     comparador: '🔄',
     labeling:   '🏷️',
     quiz:       '✏️',
+    practica:   '✍️',
+    herramienta:'🧰',
+    ficha:      '📋',
 };
 
 const LABEL_TIPO = {
@@ -42,6 +45,9 @@ const LABEL_TIPO = {
     comparador: 'Comparador',
     labeling:   'Identificación',
     quiz:       'Quiz',
+    practica:   'Práctica',
+    herramienta:'Herramienta',
+    ficha:      'Seminario',
 };
 
 /* ---------------------------------------------------------------

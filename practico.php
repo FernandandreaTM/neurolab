@@ -64,6 +64,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
             <div class="nl-paso__cuerpo">
                 <div class="nl-paso__top">
                     <h2><?= htmlspecialchars($p['titulo']) ?></h2>
+                    <?php if (($p['estado'] ?? 'funcionando') !== 'funcionando'): ?><?= nl_badge_estado($p['estado']) ?><?php endif; ?>
                     <span class="nl-paso__hecho" hidden>✓ Completada</span>
                 </div>
                 <p class="nl-paso__tarea"><?= htmlspecialchars($p['tarea']) ?></p>
@@ -74,7 +75,7 @@ $seccionesActivas = array_values(array_filter($secciones, function ($s) { return
                         <?php endforeach; ?>
                     </ul>
                 <?php elseif ($p['activo']): ?>
-                    <p class="nl-paso__nota">Actividad de observación: aún no suma una sección a tu guía.</p>
+                    <p class="nl-paso__nota"><?= ($p['estado'] ?? '') === 'en_desarrollo' ? 'En preparación: por ahora muestra la propuesta y los recursos sugeridos.' : 'Actividad de observación: aún no suma una sección a tu guía.' ?></p>
                 <?php endif; ?>
                 <?php if ($p['activo']): ?>
                     <a class="btn btn-primary btn-sm nl-paso__ir" href="<?= htmlspecialchars($href) ?>">Ir a la actividad →</a>

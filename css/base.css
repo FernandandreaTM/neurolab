@@ -460,3 +460,18 @@ p {
 .nl-pie__copy { margin-top: 1rem !important; font-size: .8rem; color: #A99BC6 !important; }
 @media (max-width: 760px) { .nl-pie__in { grid-template-columns: 1fr; } }
 @media print { .nl-pie, .nl-nav { display: none !important; } }
+
+/* ============================================================
+   NeuroLab — pool de actividades: estados de revisión
+   ============================================================ */
+.nl-estado {
+    display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap;
+    font-size: .72rem; font-weight: 700; line-height: 1; padding: .3rem .55rem; border-radius: 100px;
+    border: 1px solid transparent;
+}
+.nl-estado--en_desarrollo { background: rgba(245,158,11,.14); color: #FCD34D; border-color: rgba(245,158,11,.35); }
+.nl-estado--en_revision   { background: rgba(56,189,248,.14); color: #7DD3FC; border-color: rgba(56,189,248,.35); }
+.nl-estado--visado        { background: rgba(34,197,94,.12);  color: #86EFAC; border-color: rgba(34,197,94,.35); }
+.nl-estado--funcionando   { background: rgba(34,197,94,.22);  color: #BBF7D0; border-color: rgba(34,197,94,.5); }
+.nl-card-etqs { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
+.nl-barra .nl-estado { flex: none; }

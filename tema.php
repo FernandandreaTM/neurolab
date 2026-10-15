@@ -15,6 +15,7 @@
  */
 error_reporting(0);
 require_once __DIR__ . '/api/db.php';
+require_once __DIR__ . '/_partials/pool.php';
 
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 $id   = isset($_GET['id'])   ? (int)$_GET['id']    : 0;
@@ -88,6 +89,9 @@ function nl_tipo_label($t) {
         'comparador' => '🔄 Comparador',
         'labeling'   => '🏷️ Identificación',
         'quiz'       => '✏️ Quiz',
+        'practica'   => '✍️ Práctica',
+        'herramienta'=> '🧰 Herramienta',
+        'ficha'      => '📋 Seminario',
     ];
     return isset($m[$t]) ? $m[$t] : $t;
 }
@@ -231,7 +235,7 @@ $actividades = [];
 $quices      = [];
 $recursos    = [];
 try {
-    $st = $pdo->prepare("SELECT a.id, a.topic_id, a.slug, a.titulo, a.descripcion, a.tipo,
+    $st = $pdo->prepare("SELECT a.id, a.topic_id, a.slug, a.titulo, a.descripcion, a.tipo, a.estado,
                                 t.nombre AS topic_nombre
                          FROM actividades a
                          LEFT JOIN topics t ON t.id = a.topic_id
@@ -425,6 +429,7 @@ $active_page = 'atlas';
             <?php if ((int)$a['topic_id'] !== $topicId && !empty($a['topic_nombre'])): ?>
               <span class="nl-act-card__origen">en <?= htmlspecialchars($a['topic_nombre']) ?></span>
             <?php endif; ?>
+            <?php if (($a['estado'] ?? 'funcionando') !== 'funcionando'): ?><span class="nl-card-etqs"><?= nl_badge_estado($a['estado']) ?></span><?php endif; ?>
           </a>
         <?php endforeach; ?>
       </div>

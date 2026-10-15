@@ -229,6 +229,7 @@ function renderGrid() {
             <div class="nl-act-card__title">${escapeHTML(a.titulo)}${done}</div>
             <div class="nl-act-card__desc">${escapeHTML(desc.slice(0, 120))}${desc.length > 120 ? '…' : ''}</div>
             ${tema ? `<span class="nl-act-card__origen">en ${escapeHTML(tema)}</span>` : ''}
+            ${a.estado && a.estado !== 'funcionando' ? `<span class="nl-card-etqs">${etqEstado(a.estado)}</span>` : ''}
         </a>`;
     }).join('');
 }
@@ -250,8 +251,14 @@ function tipoLabel(t) {
         comparador: '🔄 Comparador',
         labeling:   '🏷️ Identificación',
         quiz:       '✏️ Quiz',
+        practica:   '✍️ Práctica',
+        herramienta:'🧰 Herramienta',
+        ficha:      '📋 Seminario',
     })[t] || t;
 }
+
+const ESTADOS = { en_desarrollo: '🛠️ En desarrollo', en_revision: '👀 En revisión', visado: '✅ Visado', funcionando: '🟢 Funcionando' };
+function etqEstado(e) { return `<span class="nl-estado nl-estado--${escapeHTML(e)}">${ESTADOS[e] || escapeHTML(e)}</span>`; }
 
 function escapeHTML(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>

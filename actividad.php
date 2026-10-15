@@ -3,6 +3,7 @@ error_reporting(0);
 require_once __DIR__ . '/api/db.php';
 require_once __DIR__ . '/_partials/iconos_neurona.php';
 require_once __DIR__ . '/_partials/barra.php';
+require_once __DIR__ . '/_partials/pool.php';
 
 $slug = $_GET['slug'] ?? '';
 $ruta = isset($_GET['ruta']) ? preg_replace('/[^a-z0-9-]/', '', (string)$_GET['ruta']) : '';
@@ -28,6 +29,10 @@ try {
         }
     }
     $recursos = array_values($recursos);
+
+    $estadoAct = $act['estado'] ?? 'funcionando';
+    $esDocente = nl_es_docente();
+    if (NL_SOLO_FUNCIONANDO && $estadoAct !== 'funcionando' && !$esDocente) { http_response_code(404); echo "Actividad no disponible"; exit; }
 
     $cars = $pdo->prepare("
         SELECT ac.*, c.nombre AS carrera_nombre, c.slug AS carrera_slug, c.asignatura_codigo
@@ -216,6 +221,7 @@ try {
         'volver' => $ruta !== '' ? ['practico.php?p=' . rawurlencode($ruta), '← Ruta'] : ['atlas.php', '← Atlas'],
         'titulo' => $act['titulo'],
         'guia'   => 'guia.php' . ($ruta !== '' ? '?p=' . rawurlencode($ruta) : ''),
+        'estado' => $estadoAct,
     ]); ?>
 
     <div class="nl-act-layout container">
@@ -441,6 +447,9 @@ function tipoLabel($t) {
         'comparador' => 'Comparador',
         'labeling' => 'Identificación',
         'quiz' => 'Quiz',
+        'practica' => 'Práctica',
+        'herramienta' => 'Herramienta interactiva',
+        'ficha' => 'Seminario / lectura',
     ][$t] ?? $t;
 }
 
