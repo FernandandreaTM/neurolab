@@ -3,7 +3,7 @@ error_reporting(0);
 $active_page = 'home';
 
 // Stats directamente desde la BD
-$stat_actividades = 0; $stat_topics = 0; $stat_quices = 0; $root_topics = [];
+$stat_actividades = 0; $stat_topics = 0; $stat_quices = 0; $root_topics = []; $act_por_unidad = [];
 $db_path = __DIR__ . '/data/neurolab.db';
 if (file_exists($db_path)) {
     $sdb = new SQLite3($db_path, SQLITE3_OPEN_READONLY);
@@ -12,6 +12,9 @@ if (file_exists($db_path)) {
     $stat_quices      = (int)$sdb->querySingle("SELECT COUNT(*) FROM quices WHERE activo=1");
     $res = $sdb->query("SELECT id, slug, nombre, icono, tipo FROM topics WHERE parent_id IS NULL ORDER BY orden");
     while ($row = $res->fetchArray(SQLITE3_ASSOC)) $root_topics[] = $row;
+    // Actividades por unidad (incluye las de sus subtemas)
+    $res = $sdb->query("SELECT COALESCE(t.parent_id, t.id) AS raiz, COUNT(*) AS n FROM actividades a JOIN topics t ON t.id = a.topic_id WHERE a.activo = 1 GROUP BY raiz");
+    while ($row = $res->fetchArray(SQLITE3_ASSOC)) $act_por_unidad[(int)$row['raiz']] = (int)$row['n'];
     $sdb->close();
 }
 ?>
@@ -126,6 +129,7 @@ if (file_exists($db_path)) {
     border-radius: 2px;
     opacity: .6;
 }
+.nl-hero__ctas { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: .8rem; margin: 1.6rem 0 0; }
 .nl-hero__desc {
     font-size: 1.1rem;
     color: var(--gray-300);
@@ -190,10 +194,7 @@ if (file_exists($db_path)) {
     transition: border-color var(--t-base), transform var(--t-base);
     text-align: left;
 }
-.nl-feature:hover {
-    border-color: rgba(139,92,246,.3);
-    transform: translateY(-3px);
-}
+/* Tarjetas descriptivas: no son enlaces (sin efecto al pasar el mouse) */
 .nl-feature__icon {
     width: 44px; height: 44px;
     border-radius: 12px;
@@ -204,7 +205,9 @@ if (file_exists($db_path)) {
 .nl-feature__title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .4rem; }
 .nl-feature__desc { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
 
-/* --- Cuadrados inferiores + admin --- */
+/* --- Unidades temáticas (enlaces) + admin --- */
+.nl-unidades { padding-top: 3.5rem; }
+.nl-unidades__sub { color: var(--gray-300); margin-top: .4rem; }
 .nl-bottom-row {
     display: flex;
     justify-content: space-between;
@@ -310,8 +313,6 @@ if (file_exists($db_path)) {
 }
 @media (max-width: 640px) {
     .nl-hero__eyebrow { white-space: normal; max-width: 100%; }
-    .nl-hero__discipline-row { display: grid; grid-template-columns: 1fr 1fr; }
-    .nl-disc { min-width: 0; }
     .nl-hero__inner, .nl-hero__top, .nl-hero__top-left { min-width: 0; max-width: 100%; }
     .nl-modules-row { flex: 1 1 100%; min-width: 0; grid-template-columns: 1fr; }
 }
@@ -330,26 +331,13 @@ if (file_exists($db_path)) {
   <div class="container">
     <div class="nl-hero__inner">
 
-      <!-- Fila superior: logo UACH izq + 2 rectángulos interactuables der -->
+      <!-- Título -->
       <div class="nl-hero__top">
         <div class="nl-hero__top-left">
-          <div class="nl-hero__eyebrow">🧠 Sistema Nervioso · Actividades Interactivas</div>
           <h1 class="nl-hero__title">
             NeuroLab<br>
             <span class="highlight">aprende haciendo</span>
           </h1>
-        </div>
-        <div class="nl-hero__discipline-row">
-          <a href="atlas.php?tipo=estructura" class="nl-disc">
-            <div class="nl-disc__icon">🔬</div>
-            <div class="nl-disc__name">Morfología</div>
-            <div class="nl-disc__meta">Estructura del SN</div>
-          </a>
-          <a href="atlas.php?tipo=proceso" class="nl-disc">
-            <div class="nl-disc__icon">⚡</div>
-            <div class="nl-disc__name">Función</div>
-            <div class="nl-disc__meta">Fisiología del SN</div>
-          </a>
         </div>
       </div>
 
@@ -361,6 +349,11 @@ if (file_exists($db_path)) {
         pensado para que el estudio del sistema nervioso sea una experiencia activa.
       </p>
 
+      <div class="nl-hero__ctas">
+        <a href="#practicos" class="btn btn-primary">🧪 Empezar un práctico</a>
+        <a href="atlas.php" class="btn btn-ghost">🔬 Explorar actividades</a>
+      </div>
+
       <div class="nl-hero__stats">
         <div>
           <span class="nl-hero__stat-num" id="stat-actividades"><?= $stat_actividades ?></span>
@@ -368,7 +361,7 @@ if (file_exists($db_path)) {
         </div>
         <div>
           <span class="nl-hero__stat-num" id="stat-topics"><?= $stat_topics ?></span>
-          <span class="nl-hero__stat-label">módulos temáticos</span>
+          <span class="nl-hero__stat-label">unidades</span>
         </div>
         <div>
           <span class="nl-hero__stat-num" id="stat-quices"><?= $stat_quices ?></span>
@@ -440,7 +433,10 @@ if (file_exists($db_path)) {
 </section>
 
 <!-- ─── MÓDULOS + ADMIN BOX ────────────────────────── -->
-<section class="container">
+<section class="container nl-unidades">
+  <span class="label">Unidades temáticas</span>
+  <h2 class="mt-1">Explora por unidad</h2>
+  <p class="nl-unidades__sub">Entra a una unidad para ver su mapa conceptual y todas sus actividades.</p>
   <div class="nl-bottom-row">
     <div class="nl-modules-row stagger">
       <?php foreach($root_topics as $t): ?>
@@ -448,7 +444,7 @@ if (file_exists($db_path)) {
         <div class="nl-module-mini__icon"><?= htmlspecialchars($t['icono']) ?></div>
         <div>
           <div class="nl-module-mini__name"><?= htmlspecialchars($t['nombre']) ?></div>
-          <div class="nl-module-mini__cat"><?= htmlspecialchars($t['tipo'] ?? '') ?></div>
+          <div class="nl-module-mini__cat"><?= (int)($act_por_unidad[(int)$t['id']] ?? 0) ?> actividades</div>
         </div>
       </a>
       <?php endforeach; ?>
