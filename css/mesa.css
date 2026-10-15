@@ -576,3 +576,18 @@
 .nl-quiz__op.is-ok .nl-lab__alt-letra { background: #22C55E; color: #fff; }
 .nl-quiz__op.is-mal .nl-lab__alt-letra { background: var(--repasar); color: #fff; }
 .nl-tip__dorso strong, .nl-tip__carta-nom { hyphens: manual; overflow-wrap: anywhere; }
+
+/* ============================================================
+   NeuroLab — mesa genérica (actividades sin motor propio)
+   ============================================================ */
+.nl-gen__vista { align-items: stretch; }
+.nl-gen__recursos { width: 100%; }
+.nl-gen__pane { display: none; }
+.nl-gen__pane.active { display: block; }
+.nl-gen__pane .nl-act-iframe { height: calc(var(--alto) - 3.5rem); min-height: 420px; border-radius: 12px; }
+.nl-gen__pane .nl-act-img { border-radius: 12px; background: #fff; max-height: calc(var(--alto) - 3rem); object-fit: contain; }
+.nl-gen__pane--texto_html { background: var(--navy-mid); border: 1px solid var(--gray-700); border-radius: 14px; }
+.nl-gen__vista .nl-act-tabs { margin-bottom: .5rem; }
+@media (max-width: 900px) {
+    .nl-gen__pane .nl-act-iframe { height: 65vh; }
+}

@@ -475,3 +475,25 @@ p {
 .nl-estado--funcionando   { background: rgba(34,197,94,.22);  color: #BBF7D0; border-color: rgba(34,197,94,.5); }
 .nl-card-etqs { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
 .nl-barra .nl-estado { flex: none; }
+.nl-act-etqs { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: .6rem; }
+.nl-tipo { font-size: .75rem; color: var(--gray-300); }
+
+/* Recursos externos y ficha automática de la actividad */
+.nl-enlaces { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+.nl-enlaces a { color: var(--violet-light); font-size: .88rem; font-weight: 600; text-decoration: none; }
+.nl-enlaces a:hover { text-decoration: underline; }
+.nl-enlaces span { display: block; font-size: .78rem; color: var(--gray-300); }
+
+.nl-ficha { padding: 1.4rem 1.5rem; max-width: 760px; color: var(--gray-100); }
+.nl-ficha h3 { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--violet-light); margin: 1.1rem 0 .35rem; }
+.nl-ficha h3:first-child { margin-top: 0; }
+.nl-ficha p, .nl-ficha li { font-size: .95rem; line-height: 1.6; }
+.nl-ficha ul { padding-left: 1.1rem; }
+.nl-ficha a { color: var(--violet-light); }
+.nl-ficha__aviso { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; padding: .7rem .9rem; border-radius: 12px;
+    background: rgba(245,158,11,.08); border: 1px dashed rgba(245,158,11,.4); margin-bottom: .6rem; font-size: .88rem !important; }
+.nl-ficha__docente { margin-top: 1.4rem; padding: 1rem 1.1rem; border-radius: 12px; background: rgba(139,92,246,.07); border: 1px solid rgba(139,92,246,.25); }
+.nl-ficha__docente dl { display: grid; grid-template-columns: max-content 1fr; gap: .35rem .9rem; font-size: .88rem; }
+.nl-ficha__docente dt { color: var(--gray-300); font-weight: 700; }
+.nl-act-html .nl-ficha { padding: 0; }
+.nl-act-recurso-pane:has(.nl-ficha) { min-height: 0; }

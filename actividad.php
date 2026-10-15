@@ -30,9 +30,12 @@ try {
     }
     $recursos = array_values($recursos);
 
+    // Pool: recursos externos y ficha de la actividad (objetivo, mecánica, fuente)
+    $enlaces = json_decode((string)($act['enlaces'] ?? ''), true) ?: [];
     $estadoAct = $act['estado'] ?? 'funcionando';
     $esDocente = nl_es_docente();
     if (NL_SOLO_FUNCIONANDO && $estadoAct !== 'funcionando' && !$esDocente) { http_response_code(404); echo "Actividad no disponible"; exit; }
+    $fichaHtml = nl_ficha_html($act, $enlaces, $esDocente);
 
     $cars = $pdo->prepare("
         SELECT ac.*, c.nombre AS carrera_nombre, c.slug AS carrera_slug, c.asignatura_codigo
@@ -187,7 +190,15 @@ try {
         }
         if (!$preguntasQuiz) $esQuiz = false;
     }
-    $modoMesa = $esLabeling || $esTipos || $esLamina || $esQuiz || (is_array($tareas) && $tieneIframe);
+    // Todo va en mesa de trabajo (vista a la izquierda, panel a la derecha). Lo que no tiene motor
+    // propio usa la mesa genérica: recursos (imagen, simulador, ficha) en la vista y la tarea en el panel.
+    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esQuiz || (is_array($tareas) && $tieneIframe));
+    $modoMesa = !(is_array($tareas) && !$tieneIframe);
+    // Sin motor propio: si la actividad no está lista (o no tiene recurso), la ficha va como pestaña
+    $sinMotor = $esGenerica;
+    if ($esGenerica && ($estadoAct !== 'funcionando' || empty($recursos))) {
+        $recursos[] = ['tipo' => 'texto_html', 'url' => $fichaHtml, 'caption' => 'Ficha de la actividad'];
+    }
 
     $active_page = 'actividad';
     ?>
@@ -262,6 +273,17 @@ try {
                 <p class="nl-act-desc-general"><?= nl2br(htmlspecialchars($act['descripcion'] ?? '')) ?></p>
             </div>
 
+            <?php if ($enlaces): ?>
+            <div class="nl-act-section">
+                <span class="label">Recursos externos</span>
+                <ul class="nl-enlaces">
+                    <?php foreach ($enlaces as $e): ?>
+                        <li><a href="<?= htmlspecialchars($e['u']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($e['t']) ?> ↗</a><?php if (!empty($e['nota'])): ?><span><?= htmlspecialchars($e['nota']) ?></span><?php endif; ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
+
             <?php if (!empty($carreras)): ?>
             <div class="nl-act-section">
                 <span class="label">Énfasis por carrera</span>
@@ -286,9 +308,11 @@ try {
             </div>
             <?php endif; ?>
 
+            <?php if (!$sinMotor || $estadoAct !== 'en_desarrollo' || !empty($recursos) && $recursos[0]['tipo'] !== 'texto_html'): ?>
             <div class="nl-act-section">
                 <button class="btn btn-ghost btn-sm" id="nl-act-complete">✓ Marcar actividad como completada</button>
             </div>
+            <?php endif; ?>
         </aside>
     </div>
 
@@ -451,6 +475,38 @@ function tipoLabel($t) {
         'herramienta' => 'Herramienta interactiva',
         'ficha' => 'Seminario / lectura',
     ][$t] ?? $t;
+}
+
+/** Ficha de la actividad (pestaña): objetivo, qué hace el estudiante, recursos y, en modo docente, datos de desarrollo. */
+function nl_ficha_html($act, $enlaces, $docente) {
+    $h = function ($s) { return htmlspecialchars((string)$s); };
+    $estado = $act['estado'] ?? 'funcionando';
+    $o = '<div class="nl-ficha">';
+    $avisos = [
+        'en_desarrollo' => 'Esta actividad todavía se está preparando: aquí está la propuesta. Puedes revisar los recursos sugeridos mientras tanto.',
+        'en_revision'   => 'Esta actividad ya funciona, pero su contenido está en revisión: puede cambiar.',
+        'visado'        => 'Contenido revisado; la actividad se publicará pronto.',
+    ];
+    if (isset($avisos[$estado])) {
+        $o .= '<p class="nl-ficha__aviso">' . nl_badge_estado($estado) . ' ' . $avisos[$estado] . '</p>';
+    }
+    if (!empty($act['objetivo'])) $o .= '<h3>Objetivo</h3><p>' . $h($act['objetivo']) . '</p>';
+    if (empty($act['objetivo']) && empty($act['mecanica']) && !empty($act['descripcion'])) $o .= '<h3>Descripción</h3><p>' . nl2br($h($act['descripcion'])) . '</p>';
+    if (!empty($act['mecanica'])) $o .= '<h3>' . ($estado === 'en_desarrollo' ? 'Qué harás (propuesta)' : 'Qué harás') . '</h3><p>' . $h($act['mecanica']) . '</p>';
+    if ($enlaces) {
+        $o .= '<h3>Recursos externos</h3><ul>';
+        foreach ($enlaces as $e) $o .= '<li><a href="' . $h($e['u']) . '" target="_blank" rel="noopener">' . $h($e['t']) . ' ↗</a></li>';
+        $o .= '</ul>';
+    }
+    if ($docente) {
+        $o .= '<div class="nl-ficha__docente"><h3>Para el equipo docente</h3><dl>'
+            . '<dt>Familia</dt><dd>' . $h($act['familia'] ?? '—') . '</dd>'
+            . '<dt>Fuente</dt><dd>' . $h($act['fuente'] ?? '—') . '</dd>'
+            . (!empty($act['herramienta']) ? '<dt>Herramienta propia</dt><dd>' . $h(nl_herramienta($act['herramienta'])) . '</dd>' : '')
+            . (!empty($act['notas']) ? '<dt>Notas de revisión</dt><dd>' . nl2br($h($act['notas'])) . '</dd>' : '')
+            . '</dl><p><a href="pool.php#' . $h($act['slug']) . '">Cambiar estado en el pool →</a></p></div>';
+    }
+    return $o . '</div>';
 }
 
 /** Número romano de un nivel (índice 0 -> "I"). */

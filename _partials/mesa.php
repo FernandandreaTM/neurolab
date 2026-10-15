@@ -243,6 +243,60 @@ nl_barra([
     </aside>
 </div>
 
+<?php elseif (!empty($esGenerica)):
+    // Mesa genérica: recursos (imagen, simulador, ficha) en la vista; descripción, enlaces y cierre en el panel.
+?>
+<div class="nl-mesa nl-mesa--lamina container" id="nl-gen">
+    <div class="nl-mesa__vista nl-gen__vista">
+        <?php if (count($recursos) > 1): ?>
+        <div class="nl-act-tabs" id="recursos-tabs">
+            <?php foreach ($recursos as $i => $r): ?>
+                <button class="nl-act-tab <?= $i === 0 ? 'active' : '' ?>" data-i="<?= $i ?>"><?= tabLabel($r) ?></button>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <div class="nl-gen__recursos" id="recursos-container">
+            <?php foreach ($recursos as $i => $r): ?>
+                <div class="nl-act-recurso-pane nl-gen__pane <?= $i === 0 ? 'active' : '' ?> nl-gen__pane--<?= htmlspecialchars($r['tipo']) ?>" data-i="<?= $i ?>">
+                    <?= renderRecurso($r) ?>
+                    <?php if (!empty($r['caption']) && $r['tipo'] !== 'texto_html'): ?><p class="nl-mesa__caption"><?= htmlspecialchars($r['caption']) ?></p><?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?php if (!empty($act['mecanica'])): ?>
+            <?= $instrucciones(htmlspecialchars($act['mecanica'])) ?>
+        <?php endif; ?>
+        <div class="nl-lab__trabajo">
+            <p class="nl-lab__paso"><?= htmlspecialchars($act['titulo']) ?></p>
+            <p><?= nl2br(htmlspecialchars($act['descripcion'] ?? '')) ?></p>
+            <p class="nl-act-etqs"><span class="nl-tipo"><?= htmlspecialchars(tipoLabel($act['tipo'])) ?></span></p>
+        </div>
+        <?php foreach ((array)$carreras as $c): ?>
+        <?php if (!empty($c['descripcion'])): ?>
+        <div class="nl-lab__trabajo" data-carrera="<?= htmlspecialchars($c['carrera_slug']) ?>">
+            <p class="nl-lab__paso">¿Para qué te sirve? · <?= htmlspecialchars($c['carrera_nombre']) ?></p>
+            <p><?= nl2br(htmlspecialchars($c['descripcion'])) ?></p>
+        </div>
+        <?php endif; ?>
+        <?php endforeach; ?>
+        <?php if (!empty($enlaces)): ?>
+        <div class="nl-lab__trabajo">
+            <p class="nl-lab__paso">Recursos externos</p>
+            <ul class="nl-enlaces">
+                <?php foreach ($enlaces as $e): ?>
+                    <li><a href="<?= htmlspecialchars($e['u']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($e['t']) ?> ↗</a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+        <?php if (($act['estado'] ?? '') !== 'en_desarrollo'): ?>
+            <button class="btn btn-ghost btn-sm" id="nl-act-complete">✓ Marcar actividad como completada</button>
+        <?php endif; ?>
+    </aside>
+</div>
+
 <?php else:
     // Lámina + tareas: la primera lámina (iframe) a la izquierda; guía y trabajo en el panel
     $vista = null; $textos = [];
