@@ -49,6 +49,10 @@ try {
         }
     }
 
+    foreach (['sigla' => 'TEXT', 'orden' => 'INTEGER NOT NULL DEFAULT 0'] as $col => $tipo) {
+        if (add_column_if_missing($pdo, 'carreras', $col, $tipo)) $aplicadas[] = 'carreras.' . $col;
+    }
+
     echo "<h2 style='font-family:sans-serif;color:#1A0E2E'>NeuroLab — migración OK</h2>";
     echo "<p style='font-family:sans-serif'>Base creada/actualizada en <code>{$dbPath}</code></p>";
     if ($aplicadas) {

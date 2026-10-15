@@ -7,6 +7,8 @@
  * $active_page: 'home' | 'atlas' | 'tema'
  */
 $active_page = $active_page ?? 'home';
+require_once __DIR__ . '/carreras.php';
+echo nl_carreras_script();
 $nl_rutas_nav = @include __DIR__ . '/../data/practicos.php';
 if (!is_array($nl_rutas_nav)) $nl_rutas_nav = [];
 ?>

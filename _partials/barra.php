@@ -1,9 +1,10 @@
 <?php
 require_once __DIR__ . '/docente.php';
+require_once __DIR__ . '/carreras.php';
 /**
  * NeuroLab — _partials/barra.php
  * Barra superior común (actividad, ruta del práctico, guía): logo, volver, título,
- * niveles, switch de carrera (TO por defecto ⇄ Fono) y enlace a la guía.
+ * niveles, switch de carrera (sólo con 2+ carreras activas en la BD) y enlace a la guía.
  * La carrera elegida la maneja js/carrera.js (localStorage nl_carrera).
  *
  * nl_barra([
@@ -29,7 +30,7 @@ function nl_barra(array $o) {
     $niveles = $o['niveles'] ?? [];
     echo nl_importmap_tag();
     ?>
-    <script>try { document.documentElement.dataset.carrera = localStorage.getItem('nl_carrera') || 'terapia-ocupacional'; } catch (e) { document.documentElement.dataset.carrera = 'terapia-ocupacional'; }</script>
+    <?= nl_carreras_script() ?>
     <header class="nl-barra">
         <div class="nl-barra__in">
             <a class="nl-barra__logo" href="index.php" title="NeuroLab — inicio">
@@ -54,10 +55,7 @@ function nl_barra(array $o) {
             </nav>
             <?php endif; ?>
             <div class="nl-barra__der">
-                <div class="nl-carrera" role="radiogroup" aria-label="Tu carrera">
-                    <button type="button" role="radio" class="nl-carrera__op" data-carrera-btn="terapia-ocupacional" title="Terapia Ocupacional">TO</button>
-                    <button type="button" role="radio" class="nl-carrera__op" data-carrera-btn="fonoaudiologia" title="Fonoaudiología">Fono</button>
-                </div>
+                <?= nl_carreras_switch() ?>
                 <?php if (!empty($o['guia'])): ?>
                     <a class="nl-barra__guia" href="<?= htmlspecialchars($o['guia']) ?>" title="Mi guía de estudio">📘<span> Mi guía</span></a>
                 <?php endif; ?>

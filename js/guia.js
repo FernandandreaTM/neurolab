@@ -17,7 +17,7 @@
  *   { t: 'imagenes', items: [{ src: 'data:image/jpeg;base64,…' | 'idb:…', titulo, pie }] }
  *   { t: 'conexion', items: [{ c: 'terapia-ocupacional', txt }] }   (se muestra sólo la carrera activa)
  */
-import { carrera } from './carrera.js';
+import { carrera, CARRERAS } from './carrera.js';
 
 const KEY = 'nl_guia';
 const VERSION = 2;
@@ -248,9 +248,9 @@ export function renderBloque(b, car = carrera()) {
         </table></div>`;
     }
     if (b.t === 'conexion') {
-        const it = (b.items || []).filter(i => i.c === car);
+        const it = (b.items || []).filter(i => i.c === car || i.c === 'comun');
         return it.length ? `<aside class="nl-g-conexion"><span aria-hidden="true">💡</span><div><strong>¿Para qué te sirve?</strong>${it.map(i =>
-            `<p>${esc(String(i.txt).replace(/^(Terapia Ocupacional|Fonoaudiología):\s*/, ''))}</p>`).join('')}</div></aside>` : '';
+            `<p>${esc(String(i.txt).replace(new RegExp('^(' + Object.values(CARRERAS).join('|') + '):\\s*'), ''))}</p>`).join('')}</div></aside>` : '';
     }
     if (b.t === 'lista') return `<ul class="nl-g-lista">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
     if (b.t === 'texto') return `<p class="nl-g-texto">${esc(b.txt)}</p>`;

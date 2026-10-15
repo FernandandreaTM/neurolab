@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS carreras (
     nombre          TEXT    NOT NULL,
     asignatura_codigo TEXT  NOT NULL,
     descripcion     TEXT,
-    activo          INTEGER NOT NULL DEFAULT 1,
+    sigla           TEXT,                    -- texto corto del switch (TO, Fono…)
+    orden           INTEGER NOT NULL DEFAULT 0,
+    activo          INTEGER NOT NULL DEFAULT 1,  -- sólo las activas aparecen (admin/carreras.php)
     created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 

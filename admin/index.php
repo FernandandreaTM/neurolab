@@ -51,6 +51,14 @@
 
     <div class="nl-admin-card">
         <div>
+            <h3>🎓 Carreras</h3>
+            <p>Activa o desactiva carreras y edita su sigla y orden. Con dos o más activas aparece el switch de carrera.</p>
+        </div>
+        <a href="carreras.php" class="btn btn-ghost btn-sm">Administrar carreras →</a>
+    </div>
+
+    <div class="nl-admin-card">
+        <div>
             <h3>📋 Estado de la BD</h3>
             <p>
             <?php

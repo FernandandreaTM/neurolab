@@ -43,8 +43,8 @@ foreach (((@include __DIR__ . '/../data/practicos.php') ?: []) as $rr) {
 $conexion = function () use ($carreras, $cxNivel) {
     $items = [];
     if ($cxNivel['hay']) {
-        $nombres = ['terapia-ocupacional' => 'Terapia Ocupacional', 'fonoaudiologia' => 'Fonoaudiología'];
-        foreach ((array)$cxNivel['textos'] as $slug => $txt) $items[] = [$slug, $nombres[$slug] ?? $slug, $txt];
+        $nombres = nl_carreras();
+        foreach ((array)$cxNivel['textos'] as $slug => $txt) $items[] = [$slug, $nombres[$slug]['nombre'] ?? $slug, $txt];
     } else {
         foreach ((array)$carreras as $c) $items[] = [$c['carrera_slug'], $c['carrera_nombre'], $c['descripcion'] ?? ''];
     }
@@ -180,7 +180,7 @@ nl_barra([
         <div class="nl-tip__vista" id="nl-quiz-vista"></div>
     </div>
     <aside class="nl-mesa__panel">
-        <?= $instrucciones('Una sola oportunidad por pregunta. Las preguntas son un <strong>pool común</strong> más casos de <strong>tu carrera</strong> (cámbiala con el botón TO / Fono de arriba). Algunas se responden tocando una <strong>tarjeta</strong>. <strong>Verde</strong>: correcta. <strong>Rojo</strong>: por repasar.') ?>
+        <?= $instrucciones('Una sola oportunidad por pregunta. Las preguntas son un <strong>pool común</strong>' . (count(nl_carreras()) > 1 ? ' más casos de <strong>tu carrera</strong> (cámbiala con el selector de carrera de arriba)' : '') . '. Algunas se responden tocando una <strong>tarjeta</strong>. <strong>Verde</strong>: correcta. <strong>Rojo</strong>: por repasar.') ?>
         <div class="nl-lab__estado">
             <span class="nl-lab__contador" id="nl-quiz-contador"></span>
             <span class="nl-quiz__puntos" id="nl-quiz-puntos"></span>

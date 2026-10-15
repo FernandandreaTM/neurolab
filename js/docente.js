@@ -4,6 +4,7 @@
  * · En la ruta del práctico: «Completar todo» (nivel por nivel, en orden, y abre la guía) y «Reiniciar».
  * La lámina se completa con una imagen de ejemplo en vez de las capturas.
  */
+import { carrera } from './carrera.js';
 const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz');
 const url = new URL(location.href);
 
@@ -66,7 +67,7 @@ async function completarNivel() {
         poner('nl_lam_' + d.clave, est);
     } else if (raiz.id === 'nl-quiz') {
         const todas = JSON.parse(d.preguntas || '[]');
-        const car = localStorage.getItem('nl_carrera') || 'terapia-ocupacional';
+        const car = carrera();
         const pool = todas.filter(q => q.carrera === 'comun' || q.carrera === car);
         const resp = {};
         pool.forEach(q => { resp[q.id] = q.correcta; });

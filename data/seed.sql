@@ -15,10 +15,10 @@ DELETE FROM topics;
 DELETE FROM carreras;
 DELETE FROM sqlite_sequence WHERE name IN ('carreras','topics','actividades','actividad_recursos','actividad_carrera','labeling_parts','quices','topic_recursos','practica_niveles','practica_items');
 
--- Carreras
-INSERT OR IGNORE INTO carreras (id, slug, nombre, asignatura_codigo, descripcion) VALUES
-  (1, 'fonoaudiologia', 'Fonoaudiología', 'ETMP061', 'Estudio del sistema nervioso con énfasis en comunicación, lenguaje, audición y fonación.'),
-  (2, 'terapia-ocupacional', 'Terapia Ocupacional', 'ETMP097', 'Estudio del sistema nervioso con énfasis en control motor, integración sensorial y ocupación.');
+-- Carreras: sólo las activas aparecen (admin/carreras.php); la de menor orden es la por defecto (TO).
+INSERT OR IGNORE INTO carreras (id, slug, nombre, asignatura_codigo, sigla, orden, activo, descripcion) VALUES
+  (1, 'fonoaudiologia', 'Fonoaudiología', 'ETMP061', 'Fono', 2, 1, 'Estudio del sistema nervioso con énfasis en comunicación, lenguaje, audición y fonación.'),
+  (2, 'terapia-ocupacional', 'Terapia Ocupacional', 'ETMP097', 'TO', 1, 1, 'Estudio del sistema nervioso con énfasis en control motor, integración sensorial y ocupación.');
 
 -- Topics: tronco común (5 temas raíz)
 INSERT OR IGNORE INTO topics (id, slug, nombre, parent_id, icono, tipo, orden) VALUES

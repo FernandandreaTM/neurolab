@@ -1,13 +1,17 @@
 /**
  * NeuroLab — carrera.js
- * Modo de carrera del estudiante: 'terapia-ocupacional' (por defecto) o 'fonoaudiologia'.
- * Se guarda en localStorage (nl_carrera) y se marca en <html data-carrera="…">; el CSS oculta
- * todo lo marcado con data-carrera de la otra carrera («¿Para qué te sirve?», guía…).
+ * Carrera activa del estudiante. La lista viene de la BD (window.NL_CARRERAS, ver _partials/carreras.php);
+ * la primera es la carrera por defecto. Se guarda en localStorage (nl_carrera) y se marca en
+ * <html data-carrera="…">; se oculta todo lo marcado con data-carrera de otra carrera («¿Para qué te sirve?», guía…).
  * El switch es cualquier botón [data-carrera-btn]. Al cambiar se emite 'nl:carrera'.
  */
-export const CARRERAS = { 'terapia-ocupacional': 'Terapia Ocupacional', 'fonoaudiologia': 'Fonoaudiología' };
+const DATOS = (typeof window !== 'undefined' && window.NL_CARRERAS) || { general: { n: 'General', s: 'General' } };
+/** { slug: nombre } */
+export const CARRERAS = Object.fromEntries(Object.entries(DATOS).map(([k, v]) => [k, v.n]));
+/** { slug: sigla } */
+export const SIGLAS = Object.fromEntries(Object.entries(DATOS).map(([k, v]) => [k, v.s || v.n]));
 const KEY = 'nl_carrera';
-const DEF = 'terapia-ocupacional';
+const DEF = Object.keys(CARRERAS)[0];
 
 export function carrera() {
     let c = null;
@@ -25,6 +29,9 @@ export function ponerCarrera(c) {
 function pintar() {
     const c = carrera();
     document.documentElement.dataset.carrera = c;
+    let st = document.getElementById('nl-carrera-css');
+    if (!st) { st = document.createElement('style'); st.id = 'nl-carrera-css'; document.head.appendChild(st); }
+    st.textContent = `[data-carrera]:not(html):not([data-carrera="comun"]):not([data-carrera="${c}"]){display:none!important}`;
     document.querySelectorAll('[data-carrera-btn]').forEach(b => {
         const on = b.dataset.carreraBtn === c;
         b.classList.toggle('active', on);

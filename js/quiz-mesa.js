@@ -10,7 +10,7 @@
  */
 import { markDone } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
-import { carrera, CARRERAS } from './carrera.js';
+import { carrera, CARRERAS, SIGLAS } from './carrera.js';
 
 const RAIZ = document.getElementById('nl-quiz');
 const KEY_BASE = 'nl_quiz_';
@@ -70,7 +70,7 @@ function iniciar(raiz) {
     const ok = id => est.resp[id] === q(id).correcta;
     const hechas = () => est.orden.filter(id => est.resp[id] != null).length;
     const aciertos = () => est.orden.filter(id => est.resp[id] != null && ok(id)).length;
-    const etqCarrera = x => x.carrera === 'comun' ? 'Común' : (x.carrera === 'fonoaudiologia' ? 'Fono' : 'TO');
+    const etqCarrera = x => x.carrera === 'comun' ? 'Común' : (SIGLAS[x.carrera] || x.carrera);
     /** Orden de las alternativas (fijo para cada estudiante; las tarjetas no se barajan). */
     function opciones(id) {
         const x = q(id);

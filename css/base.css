@@ -375,8 +375,7 @@ p {
 @media print { .nl-barra { display: none; } }
 
 /* Modo de carrera: se oculta lo de la otra carrera */
-html[data-carrera="terapia-ocupacional"] [data-carrera="fonoaudiologia"],
-html[data-carrera="fonoaudiologia"] [data-carrera="terapia-ocupacional"] { display: none !important; }
+/* Textos por carrera: los oculta la regla que genera _partials/carreras.php / js/carrera.js */
 .nl-barra__logo-uach { height: 30px; opacity: 1; }
 
 /* ===============================================================
