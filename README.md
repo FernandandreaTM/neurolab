@@ -24,7 +24,7 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 | Clave | Práctico | Estado |
 |---|---|---|
 | `celulas-1` | Células nerviosas I: la neurona | **En uso con estudiantes** |
-| `celulas-2` | Células nerviosas II: circuitos y glía | En desarrollo |
+| `celulas-2` | Células nerviosas II: circuitos y glía | **Listo para revisión** (contenido completo; faltan íconos de glía) |
 | — | Potencial de acción · Sinapsis | Planificados |
 
 ### Ruta de `celulas-1`
@@ -35,6 +35,15 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 | 2 | Tipos de neurona | 2 | I: armar multipolar/bipolar/pseudounipolar y marcar entrada/salida · II: frases → tarjetas → cuadro comparativo | Dibujos con flecha + cuadro |
 | 3 | Lámina: neuronas reales | 3 | Corte sagital de rata: orientarse, **Capturar** y etiquetar piramidal y Purkinje (Golgi), comparar con cresil violeta | Capturas + preguntas |
 | 4 | Quiz de cierre | 1 | 18 preguntas, conceptos → casos de la carrera activa | Resultado + explicaciones |
+
+### Ruta de `celulas-2`
+
+| # | Actividad | Niveles | Mecánica | Va a la guía |
+|---|---|---|---|---|
+| 1 | Circuito reflejo | 2 | I: capturar y etiquetar médula + ganglio (MH-047) · II: **sobre la propia captura**, ubicar neurona sensitiva, interneurona y motoneurona, conectarlas en orden (impulso animado) y responder | Captura etiquetada + circuito dibujado |
+| 2 | Glía del SNC | 3 | I: escribir la célula que describe cada frase · II: canal central y sustancia blanca (MHS-240, H&E) · III: motoneurona y su glía (UCSF-163, cresil) | Tabla + capturas + preguntas |
+| 3 | Glía del SNP | 3 | I: frases → tarjetas → cuadro SNC/SNP · II: ganglio y células satélite (MH-051) · III: nervio periférico (MH-052) | Cuadro + capturas + preguntas |
+| 4 | Quiz de cierre | 1 | 15 preguntas (7 conceptos + 4 casos + 4 de la carrera), algunas con tarjetas | Resultado + explicaciones |
 
 Cada nivel puede tener un recuadro **«¿Para qué te sirve?»** propio de TO o Fono.
 
@@ -58,7 +67,9 @@ Cada nivel puede tener un recuadro **«¿Para qué te sirve?»** propio de TO o 
 | Mesa de trabajo (contenedor de actividades) | `_partials/mesa.php`, `css/mesa.css` |
 | Identificación de partes | `js/labeling.js`, `api/labeling_check.php` |
 | Armar neuronas / tarjetas / cuadro | `js/tipos.js`, `js/armar-neurona.js`, `_partials/iconos_neurona.php` |
-| Lámina virtual y Capturar | `js/lamina.js` |
+| Lámina virtual y Capturar | `js/lamina.js` (niveles `identificar` · `capturas` · `practica` · `circuito` en el recurso «tareas») |
+| Circuito sobre la captura | `js/circuito.js`, `api/circuito_check.php` |
+| Práctica en mesa (completar · elegir) | `js/mesa-practica.js`, `api/practica_check.php` |
 | Quiz | `js/quiz-mesa.js` |
 | Switch de carrera | `_partials/barra.php`, `js/carrera.js` |
 | Inicio, menú, pie (recursos, equipo) | `index.php`, `_partials/nav.php`, `_partials/footer.php` |

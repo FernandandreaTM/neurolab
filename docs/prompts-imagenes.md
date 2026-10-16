@@ -85,3 +85,32 @@ Los tres niveles usan la MISMA neurona:
 |---|---|---|
 | `img/neurona-base.jpg` | `img/_fuentes/base-espinas.png` (ChatGPT: imagen 2 sin zooms + espinas en todas las dendritas) | I y II |
 | `img/neurona-nivel3-zoom.jpg` | Composición: 4 zooms (A espina = `_fuentes/zoom-espina.png`, B axón, C cono y D botón = `_fuentes/neurona-nivel2-actina.png`) + miniatura de la base con líneas | III |
+
+## 4. Práctico II · Íconos de glía → `img/glia/<nombre>.png`
+
+Se usan solos en las tarjetas (Glía del SNP nivel I y quiz de cierre) apenas se suben con el nombre exacto:
+no hay que tocar código (`_partials/iconos_neurona.php` busca en `img/tipos/` y `img/glia/`).
+Adjunta `img/tipos/multipolar.png` como referencia de estilo y usa este bloque común:
+
+```
+Adjunto un ícono de referencia. Crea un ÍCONO cuadrado (1024 × 1024 px) con exactamente el
+mismo estilo: ilustración médico-educativa semi-realista y limpia, trazo grueso, fondo blanco
+puro, SIN texto, SIN letras, SIN números. La célula centrada, ocupando ~80 % del cuadro, con
+silueta muy reconocible a tamaño pequeño (se verá a 40–60 px). La célula glial en verde
+azulado (#14B8A6 a #99F6E4); si aparece una neurona o un axón, en lila (#8B5CF6 a #C4B5FD)
+y la mielina en celeste translúcido.
+Célula: [DESCRIPCIÓN]
+```
+
+| Archivo | [DESCRIPCIÓN] |
+|---|---|
+| `astrocito.png` | ASTROCITO: soma pequeño con muchas prolongaciones en forma de estrella; una de ellas termina en un «pie» ensanchado que abraza un capilar (tubo rojo corto). |
+| `oligodendrocito.png` | OLIGODENDROCITO: soma redondo pequeño con 4 prolongaciones; cada una se enrolla como vaina de mielina alrededor de un axón distinto (4 axones lila paralelos). |
+| `microglia.png` | MICROGLÍA: soma pequeño y alargado con prolongaciones finas, cortas y muy ramificadas, como un arbusto; junto a ella un pequeño resto celular que está fagocitando. |
+| `celula-ependimaria.png` | CÉLULAS EPENDIMARIAS: 3 células cúbicas en fila, una al lado de la otra, con cilios finos en su borde superior (hacia una cavidad celeste clara que representa el LCR). |
+| `celula-de-schwann.png` | CÉLULA DE SCHWANN: un segmento de axón lila horizontal envuelto por UNA sola vaina de mielina celeste en espiral, con el núcleo aplanado de la célula sobre la vaina; a cada lado, un nodo de Ranvier (axón desnudo). |
+| `celula-satelite.png` | CÉLULAS SATÉLITE: un soma neuronal grande y redondo (lila) rodeado por un anillo de 6–8 células pequeñas y aplanadas, como una cápsula. |
+
+Opcional, para el circuito reflejo: `img/tipos/interneurona.png` (neurona MULTIPOLAR pequeña con
+pocas dendritas cortas y un axón corto que no sale del dibujo). Si la subes, avísame para usarla
+en lugar del ícono multipolar.
