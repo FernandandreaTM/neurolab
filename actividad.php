@@ -211,7 +211,9 @@ try {
     // Todo va en mesa de trabajo (vista a la izquierda, panel a la derecha). Lo que no tiene motor
     // propio usa la mesa genérica: recursos (imagen, simulador, ficha) en la vista y la tarea en el panel.
     $esGenerica = !($esLabeling || $esTipos || $esLamina || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
-    $modoMesa = !(is_array($tareas) && !$tieneIframe);
+    // Las que tienen motor propio (lámina, identificación, tipos, quiz, práctica) siempre van en mesa;
+    // las genéricas también, salvo tareas sin lámina en iframe (diseño con sección «Tu trabajo»).
+    $modoMesa = !$esGenerica || !(is_array($tareas) && !$tieneIframe);
     // Sin motor propio: si la actividad no está lista (o no tiene recurso), la ficha va como pestaña
     $sinMotor = $esGenerica;
     if ($esGenerica && ($estadoAct !== 'funcionando' || empty($recursos))) {
