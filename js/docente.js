@@ -5,7 +5,7 @@
  * La lámina se completa con una imagen de ejemplo en vez de las capturas.
  */
 import { carrera } from './carrera.js';
-const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz');
+const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ');
 const url = new URL(location.href);
 
 function leer(k, def) { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? def; } catch { return def; } }
@@ -54,6 +54,21 @@ async function completarNivel() {
     } else if (raiz.id === 'nl-tip') {
         const { items } = await api({ tipo: 'practica', nivel: d.nivel });
         poner('nl_tipos_' + d.nivel, { items, err: 0 });
+    } else if (raiz.id === 'nl-mprac') {
+        const { items } = await api({ tipo: 'practica', nivel: d.nivel });
+        poner('nl_mprac_' + d.nivel, { items, mal: {}, err: 0 });
+    } else if (raiz.id === 'nl-circ') {
+        const base = JSON.parse(d.base || '{}');
+        const { piezas, orden } = await api({ tipo: 'circuito', slug: d.slug, n: d.n });
+        const pines = ((leer('nl_lam_' + base.clave, {}).caps || {})[base.captura] || {}).pines || {};
+        const est = { pos: {}, ok: {}, mal: {}, exp: {}, seq: [], preg: {}, err: 0, orden: true, listo: true, ordenOk: orden };
+        piezas.forEach((p, i) => {
+            est.pos[p.clave] = pines[p.zona] || [25 + 25 * i, 50];
+            est.ok[p.clave] = true;
+            est.exp[p.clave] = { exp: p.exp, zona: p.zona, e: 0 };
+        });
+        JSON.parse(d.preguntas || '[]').forEach((q, i) => { est.preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
+        poner('nl_circ_' + d.clave, est);
     } else if (raiz.id === 'nl-lam') {
         const caps = JSON.parse(d.capturas || '[]');
         const est = { caps: {}, err: 0 };

@@ -111,10 +111,18 @@ try {
             $imgLab     = $nivelLam['img'];
             $claveLab   = $nivelLam['clave'];
             $sigHrefLab = $nivelLam['siguiente'];
+        } elseif (($nivelLam['tipo'] ?? '') === 'practica') {
+            // Nivel de práctica (completar · elegir) dentro de la lámina: practica_niveles con numero = n
+            foreach ($niveles as $nv) {
+                if ((int)$nv['numero'] === (int)$nivelLam['n'] && !empty($nv['items'])) { $nivelPracLam = $nv; break; }
+            }
+        } elseif (($nivelLam['tipo'] ?? '') === 'circuito') {
+            $esCircuito = true;
         } else {
             $esLamina = true;
         }
     }
+    $esCircuito = !empty($esCircuito);
 
     $nivelesLab = [];   // otras actividades de identificación del mismo tema (niveles)
     $requiereLab = $lamPorNiveles ? (string)$nivelLam['requiere'] : '';
@@ -175,7 +183,14 @@ try {
 
     // --- Práctica por niveles en mesa de trabajo (completar · elegir; js/mesa-practica.js): un nivel por página ---
     $esPractica = false; $nivelPrac = null; $siguientePrac = '';
-    if (!$esTipos && !empty($niveles)) {
+    if (!empty($nivelPracLam)) {
+        $esPractica = true;
+        $nivelPrac = $nivelPracLam;
+        $nivelPrac['romano']   = $nivelLam['romano'];
+        $nivelPrac['requiere'] = $nivelLam['requiere'];
+        $nivelPrac['ultimo']   = $nivelLam['siguiente'] === '';
+        $siguientePrac = $nivelLam['siguiente'];
+    } elseif (!$esTipos && !$lamPorNiveles && !empty($niveles)) {
         $jugP = array_values(array_filter($niveles, function ($n) { return (int)$n['activo'] && !empty($n['items']); }));
         if ($jugP) {
             $esPractica = true;
@@ -210,7 +225,7 @@ try {
     }
     // Todo va en mesa de trabajo (vista a la izquierda, panel a la derecha). Lo que no tiene motor
     // propio usa la mesa genérica: recursos (imagen, simulador, ficha) en la vista y la tarea en el panel.
-    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
+    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esCircuito || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
     // Las que tienen motor propio (lámina, identificación, tipos, quiz, práctica) siempre van en mesa;
     // las genéricas también, salvo tareas sin lámina en iframe (diseño con sección «Tu trabajo»).
     $modoMesa = !$esGenerica || !(is_array($tareas) && !$tieneIframe);
@@ -352,7 +367,7 @@ try {
 
     <?php endif; ?>
 
-    <?php if (!empty($niveles) && !$esTipos && !$esPractica): ?>
+    <?php if (!empty($niveles) && !$esTipos && !$esPractica && !$lamPorNiveles): ?>
     <section class="nl-prac container" id="nl-prac" data-slug="<?= htmlspecialchars($act['slug']) ?>">
         <div class="nl-prac__head">
             <span class="label">Práctica</span>
@@ -470,10 +485,12 @@ try {
     <script type="module" src="js/tipos.js?v=<?= nl_ver('js/tipos.js') ?>"></script>
     <?php elseif ($esPractica): ?>
     <script type="module" src="js/mesa-practica.js?v=<?= nl_ver('js/mesa-practica.js') ?>"></script>
-    <?php elseif (!empty($niveles)): ?>
+    <?php elseif (!empty($niveles) && !$lamPorNiveles): ?>
     <script type="module" src="js/practica.js?v=<?= nl_ver('js/practica.js') ?>"></script>
     <?php endif; ?>
-    <?php if ($esLamina): ?>
+    <?php if ($esCircuito): ?>
+    <script type="module" src="js/circuito.js?v=<?= nl_ver('js/circuito.js') ?>"></script>
+    <?php elseif ($esLamina): ?>
     <script type="module" src="js/lamina.js?v=<?= nl_ver('js/lamina.js') ?>"></script>
     <?php elseif (is_array($tareas) && !$lamPorNiveles): ?>
     <script type="module" src="js/tareas.js?v=<?= nl_ver('js/tareas.js') ?>"></script>

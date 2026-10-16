@@ -602,3 +602,59 @@
     #nl-mprac .nl-tip__vista { width: 100%; }
     .nl-gen__pane .nl-act-iframe { height: 65vh; }
 }
+
+/* --- Circuito sobre la captura (js/circuito.js) --- */
+.nl-circ__lienzo .nl-circ__etq i { width: 9px; height: 9px; left: -4.5px; top: -4.5px; background: rgba(245,158,11,.85); }
+.nl-circ__lienzo .nl-circ__etq b { font-size: .68rem; opacity: .85; }
+.nl-circ__svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.nl-circ__halo { fill: none; stroke: rgba(253,230,138,.45); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-width: 12px; }
+.nl-circ__ruta { fill: none; stroke: #F59E0B; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-width: 4px; }
+.nl-circ__ruta.is-animada { stroke-dasharray: 6 4; animation: nlCircFlujo 1.2s linear infinite; }
+@keyframes nlCircFlujo { to { stroke-dashoffset: -10; } }
+.nl-circ__impulso { fill: #FEF3C7; filter: drop-shadow(0 0 3px #FCD34D) drop-shadow(0 0 6px #F59E0B); }
+.nl-circ__fin {
+    position: absolute; transform: translate(-50%, -50%); padding: .15rem .55rem; border-radius: 99px; line-height: 1.2;
+    font-size: .75rem; font-weight: 800; color: #FDE68A; background: rgba(26,14,46,.88); border: 2px solid #F59E0B; pointer-events: none; white-space: nowrap;
+}
+.nl-circ__neu {
+    position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: .1rem;
+    padding: 0; border: 0; background: none; font: inherit; line-height: 1.1; cursor: default; animation: nlFade .3s ease;
+}
+.nl-circ__neu .nl-circ__ico {
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; overflow: hidden;
+    background: rgba(26,14,46,.85); border: 3px solid var(--c); box-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+.nl-circ__neu.is-mal .nl-circ__ico { border-color: var(--repasar); box-shadow: 0 0 0 4px rgba(224,82,74,.35); }
+.nl-circ__neu .nl-ico { width: 40px; height: 40px; object-fit: contain; }
+.nl-circ__nom { font-size: .7rem; font-weight: 800; color: #fff; background: rgba(26,14,46,.85); padding: .1rem .45rem; border-radius: 99px; white-space: nowrap; }
+.nl-circ__neu.is-tocable { cursor: pointer; }
+.nl-circ__neu.is-tocable:hover .nl-circ__ico { transform: scale(1.08); }
+.nl-circ__neu.is-elegida .nl-circ__ico { box-shadow: 0 0 0 5px rgba(252,211,77,.5); }
+.nl-circ__num {
+    position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
+    font-size: .72rem; font-weight: 800; color: #2E1065; background: #FCD34D;
+}
+.nl-circ__piezas { display: flex; flex-direction: column; gap: .45rem; margin: .5rem 0; }
+.nl-circ__pieza {
+    display: flex; align-items: center; gap: .6rem; padding: .35rem .7rem .35rem .35rem; border-radius: 12px; cursor: pointer; text-align: left;
+    font: inherit; color: var(--gray-100); background: rgba(139,92,246,.12); border: 2px solid transparent;
+}
+.nl-circ__pieza .nl-circ__ico { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; overflow: hidden; background: rgba(26,14,46,.7); border: 2px solid var(--c); }
+.nl-circ__pieza .nl-ico { width: 34px; height: 34px; object-fit: contain; }
+.nl-circ__pieza strong { display: block; font-size: .88rem; }
+.nl-circ__pieza small { display: block; font-size: .75rem; color: var(--gray-400); }
+.nl-circ__pieza.is-sel { border-color: #F59E0B; background: rgba(245,158,11,.14); }
+.nl-circ__pieza.is-ok { border-color: rgba(134,239,172,.5); }
+.nl-circ__pieza.is-ok strong { color: #86EFAC; }
+.nl-circ__seq { font-size: .85rem; line-height: 1.6; color: var(--gray-200); }
+.nl-circ__seq span { font-weight: 800; color: var(--c); }
+@media (max-width: 900px) {
+    .nl-circ__neu .nl-circ__ico { width: 36px; height: 36px; }
+    .nl-circ__neu .nl-ico { width: 30px; height: 30px; }
+    .nl-circ__nom { font-size: .62rem; }
+}
+@media (max-width: 900px) { .nl-circ__lienzo.is-armado .nl-circ__etq b { display: none; } }
+@media (max-width: 600px) {
+    .nl-tip__cuadro.is-grande th, .nl-tip__cuadro.is-grande td { hyphens: auto; overflow-wrap: anywhere; }
+    .nl-tip__cuadro.is-grande { font-size: .68rem; }
+}

@@ -330,7 +330,7 @@ function iniciar(raiz) {
                 <div class="nl-ficha__bloque"><span class="nl-ficha__etq">Dónde buscar</span><p>${escapar(sel.busca)}</p></div>
                 ${puedeCapturar() ? `<div class="nl-lam__capt">
                     <button type="button" class="btn btn-primary btn-sm nl-lam__capturar">📷 Capturar la lámina</button>
-                    <span>Haz zoom en la lámina hasta que la ${/capa|cerebelo/i.test(sel.titulo) ? 'zona' : 'neurona'} se vea bien y presiona <strong>Capturar</strong>. El navegador te pedirá compartir <strong>esta pestaña</strong>: acepta y se abre el recorte.</span>
+                    <span>Haz zoom en la lámina hasta que ${sel.objeto || (/capa|cerebelo/i.test(sel.titulo) ? 'la zona' : 'la neurona')} se vea bien y presiona <strong>Capturar</strong>. El navegador te pedirá compartir <strong>esta pestaña</strong>: acepta y se abre el recorte.</span>
                 </div>` : ''}
                 <div class="nl-lam__pegar${puedeCapturar() ? ' is-respaldo' : ''}" tabindex="0">
                     <strong>${puedeCapturar() ? '¿No funcionó? Pega o sube una captura' : '📋 Pega aquí tu captura'}</strong>
@@ -347,7 +347,7 @@ function iniciar(raiz) {
 
         if (s.paso === 'recortar') {
             panel.innerHTML = `${av}${cab}${linea}
-                <p class="nl-lab__ayuda">Arrastra sobre tu captura para dejar solo ${/capa|cerebelo/i.test(sel.titulo) ? 'la zona que te interesa' : 'la neurona'}.</p>
+                <p class="nl-lab__ayuda">Arrastra sobre tu captura para dejar solo ${sel.objeto ? sel.objeto + ' que te interesa' : (/capa|cerebelo/i.test(sel.titulo) ? 'la zona que te interesa' : 'la neurona')}.</p>
                 <div class="nl-ficha__acciones">
                     <button type="button" class="btn btn-primary btn-sm nl-lam__usar"${recorte ? '' : ' disabled'}>✂ Usar este recorte</button>
                     <button type="button" class="btn btn-ghost btn-sm nl-lam__completa">Usar completa</button>
@@ -571,12 +571,28 @@ function iniciar(raiz) {
             ${tplCx ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tplCx.innerHTML}</details>` : ''}
             <p class="nl-lab__ayuda">Tus capturas etiquetadas están a la izquierda. Toca una captura arriba para repasarla.</p>
             <p class="nl-guia-ok">✓ Guardado en tu guía de estudio · <a href="${urlGuia()}">Ver guía</a></p>`;
+        esperarGuiaAlSalir(panel);
     }
 
-    let guiaHecha = false;
-    async function guardarGuia() {
-        if (guiaHecha) return;
+    /** Los enlaces del cierre esperan a que la sección (con sus imágenes) quede guardada en la guía. */
+    function esperarGuiaAlSalir(cont) {
+        cont.querySelectorAll('.nl-lab__sig-nivel, .nl-guia-ok a').forEach(a => a.addEventListener('click', async ev => {
+            if (!guiaPromesa) return;
+            ev.preventDefault();
+            a.classList.add('is-esperando');
+            try { await guiaPromesa; } catch { /* igual se sigue */ }
+            location.href = a.href;
+        }));
+    }
+
+    let guiaHecha = false, guiaPromesa = null;
+    function guardarGuia() {
+        if (guiaHecha) return guiaPromesa;
         guiaHecha = true;
+        guiaPromesa = armarGuia();
+        return guiaPromesa;
+    }
+    async function armarGuia() {
         const imagenes = [];
         for (const c of caps) {
             const s = est.caps[c.clave];

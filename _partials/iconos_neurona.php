@@ -2,7 +2,7 @@
 /**
  * NeuroLab — iconos_neurona.php
  * Ícono de cada tipo de neurona para los botones del nivel "elegir".
- * Si existe img/tipos/<clave>.png (asset ilustrado) se usa esa imagen;
+ * Si existe img/tipos/<clave>.png o img/glia/<clave>.png (asset ilustrado) se usa esa imagen;
  * si no, un dibujo SVG simple de respaldo.
  */
 
@@ -16,9 +16,11 @@ function nl_clave_icono($nombre) {
 
 function nl_icono_neurona($nombre) {
     $clave = nl_clave_icono($nombre);
-    $png = 'img/tipos/' . $clave . '.png';
-    if (is_file(__DIR__ . '/../' . $png)) {
-        return '<img class="nl-ico" src="' . $png . '?v=' . filemtime(__DIR__ . '/../' . $png) . '" alt="" loading="lazy">';
+    foreach (['img/tipos/', 'img/glia/'] as $dir) {   // neuronas y células gliales
+        $png = $dir . $clave . '.png';
+        if (is_file(__DIR__ . '/../' . $png)) {
+            return '<img class="nl-ico" src="' . $png . '?v=' . filemtime(__DIR__ . '/../' . $png) . '" alt="" loading="lazy">';
+        }
     }
     $d = 'stroke="#8B5CF6" stroke-width="2.2" fill="none" stroke-linecap="round"';
     $a = 'stroke="#EC4899" stroke-width="2.2" fill="none" stroke-linecap="round"';

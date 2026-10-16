@@ -64,6 +64,8 @@ function iniciar(raiz) {
     const tplCx = document.getElementById('nl-conexion-tpl');
     let opciones = [];
     try { opciones = JSON.parse(d.opciones || '[]'); } catch { opciones = []; }
+    const iconos = {};   // ícono opcional de cada tarjeta (img/tipos o img/glia; ver _partials/iconos_neurona.php)
+    document.getElementById('nl-mprac-iconos')?.content.querySelectorAll('[data-op]').forEach(n => { if (n.innerHTML.trim()) iconos[n.dataset.op] = n.innerHTML; });
 
     if (bloqueado(d.requiere)) {
         raiz.classList.add('is-bloqueada');
@@ -274,9 +276,9 @@ function iniciar(raiz) {
                         const esMal = m.find(x => x.t === o);
                         const esOk = s && s.r === o;
                         const cls = esOk ? ' is-ok is-vuelta' : esMal ? ' is-mal is-vuelta' : (s ? ' is-apagada' : '');
-                        const dorso = esOk ? `<strong>✓ ${esc(o)}</strong>` : esMal ? `<strong>✗ No es ${esc(o.toLowerCase())}</strong><small>${esc(esMal.p)}</small>` : '';
+                        const dorso = esOk ? `<strong>✓ ${partir(o)}</strong>` : esMal ? `<strong>✗ No es ${partir(o.toLowerCase())}</strong><small>${esc(esMal.p)}</small>` : '';
                         return `<button type="button" class="nl-tip__carta${cls}" data-op="${esc(o)}"${s || esMal ? ' disabled' : ''}>
-                            <span class="nl-tip__carta-in"><span class="nl-tip__cara"><span class="nl-tip__carta-nom">${partir(o)}</span></span>
+                            <span class="nl-tip__carta-in"><span class="nl-tip__cara">${iconos[o] || ''}<span class="nl-tip__carta-nom">${partir(o)}</span></span>
                             <span class="nl-tip__dorso">${dorso}</span></span></button>`;
                     }).join('')}</div></div>`;
                 vista.querySelectorAll('.nl-tip__carta:not([disabled])').forEach(b => b.addEventListener('click', async () => {

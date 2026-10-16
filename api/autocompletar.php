@@ -4,6 +4,7 @@
  * Entrega las respuestas de un nivel para que js/docente.js lo deje completo.
  *   GET tipo=labeling&slug=<actividad>  -> { partes: [{ id, n, f, d }] }
  *   GET tipo=practica&nivel=<id>        -> { tipo: 'armar'|'elegir', items: { <id>: estado } }
+ *   GET tipo=circuito&slug=<act>&n=<N>  -> { piezas: [{ clave, zona, exp }], orden: [clave…] }
  * La lámina y el quiz se completan en el navegador con los datos de la página.
  */
 error_reporting(0);
@@ -59,6 +60,21 @@ try {
             }
         }
         nl_ac_json(['ok' => true, 'tipo' => $nivel['tipo'], 'items' => $items]);
+    }
+
+    if ($tipo === 'circuito') {
+        $st = $pdo->prepare("SELECT r.url FROM actividad_recursos r JOIN actividades a ON a.id = r.actividad_id
+                             WHERE a.slug = ? AND r.tipo = 'tareas' LIMIT 1");
+        $st->execute([(string)($_GET['slug'] ?? '')]);
+        $t = json_decode((string)$st->fetchColumn(), true);
+        foreach ((array)($t['niveles'] ?? []) as $nv) {
+            if ((int)($nv['n'] ?? 0) !== (int)($_GET['n'] ?? 0) || ($nv['tipo'] ?? '') !== 'circuito') continue;
+            $piezas = array_map(function ($p) {
+                return ['clave' => $p['clave'], 'zona' => (string)$p['zona'], 'exp' => (string)($p['exp'] ?? '')];
+            }, $nv['piezas']);
+            nl_ac_json(['ok' => true, 'piezas' => $piezas, 'orden' => array_values($nv['orden'])]);
+        }
+        nl_ac_json(['ok' => false, 'error' => 'Nivel no encontrado.'], 404);
     }
 
     nl_ac_json(['ok' => false, 'error' => 'Tipo no reconocido.'], 400);
