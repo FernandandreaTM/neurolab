@@ -17,8 +17,11 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 | # | Actividad | Nivel | Qué hacen | Lámina |
 |---|---|---|---|---|
-| 1 | Circuito reflejo | I · Orientación | Capturan el campo y ubican: ganglio, asta dorsal, asta ventral, sustancia blanca, canal central | MH-047 |
-| | | II · Armar el circuito | Sobre su captura arrastran pseudounipolar → ganglio, interneurona → asta dorsal, motoneurona → asta ventral; conectan y marcan el sentido | MH-047 |
+| 1 | Circuito reflejo (un solo esquema, por capas) | I · La médula | Ubican 7 partes sobre la médula sola | Esquema |
+| | | II · Los extremos | Completan los huecos: piel, extensor con huso, nervio, ganglio, raíz dorsal → raíz ventral, flexor | Esquema |
+| | | III · Reflejo rotuliano | Ubican 4 neuronas (aparecen dibujadas), conectan la vía directa y la de inhibición recíproca, 4 lupas (huso, excitatoria, inhibitoria, placa motora) | Esquema |
+| | | IV · Reflejo de retirada | Ubican la sensitiva y 2 interneuronas, conectan 2 vías, 2 lupas | Esquema |
+| | | V · ¿Dónde se cortó? | Emparejan 3 casos (hernia L4, atrofia muscular espinal, nervio femoral) con 3 sitios | Esquema |
 | 2 | Glía del SNC | I · Esquema | Identifican astrocito, oligodendrocito, microglía, ependimaria y eligen su función | Esquema |
 | | | II · En el corte | Canal central (ependimarias) y sustancia blanca (núcleos de oligodendrocitos). ¿Por qué con H&E solo se ven núcleos? | MHS-240 |
 | | | III · Motoneurona y su glía | Motoneurona del asta ventral, núcleos de glía alrededor, axón vs dendrita por el Nissl | UCSF-163 |
@@ -31,7 +34,7 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 | Actividad | Lámina | Idea |
 |---|---|---|
-| ¿Dónde se cortó el arco? | MH-047 | Casos TO y Fono: tocan el tramo lesionado del circuito |
+| Más casos del arco | — | Banco de casos TO y Fono para variar el nivel V (mismo formato: caso → sitio → por qué) |
 | Mielina en el ganglio | MHS-286 | Weigert: mielinizadas vs no mielinizadas y velocidad de conducción |
 | Una tinción, dos miradas | MH-051 vs MHS-285 | Misma estructura con Azan y toluidina: qué tiñe cada una |
 
@@ -39,16 +42,14 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. Fernanda revisa, mergea y sube al servidor. Lo técnico nuevo (arrastrar neuronas sobre la captura y corregir por zonas) lo hace Fernanda.
 
+Las tareas A–H de la sesión 05 ya están en el sitio. Quedan estas:
+
 | Tarea | Qué queda en el sitio | Rama |
 |---|---|---|
-| A. Dónde buscar | En cada nivel con lámina: link al campo exacto (`x`, `y`, `z`) + pista corta | `feat/p2-donde-buscar` |
-| B. Esquemas de glía | Esquema SNC y SNP con números + nombre, función y «para recordar» de cada célula | `feat/p2-esquemas-glia` |
-| C. Preguntas de láminas | 2–3 preguntas por nivel (comparar, interpretar), alternativas de largo parejo, explicación | `feat/p2-preguntas-laminas` |
-| D. Tarjetas SNC/SNP | 8–10 frases que llevan a una célula + filas del cuadro comparativo | `feat/p2-tarjetas-glia` |
-| E. Íconos de glía | Un ícono por célula, mismo estilo que los de tipos de neurona | `feat/p2-iconos-glia` |
-| F. ¿Para qué te sirve? | Un texto por nivel en versión TO y Fono (2–3 líneas, situación clínica concreta) | `feat/p2-para-que-sirve` |
-| G. Quiz de cierre | 15–18 preguntas: conceptos → casos comunes → casos de la carrera | `feat/p2-quiz` |
-| H. ¿Dónde se cortó el arco? | 6–8 casos (mitad TO, mitad Fono): síntoma → tramo lesionado → explicación | `feat/p2-casos-arco` |
+| I. Casos del arco | 4–6 casos más (mitad TO, mitad Fono) para el nivel V del circuito, con sitio (nervio, raíz dorsal o asta ventral), pista y «para recordar». En `data/seed.sql`, actividad 9, nivel 5 (`cortes.casos`) | `feat/p2-casos-arco` |
+| J. Revisar las lupas | Leer las preguntas de las 6 lupas (niveles III y IV) mirando cada imagen de `img/reflejo/`; proponer cambios si algo no se ve en la imagen | `feat/p2-lupas` |
+| K. Revisar láminas de glía | Recorrer Glía del SNC III–IV y Glía del SNP II–IV en histologyguide: que los links abran en el campo correcto y las preguntas se respondan con lo que se ve | `feat/p2-revision-glia` |
+| L. Mielina en el ganglio | Actividad adicional con MHS-286 (Weigert): mielinizadas frente a no mielinizadas y velocidad de conducción | `feat/p2-mielina-ganglio` |
 
 **¿Quién tiene qué tarea?** La que tenga un Pull Request abierto en GitHub (pestaña *Pull requests*). Antes de elegir, revisa ahí que nadie la haya tomado. Una tarea a la vez.
 
