@@ -156,7 +156,7 @@ function iniciar(raiz) {
             }).join('');
             const i = casos.findIndex((_, j) => !ek(j).ok);
             clase = i >= 0 && casoOk == null ? ' is-poner' : '';
-            ayuda = i >= 0 ? `Caso ${i + 1}: toca en el esquema <strong>dónde se cortó</strong> el arco` : 'Tus cortes, sobre el reflejo rotuliano';
+            ayuda = i >= 0 ? `Caso ${i + 1}: toca <strong>dónde se cortó</strong> el arco` : 'Tus cortes, sobre el reflejo rotuliano';
         } else {
             const c = circDe(ver), e = ec(ver), p = pasoC(c);
             if (e.ruta) capas += svgRuta(e.ruta, true) + extremos(c, e.ruta);
@@ -291,7 +291,7 @@ function iniciar(raiz) {
             const malSel = sel ? (e.mal[sel.clave] || []) : [];
             const ultimoMal = sel && !e.ok[sel.clave] && e.pos[sel.clave] && malSel.length ? malSel[malSel.length - 1] : '';
             panel.innerHTML = `${av}${cab}
-                <p class="nl-lab__ayuda">Elige una neurona y toca su lugar en el esquema, del lado izquierdo.</p>
+                <p class="nl-lab__ayuda">Elige una neurona y toca su lugar: en tu captura o en el esquema.</p>
                 <div class="nl-circ__piezas">${c.piezas.map(pz => {
                     const ok = e.ok[pz.clave];
                     return `<button type="button" class="nl-circ__pieza${ok ? ' is-ok' : ''}${pz.clave === selPieza ? ' is-sel' : ''}" data-clave="${esc(pz.clave)}" style="--c:${color(pz.clave)}">
@@ -464,22 +464,23 @@ function iniciar(raiz) {
     /* ---------------- Guía ---------------- */
     async function lienzoBase() {
         const img = await cargar(capBase.img);
-        const lado = Math.min(MAX_GUIA, img.width);
+        const W = Math.min(MAX_GUIA, img.width), H = Math.round(W * img.height / img.width);
         const c = document.createElement('canvas');
-        c.width = c.height = lado;
+        c.width = W; c.height = H;
         const g = c.getContext('2d');
-        g.drawImage(img, 0, 0, lado, lado);
-        const esq = await imagenMolde(molde, 'esquema', lado);
-        if (esq) g.drawImage(esq, 0, 0, lado, lado);
-        return { c, g, lado };
+        g.drawImage(img, 0, 0, W, H);
+        const esq = await imagenMolde(molde, 'esquema', W);
+        if (esq) g.drawImage(esq, 0, 0, W, H);
+        // de % (x, y) a píxeles
+        return { c, g, W, H, px: p => [p[0] * W / 100, p[1] * H / 100], fs: Math.max(12, Math.round(W / 52)) };
     }
-    function rotulo(g, lado, txt, x, y, borde, alinear) {
-        const fs = Math.max(12, Math.round(lado / 46));
+    function rotulo(L, txt, x, y, borde, alinear) {
+        const { g, W, H, fs } = L;
         g.font = `bold ${fs}px Arial, sans-serif`; g.textBaseline = 'middle';
         const tw = g.measureText(txt).width + fs * 0.8, h = fs * 1.5;
         let lx = alinear === 'izq' ? x : x - tw / 2;
-        lx = Math.min(Math.max(lx, 2), lado - tw - 2);
-        const ly = Math.min(Math.max(y, h / 2 + 2), lado - h / 2 - 2);
+        lx = Math.min(Math.max(lx, 2), W - tw - 2);
+        const ly = Math.min(Math.max(y, h / 2 + 2), H - h / 2 - 2);
         g.fillStyle = 'rgba(26,14,46,.88)';
         g.beginPath(); if (g.roundRect) g.roundRect(lx, ly - h / 2, tw, h, h / 2); else g.rect(lx, ly - h / 2, tw, h); g.fill();
         g.strokeStyle = borde; g.lineWidth = 2; g.stroke();
@@ -487,42 +488,42 @@ function iniciar(raiz) {
     }
     async function imagenCircuito(cc) {
         const e = ec(cc.clave);
-        const { c, g, lado } = await lienzoBase();
-        const k = lado / 100, fs = Math.max(12, Math.round(lado / 46));
-        const camino = new Path2D(curva(e.ruta));
-        g.save(); g.scale(k, k); g.lineCap = 'round'; g.lineJoin = 'round';
-        g.strokeStyle = 'rgba(253,230,138,.55)'; g.lineWidth = 2.6; g.stroke(camino);
-        g.strokeStyle = '#F59E0B'; g.lineWidth = 0.9; g.stroke(camino);
-        for (let i = 1; i < e.ruta.length; i += 2) {   // flechas del sentido de la información
-            const a = e.ruta[i - 1], b = e.ruta[i], ang = Math.atan2(b[1] - a[1], b[0] - a[0]), L = 1.8;
+        const L = await lienzoBase();
+        const { c, g, px, fs, H } = L;
+        const pts = e.ruta.map(px);
+        const camino = new Path2D(curva(pts));
+        g.lineCap = 'round'; g.lineJoin = 'round';
+        g.strokeStyle = 'rgba(253,230,138,.6)'; g.lineWidth = fs * 0.9; g.stroke(camino);
+        g.strokeStyle = '#F59E0B'; g.lineWidth = Math.max(3, fs / 4); g.stroke(camino);
+        for (let i = 1; i < pts.length; i += 2) {   // flechas del sentido de la información
+            const a = pts[i - 1], b = pts[i], ang = Math.atan2(b[1] - a[1], b[0] - a[0]), l = fs * 0.75;
             const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
             g.fillStyle = '#B45309';
-            g.beginPath(); g.moveTo(m[0] + Math.cos(ang) * L, m[1] + Math.sin(ang) * L);
-            g.lineTo(m[0] + Math.cos(ang + 2.5) * L, m[1] + Math.sin(ang + 2.5) * L);
-            g.lineTo(m[0] + Math.cos(ang - 2.5) * L, m[1] + Math.sin(ang - 2.5) * L); g.fill();
+            g.beginPath(); g.moveTo(m[0] + Math.cos(ang) * l, m[1] + Math.sin(ang) * l);
+            g.lineTo(m[0] + Math.cos(ang + 2.5) * l, m[1] + Math.sin(ang + 2.5) * l);
+            g.lineTo(m[0] + Math.cos(ang - 2.5) * l, m[1] + Math.sin(ang - 2.5) * l); g.fill();
         }
-        g.restore();
-        const a = e.ruta[0], b = e.ruta[e.ruta.length - 1];
-        rotulo(g, lado, '→ ' + cc.receptor, a[0] * k + 2, (a[1] - 6) * k, '#F59E0B', 'izq');
-        rotulo(g, lado, '← ' + cc.efector, b[0] * k + 2, (b[1] + 5) * k, '#F59E0B', 'izq');
+        const a = pts[0], b = pts[pts.length - 1];
+        rotulo(L, '→ ' + cc.receptor, a[0] + fs, a[1] - H * 0.05, '#F59E0B', 'izq');
+        rotulo(L, '← ' + cc.efector, b[0] + fs, b[1] + H * 0.04, '#F59E0B', 'izq');
         (e.ordenOk || []).forEach((kk, i) => {
-            const p = e.pos[kk], pz = cc.piezas.find(x => x.clave === kk);
+            const p = px(e.pos[kk]), pz = cc.piezas.find(x => x.clave === kk);
             g.fillStyle = color(kk); g.strokeStyle = '#fff'; g.lineWidth = 2;
-            g.beginPath(); g.arc(p[0] * k, p[1] * k, fs * 0.6, 0, Math.PI * 2); g.fill(); g.stroke();
-            rotulo(g, lado, `${i + 1}. ${pz ? pz.nombre : kk}`, p[0] * k + fs * 1.2, p[1] * k - fs * 1.4, color(kk), 'izq');
+            g.beginPath(); g.arc(p[0], p[1], fs * 0.6, 0, Math.PI * 2); g.fill(); g.stroke();
+            rotulo(L, `${i + 1}. ${pz ? pz.nombre : kk}`, p[0] + fs * 1.2, p[1] - fs * 1.4, color(kk), 'izq');
         });
         return c.toDataURL('image/jpeg', 0.8);
     }
     async function imagenCortes() {
-        const { c, g, lado } = await lienzoBase();
-        const k = lado / 100, fs = Math.max(14, Math.round(lado / 40));
+        const L = await lienzoBase();
+        const { c, g, px } = L, fs = L.fs * 1.15;
         casos.forEach((_, i) => {
-            const p = ek(i).pos;
-            if (!p) return;
+            if (!ek(i).pos) return;
+            const p = px(ek(i).pos);
             g.fillStyle = '#DC2626'; g.strokeStyle = '#fff'; g.lineWidth = 2;
-            g.beginPath(); g.arc(p[0] * k, p[1] * k, fs * 0.75, 0, Math.PI * 2); g.fill(); g.stroke();
+            g.beginPath(); g.arc(p[0], p[1], fs * 0.75, 0, Math.PI * 2); g.fill(); g.stroke();
             g.fillStyle = '#fff'; g.font = `bold ${fs}px Arial, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
-            g.fillText(String(i + 1), p[0] * k, p[1] * k + 1);
+            g.fillText(String(i + 1), p[0], p[1] + 1);
             g.textAlign = 'start';
         });
         return c.toDataURL('image/jpeg', 0.8);

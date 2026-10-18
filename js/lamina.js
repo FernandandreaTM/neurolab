@@ -20,14 +20,14 @@
 import { markDone, isDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia } from './carrera.js';
-import { svgMolde } from './molde.js';
+import { svgMolde, arMolde, MOLDES } from './molde.js';
 
 const RAIZ = document.getElementById('nl-lam');
 const KEY_BASE = 'nl_lam_';
 const MAX_BRUTA = 1400;    // captura sin recortar (lado mayor)
 const MAX_FINAL = 900;     // captura recortada que se guarda
 const MAX_GUIA = 760;      // imagen anotada para la guía
-const LADO_MOLDE = 900;    // captura encajada en el molde (cuadrada)
+const ANCHO_MOLDE = 1200;  // captura encajada en el molde (alto según la proporción del molde)
 
 function leer(clave) {
     let e = null;
@@ -89,17 +89,17 @@ async function procesar(fuente, maxLado, rec) {
     }
 }
 
-/** Recorta la captura al cuadro del molde: {cx, cy} centro y {s} lado, en fracción del ancho. */
-async function encajar(src, e) {
+/** Recorta la captura al marco del molde: {cx, cy} centro y {s} ancho, en fracción del ancho; ar = ancho/alto. */
+async function encajar(src, e, ar) {
     const img = await cargar(src);
-    const lado = e.s * img.width;
-    const sx = e.cx * img.width - lado / 2, sy = e.cy * img.height - lado / 2;
+    const ancho = e.s * img.width, alto = ancho / ar;
+    const sx = e.cx * img.width - ancho / 2, sy = e.cy * img.height - alto / 2;
     const c = document.createElement('canvas');
-    c.width = c.height = LADO_MOLDE;
+    c.width = ANCHO_MOLDE; c.height = Math.round(ANCHO_MOLDE / ar);
     const g = c.getContext('2d');
     g.fillStyle = '#fff';
-    g.fillRect(0, 0, LADO_MOLDE, LADO_MOLDE);
-    const k = LADO_MOLDE / lado;
+    g.fillRect(0, 0, c.width, c.height);
+    const k = ANCHO_MOLDE / ancho;
     g.drawImage(img, -sx * k, -sy * k, img.width * k, img.height * k);
     return c.toDataURL('image/jpeg', 0.85);
 }
@@ -347,10 +347,11 @@ function iniciar(raiz) {
         const listo = () => {
             const W = img.clientWidth, H = img.clientHeight;
             if (!W || !H) return;
-            if (!enc) enc = { cx: 0.5, cy: 0.5, s: 0.86 * Math.min(1, H / W) };
-            const lado = enc.s * W;
-            Object.assign(caja.style, { width: lado + 'px', height: lado + 'px',
-                left: (img.offsetLeft + enc.cx * W - lado / 2) + 'px', top: (img.offsetTop + enc.cy * H - lado / 2) + 'px' });
+            const ar = arMolde(sel.molde);
+            if (!enc) enc = { cx: 0.5, cy: 0.5, s: 0.86 * Math.min(1, H * ar / W) };
+            const ancho = enc.s * W, alto = ancho / ar;
+            Object.assign(caja.style, { width: ancho + 'px', height: alto + 'px',
+                left: (img.offsetLeft + enc.cx * W - ancho / 2) + 'px', top: (img.offsetTop + enc.cy * H - alto / 2) + 'px' });
             const rango = panel.querySelector('.nl-lam__tam');
             if (rango) rango.value = Math.round(enc.s * 100);
         };
@@ -458,7 +459,7 @@ function iniciar(raiz) {
 
         if (s.paso === 'recortar' && sel.molde) {
             panel.innerHTML = `${av}${cab}${linea}
-                <p class="nl-lab__ayuda">La silueta muestra la forma del corte. <strong>Arrástrala</strong> hasta que la médula, la vértebra y los ganglios calcen con tu lámina, y <strong>ajusta su tamaño</strong> con el control, la rueda del mouse o pellizcando.</p>
+                <p class="nl-lab__ayuda">La silueta muestra la forma del corte. <strong>Arrástrala</strong> hasta que ${escapar((MOLDES[sel.molde] || {}).guia || 'la silueta')} calcen con tu lámina, y <strong>ajusta su tamaño</strong> con el control, la rueda del mouse o pellizcando.</p>
                 <label class="nl-lam__tam-etq">Tamaño de la silueta
                     <input type="range" class="nl-lam__tam" min="15" max="300" value="${Math.round((enc ? enc.s : 0.5) * 100)}"></label>
                 <div class="nl-ficha__acciones">
@@ -677,7 +678,7 @@ function iniciar(raiz) {
         if (!enc) return;
         panel.classList.add('is-esperando');
         try {
-            s.img = await encajar(s.bruta, enc);
+            s.img = await encajar(s.bruta, enc, arMolde(sel.molde));
             delete s.bruta;
             s.pines = {}; s.malp = {};
             s.paso = 'etiquetar';

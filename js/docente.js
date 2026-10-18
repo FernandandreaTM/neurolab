@@ -5,6 +5,7 @@
  * La lámina se completa con una imagen de ejemplo en vez de las capturas.
  */
 import { carrera } from './carrera.js';
+import { arMolde } from './molde.js';
 const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ');
 const url = new URL(location.href);
 
@@ -21,24 +22,25 @@ async function api(params) {
     return d;
 }
 
-/** Imagen de ejemplo para la lámina (en lugar de la captura del estudiante); cuadrada si la captura usa molde. */
-function imagenEjemplo(titulo, cuadrada = false) {
+/** Imagen de ejemplo para la lámina (en lugar de la captura del estudiante); con la proporción del molde si la captura lo usa. */
+function imagenEjemplo(titulo, ar = 0) {
     const c = document.createElement('canvas');
-    c.width = 900; c.height = cuadrada ? 900 : 560;
+    c.width = 900; c.height = ar ? Math.round(900 / ar) : 560;
+    const H = c.height;
     const g = c.getContext('2d');
-    const gr = g.createLinearGradient(0, 0, 900, 560);
+    const gr = g.createLinearGradient(0, 0, 900, H);
     gr.addColorStop(0, '#E9D9B8'); gr.addColorStop(1, '#C9B08A');
-    g.fillStyle = gr; g.fillRect(0, 0, 900, 560);
+    g.fillStyle = gr; g.fillRect(0, 0, 900, H);
     g.strokeStyle = 'rgba(60,40,20,.35)'; g.lineWidth = 2;
     for (let i = 0; i < 40; i++) {
-        g.beginPath(); g.moveTo(Math.random() * 900, Math.random() * 560);
-        g.bezierCurveTo(Math.random() * 900, Math.random() * 560, Math.random() * 900, Math.random() * 560, Math.random() * 900, Math.random() * 560);
+        g.beginPath(); g.moveTo(Math.random() * 900, Math.random() * H);
+        g.bezierCurveTo(Math.random() * 900, Math.random() * H, Math.random() * 900, Math.random() * H, Math.random() * 900, Math.random() * H);
         g.stroke();
     }
-    g.fillStyle = 'rgba(26,14,46,.78)'; g.fillRect(0, 230, 900, 100);
+    g.fillStyle = 'rgba(26,14,46,.78)'; g.fillRect(0, H / 2 - 50, 900, 100);
     g.fillStyle = '#fff'; g.textAlign = 'center';
-    g.font = 'bold 30px Arial, sans-serif'; g.fillText(titulo, 450, 272);
-    g.font = '20px Arial, sans-serif'; g.fillText('Imagen de ejemplo (modo docente)', 450, 308);
+    g.font = 'bold 30px Arial, sans-serif'; g.fillText(titulo, 450, H / 2 - 8);
+    g.font = '20px Arial, sans-serif'; g.fillText('Imagen de ejemplo (modo docente)', 450, H / 2 + 28);
     return c.toDataURL('image/jpeg', 0.75);
 }
 
@@ -80,7 +82,7 @@ async function completarNivel() {
             (c.etiquetas || []).forEach((t, i, a) => { pines[t] = (conMolde[c.clave] || {})[t] || [20 + 60 * (i + 0.5) / a.length, 25 + (i % 2) * 45]; });
             const preg = {};
             (c.preguntas || []).forEach((q, i) => { preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
-            est.caps[c.clave] = { paso: 'preguntas', listo: true, img: imagenEjemplo(c.titulo, !!c.molde), pines, malp: {}, preg, err: 0 };
+            est.caps[c.clave] = { paso: 'preguntas', listo: true, img: imagenEjemplo(c.titulo, c.molde ? arMolde(c.molde) : 0), pines, malp: {}, preg, err: 0 };
         });
         poner('nl_lam_' + d.clave, est);
     } else if (raiz.id === 'nl-quiz') {

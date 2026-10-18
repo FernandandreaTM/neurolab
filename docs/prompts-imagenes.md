@@ -180,3 +180,35 @@ Célula: [DESCRIPCIÓN]
 Opcional, para el circuito reflejo: `img/tipos/interneurona.png` (neurona MULTIPOLAR pequeña con
 pocas dendritas cortas y un axón corto que no sale del dibujo). Si la subes, avísame para usarla
 en lugar del ícono multipolar.
+
+## 6. Práctico II · Rompecabezas del arco reflejo → `img/reflejo/arco.png`
+
+Una sola imagen: la corto en piezas (ganglio, raíz dorsal, raíz ventral, nervio espinal, piel, músculo)
+para que calcen perfecto entre sí. La médula de la imagen sólo sirve de referencia: en la actividad,
+las piezas se arman **junto a la captura real** de la médula (UCSF-163, nivel I). Adjunta
+`img/tipos/multipolar.png` y `img/glia/celula-satelite.png` como referencia de estilo.
+
+```
+Adjunto dos íconos de referencia. Crea una ilustración horizontal (1536 × 1024 px) con exactamente
+el mismo estilo: médico-educativa semi-realista y limpia, trazo grueso, colores suaves, fondo blanco
+puro, SIN texto, SIN letras, SIN números, SIN flechas y SIN neuronas dibujadas.
+Es un esquema del arco reflejo del lado IZQUIERDO del cuerpo, visto en corte transversal:
+- A la DERECHA (ocupando el tercio derecho): corte transversal de la médula espinal con la cara
+  dorsal ARRIBA: sustancia gris en forma de mariposa (lila), sustancia blanca alrededor (rosado muy
+  pálido), canal central pequeño, astas dorsales delgadas arriba y astas ventrales anchas abajo,
+  fisura media ventral abajo.
+- Desde el borde dorsolateral izquierdo de la médula sale la RAÍZ DORSAL (cordón beige-amarillo)
+  hacia la izquierda, y en ella el GANGLIO DE LA RAÍZ DORSAL (óvalo amarillo ocre con células
+  redondas pequeñas).
+- Desde el borde ventrolateral izquierdo sale la RAÍZ VENTRAL (cordón beige más delgado) hacia la
+  izquierda y hacia arriba, y se une con la raíz dorsal justo a la izquierda del ganglio.
+- Ambas forman el NERVIO ESPINAL (cordón grueso beige), que sigue a la izquierda y se divide en dos
+  ramas: una sube hasta un trozo de PIEL en la esquina superior izquierda (bloque rectangular con
+  epidermis rosada y dermis más clara) y otra baja hasta un MÚSCULO esquelético en la esquina
+  inferior izquierda (vientre muscular rojo con estrías).
+- Cada elemento con contorno bien definido y separado del resto por fondo blanco, salvo donde
+  se conectan (raíces con la médula y con el nervio).
+```
+
+Guárdala como `img/reflejo/arco.png` (crea la carpeta) y avísame: la corto, ajusto las piezas al
+marco de la captura y el nivel II pasa de esquema a rompecabezas.
