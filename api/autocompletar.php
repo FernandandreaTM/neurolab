@@ -4,7 +4,7 @@
  * Entrega las respuestas de un nivel para que js/docente.js lo deje completo.
  *   GET tipo=labeling&slug=<actividad>  -> { partes: [{ id, n, f, d }] }
  *   GET tipo=practica&nivel=<id>        -> { tipo: 'armar'|'elegir', items: { <id>: estado } }
- *   GET tipo=circuito&slug=<act>&n=<N>  -> { circuitos: { <clave>: { orden, ruta, exp, piezas } }, casos: [{ pos, resp, exp }] }
+ *   GET tipo=circuito&slug=<act>&n=<N>  -> { circuitos: { <clave>: { vias, piezas } }, casos: [{ sitio, pos, resp, exp }] }
  *   GET tipo=rompecabezas&slug=<act>&n=<N> -> { piezas: [{ clave, caja, exp }] }
  *   GET tipo=lamina&slug=<act>&n=<N>    -> { pines: { <captura>: { <etiqueta>: [x, y] } } } (capturas con molde)
  * La lámina y el quiz se completan en el navegador con los datos de la página.
@@ -70,13 +70,17 @@ try {
         if (!$nv || ($nv['tipo'] ?? '') !== 'circuito') nl_ac_json(['ok' => false, 'error' => 'Nivel no encontrado.'], 404);
         $circ = [];
         foreach ((array)($nv['circuitos'] ?? []) as $c) {
-            $circ[$c['clave']] = ['orden' => array_values($c['orden']), 'ruta' => $c['ruta'], 'exp' => (string)($c['orden_exp'] ?? ''),
+            $vias = $c['vias'] ?? (!empty($c['orden']) ? [['orden' => $c['orden'], 'ruta' => $c['ruta'], 'exp' => $c['orden_exp'] ?? '']] : []);
+            $circ[$c['clave']] = [
+                'vias' => array_map(function ($v) {
+                    return ['seq' => array_values($v['orden']), 'ok' => true, 'exp' => (string)($v['exp'] ?? ''), 'ruta' => $v['ruta'] ?? null, 'inhibe' => (string)($v['inhibe'] ?? ''), 'mal' => 0];
+                }, $vias),
                 'piezas' => array_map(function ($p) {
-                    return ['clave' => $p['clave'], 'punto' => $p['punto'], 'zona' => (string)$p['zona_nombre'], 'exp' => (string)($p['exp'] ?? '')];
+                    return ['clave' => $p['clave'], 'punto' => $p['punto'], 'zona' => (string)($p['zona_nombre'] ?? ''), 'exp' => (string)($p['exp'] ?? ''), 'trazo' => $p['trazo'] ?? null];
                 }, $c['piezas'])];
         }
         $casos = array_map(function ($k) {
-            return ['pos' => nl_zona_centro($k['zona']), 'resp' => (string)$k['respuesta'], 'exp' => (string)$k['exp']];
+            return ['sitio' => (string)($k['sitio'] ?? ''), 'pos' => isset($k['zona']) ? nl_zona_centro($k['zona']) : null, 'resp' => (string)$k['respuesta'], 'exp' => (string)$k['exp']];
         }, $nv['cortes']['casos'] ?? []);
         nl_ac_json(['ok' => true, 'circuitos' => $circ, 'casos' => $casos]);
     }

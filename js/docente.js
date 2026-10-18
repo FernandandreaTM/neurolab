@@ -62,16 +62,22 @@ async function completarNivel() {
     } else if (raiz.id === 'nl-circ') {
         const { circuitos, casos } = await api({ tipo: 'circuito', slug: d.slug, n: d.n });
         const datos = JSON.parse(d.circuitos || '[]');
-        const est = { c: {}, k: {}, err: 0, listo: true };
+        const est = { c: {}, k: {}, err: 0, listo: true, inicio: true };
         datos.forEach(cd => {
             const r = circuitos[cd.clave];
             if (!r) return;
-            const e = { pos: {}, ok: {}, mal: {}, exp: {}, seq: [], preg: {}, orden: true, ordenOk: r.orden, ordenExp: r.exp, ruta: r.ruta, listo: true };
-            r.piezas.forEach(p => { e.pos[p.clave] = p.punto; e.ok[p.clave] = true; e.exp[p.clave] = { exp: p.exp, zona: p.zona, e: 0 }; });
+            const e = { pos: {}, ok: {}, mal: {}, exp: {}, trz: {}, via: {}, lupa: {}, preg: {}, listo: true };
+            r.piezas.forEach(p => { e.pos[p.clave] = p.punto; e.ok[p.clave] = true; if (p.trazo) e.trz[p.clave] = p.trazo; e.exp[p.clave] = { exp: p.exp, zona: p.zona, e: 0 }; });
+            r.vias.forEach((v, i) => { e.via[i] = v; });
+            (cd.lupas || []).forEach(lp => {
+                const preg = {};
+                lp.preguntas.forEach((q, i) => { preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
+                e.lupa[lp.clave] = { preg, listo: true };
+            });
             (cd.preguntas || []).forEach((q, i) => { e.preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
             est.c[cd.clave] = e;
         });
-        casos.forEach((k, i) => { est.k[i] = { mal: [], pos: k.pos, ok: true, resp: k.resp, exp: k.exp }; });
+        casos.forEach((k, i) => { est.k[i] = { mal: [], sitio: k.sitio, pos: k.pos, ok: true, resp: k.resp, exp: k.exp }; });
         poner('nl_circ_' + d.clave, est);
     } else if (raiz.id === 'nl-rompe') {
         const { piezas } = await api({ tipo: 'rompecabezas', slug: d.slug, n: d.n });

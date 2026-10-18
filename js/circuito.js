@@ -162,15 +162,19 @@ function iniciar(raiz) {
               ${img}<circle cx="${sx}" cy="${sy}" r="${sr}" fill="${col}" fill-opacity="${img ? .22 : .85}" stroke="${col}" stroke-width="5"/>
             </g>
             ${o.num ? `<g class="nl-neu__num"><circle cx="${sx + sr}" cy="${sy - sr}" r="14"/><text x="${sx + sr}" y="${sy - sr + 6}">${o.num}</text></g>` : ''}
-            ${o.inhibida ? `<text x="${sx - sr - 8}" y="${sy + sr + 26}" class="nl-neu__inh">⊣ inhibida</text>` : ''}
-            ${o.nombre ? `<text x="${sx}" y="${sy + sr + (o.inhibida ? 52 : 26)}" class="nl-neu__nom">${esc(o.nombre)}</text>` : ''}
+            ${(() => {   // rótulo: nombre y, si corresponde, «⊣ inhibida» (posición relativa al soma en t.lbl)
+                const [dx, dy, an] = t.lbl || [0, sr + 26, 'middle'];
+                const lx = sx + dx, ly = sy + dy + (dy > 0 ? 0 : 0);
+                const nom = o.nombre ? `<tspan x="${lx}" dy="0">${esc(o.nombre)}</tspan>` : '';
+                const inh = o.inhibida ? `<tspan x="${lx}" dy="${o.nombre ? (dy < 0 && an === 'middle' ? -24 : 24) : 0}" class="nl-neu__inh">⊣ inhibida</tspan>` : '';
+                return nom || inh ? `<text x="${lx}" y="${ly}" class="nl-neu__nom" style="text-anchor:${an}">${nom}${inh}</text>` : '';
+            })()}
         </g>`;
     }
     function svgRuta(dd, inhibe, idx) {
         const col = inhibe ? '#A78BFA' : '#F59E0B';
-        return `<path d="${dd}" class="nl-circ__halo"/>
-            <path d="${dd}" class="nl-circ__ruta is-animada" style="stroke:${col}"/>
-            <circle r="9" class="nl-circ__impulso${inhibe ? ' is-inh' : ''}"><animateMotion dur="4s" begin="${idx * 0.6}s" repeatCount="indefinite" path="${dd}"/></circle>`;
+        return `<path d="${dd}" class="nl-circ__ruta is-animada" style="stroke:${col}"/>
+            <circle r="10" class="nl-circ__impulso${inhibe ? ' is-inh' : ''}"><animateMotion dur="${4 + idx * 0.7}s" repeatCount="indefinite" path="${dd}"/></circle>`;
     }
 
     /* ---------------- Vista ---------------- */
@@ -194,12 +198,12 @@ function iniciar(raiz) {
                     return `<span class="nl-circ__chip" style="left:${x}%;top:${y}%"><i></i>${esc(pz.nombre)}</span>`;
                 }).join('');
             } else {
-                c.vias.forEach((v, i) => { const s = e.via[i]; if (s && s.ok && s.ruta) svg += svgRuta(s.ruta, !!s.inhibe, i); });
                 svg += c.piezas.filter(pz => e.ok[pz.clave] && e.trz[pz.clave]).map(pz => {
                     const iSeq = p === 'conectar' && e.via[via] ? (e.via[via].seq || []).indexOf(pz.clave) : -1;
                     return svgNeurona(pz.clave, e.trz[pz.clave], { clave: pz.clave, inhibida: inh.includes(pz.clave), nueva: nueva === pz.clave,
                         tocable: p === 'conectar', elegida: iSeq >= 0, num: iSeq >= 0 ? iSeq + 1 : 0, nombre: angosta() ? '' : pz.nombre });
                 }).join('');
+                c.vias.forEach((v, i) => { const s = e.via[i]; if (s && s.ok && s.ruta) svg += svgRuta(s.ruta, !!s.inhibe, i); });
                 if (p === 'lupas' || p === 'preguntas' || p === 'listo') {
                     html += (c.lupas || []).map(lp => {
                         const [x, y] = pct(lp.x, lp.y);
@@ -397,9 +401,12 @@ function iniciar(raiz) {
                 <p class="nl-lab__paso nl-circ__via">${c.vias.length > 1 ? `Vía ${i + 1} de ${c.vias.length}: ` : ''}<strong>${esc(c.vias[i].titulo || 'Conecta el reflejo')}</strong></p>
                 <p class="nl-lab__ayuda">Toca en el esquema las <strong>${c.vias[i].n} neuronas</strong> de esta vía, en el orden en que viaja la información, empezando por la que recibe del <strong>${esc(c.receptor.toLowerCase())}</strong>.</p>
                 <p class="nl-circ__seq">${v.seq.length ? v.seq.map((k, j) => `<span style="--c:${pieza(c, k).color || '#FCD34D'}">${j + 1}. ${esc(pieza(c, k).nombre)}</span>`).join(' → ') : '<em>Aún no tocas ninguna</em>'}</p>
-                ${v.seq.length ? '<button type="button" class="nl-lab__nose nl-circ__borrar">Borrar y empezar el orden de nuevo</button>' : ''}`;
+                ${v.seq.length ? '<button type="button" class="nl-lab__nose nl-circ__borrar">Borrar y empezar el orden de nuevo</button>' : ''}
+                <p class="nl-lab__ayuda nl-circ__o">También puedes tocarlas aquí:</p>
+                <div class="nl-circ__piezas nl-circ__toque">${c.piezas.map(pz => `<button type="button" class="nl-circ__pieza${v.seq.includes(pz.clave) ? ' is-sel' : ''}" data-neu="${esc(pz.clave)}" style="--c:${pz.color || '#FCD34D'}"${v.seq.includes(pz.clave) ? ' disabled' : ''}>
+                    <span class="nl-circ__ico">${iconos[pz.clave] || ''}</span><span><strong>${v.seq.includes(pz.clave) ? (v.seq.indexOf(pz.clave) + 1) + '. ' : ''}${esc(pz.nombre)}</strong></span></button>`).join('')}</div>`;
             panel.querySelector('.nl-circ__borrar')?.addEventListener('click', () => { v.seq = []; guardar(); pintar(); });
-            if (angosta()) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            panel.querySelectorAll('.nl-circ__toque [data-neu]:not([disabled])').forEach(b => b.addEventListener('click', () => { if (!ocupado) tocarNeurona(c, b.dataset.neu); }));
             return;
         }
 
@@ -628,7 +635,7 @@ function iniciar(raiz) {
         } else {
             const inh = inhibidas(cc);
             const rutas = cc.vias.map((_, i) => e.via[i] || {}).filter(v => v.ok && v.ruta).map(v => ({ d: v.ruta, inhibe: !!v.inhibe }));
-            await dibujarNeuronas(L, cc.piezas.filter(pz => e.trz[pz.clave]).map(pz => ({ t: e.trz[pz.clave], inhibida: inh.includes(pz.clave), nombre: pz.nombre })), rutas);
+            await dibujarNeuronas(L, cc.piezas.filter(pz => e.trz[pz.clave]).map(pz => ({ t: e.trz[pz.clave], inhibida: inh.includes(pz.clave), nombre: pz.nombre + (inh.includes(pz.clave) ? ' ⊣ inhibida' : '') })), rutas);
         }
         return L.c.toDataURL('image/jpeg', 0.82);
     }
