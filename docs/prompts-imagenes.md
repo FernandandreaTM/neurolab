@@ -215,6 +215,10 @@ marco de la captura y el nivel II pasa de esquema a rompecabezas.
 
 ## 7. Circuito reflejo por capas (rediseño, sesión 06) → `img/reflejo/`
 
+> **Resultado (2026-10-18):** se usó un prompt único de 7 imágenes (ver reporte de la sesión 06, §4b).
+> Sirvieron `esquema-base.png` y las 4 lupas; los circuitos se descartaron y las neuronas se dibujan en SVG.
+> Lo que sigue quedó como referencia.
+
 Reemplaza a §6. Cada imagen se corta en capas: la médula, cada pieza periférica y **cada neurona por su
 color** (por eso los colores puros y distintos). Adjunta siempre `img/_fuentes/reflejo-arco.png` como
 referencia de **composición** (misma ubicación de médula, raíces, ganglio, nervio, piel y músculo) y

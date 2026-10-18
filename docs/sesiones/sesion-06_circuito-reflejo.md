@@ -1,7 +1,7 @@
 # Sesión 06: íconos de glía, tarjetas de Glía del SNC y circuito reflejo (rediseño en curso)
 
 **Fecha:** 2026-10-18 · **Asignatura:** ETMP097 Neurobiología · **Práctico:** Células nerviosas II (`practico.php?p=celulas-2`) · **Uso con estudiantes:** miércoles 21-10
-**Estado:** Glía del SNC II con tarjetas e íconos, listo. El **circuito reflejo funciona en 3 niveles** (commit `f7291ab`), pero Fer pidió un **rediseño completo por capas sobre un solo esquema**: queda diseñado (§4) y a la espera de las imágenes de ChatGPT (`docs/prompts-imagenes.md` §7). Todo se probó con PHP 8.3 + Playwright en 1366×660 y 390×844; con «Completar todo el práctico», Células II llega a 12/12 secciones y Células I a 9/9.
+**Estado:** Glía del SNC II con tarjetas e íconos, listo. El **circuito reflejo funciona en 3 niveles** (commit `f7291ab`), pero Fer pidió un **rediseño completo por capas sobre un solo esquema**: queda diseñado (§4). Imágenes: el esquema base y las 4 lupas de ChatGPT sirven; los circuitos de ChatGPT se descartaron y **las neuronas se dibujarán en SVG** (§4b). Todo se probó con PHP 8.3 + Playwright en 1366×660 y 390×844; con «Completar todo el práctico», Células II llega a 12/12 secciones y Células I a 9/9.
 
 ---
 
@@ -54,10 +54,28 @@ Un solo esquema al que se le van agregando capas, en niveles de la misma activid
 | Asta ventral / motoneurona | Poliomielitis o ELA: debilidad, atrofia y fasciculaciones, sin reflejo, con sensibilidad intacta | Enfermedades que dañan selectivamente la motoneurona |
 | Nervio (mixto) | Herida cortante o fractura que lesiona un nervio periférico: se pierden sensibilidad, fuerza y reflejo en su territorio | El nervio lleva fibras sensitivas y motoras juntas |
 
+## 4b. Imágenes y decisión final (2026-10-18, al cierre)
+
+Se pidió a ChatGPT un set de 7 imágenes con un solo prompt (flexor y extensor por separado, interneurona inhibitoria, lupas). Revisión:
+
+| Imagen (`img/reflejo/`) | Estado | Motivo |
+|---|---|---|
+| `esquema-base.png` | ✅ Fondo de todos los niveles | Piel con terminación libre, extensor con huso, flexor, ganglio, raíces y médula con dorsal arriba |
+| `sinapsis-excitatoria.png`, `sinapsis-inhibitoria.png`, `placa-motora.png`, `huso-muscular.png` | ✅ Lupas | Correctas (vesículas redondas frente a aplanadas, canales, pliegues, espiral sobre fibras intrafusales) |
+| `rotuliano.png`, `retirada.png` | ❌ Movidas a `img/_fuentes/descartadas/` | Pseudounipolar con «cola» (parece bipolar); motoneuronas e interneuronas del lado contrario; un axón cruza la médula para salir por la otra raíz; nervios pintados enteros |
+
+**Decisión (Fer):** las neuronas no se piden a ChatGPT. Se dibujan **como capas SVG** sobre `esquema-base.png`:
+- Somas con los íconos existentes (`img/tipos/pseudounipolar.png`, `motoneurona.png`, `multipolar.png`; la interneurona inhibitoria con el multipolar, en otro color).
+- Axones, la T de la pseudounipolar, ramas y botones terminales trazados por su camino real, **todo del lado izquierdo**: la sensitiva por el nervio → ganglio → raíz dorsal; la motora por la raíz ventral → nervio → placa motora del músculo que corresponde.
+- Colores: sensitiva del huso azul #2563EB · sensitiva del dolor celeste #0891B2 · interneurona excitatoria verde #16A34A · interneurona inhibitoria morado #7C3AED · motoneurona del extensor rojo #DC2626 · motoneurona del flexor naranjo #EA580C.
+- Rotuliano: azul (huso del extensor) → roja (extensor), y la colateral → morada → naranja (flexor, inhibida). Retirada: celeste (piel) → verde → naranja (flexor) y celeste → morada → roja (extensor, inhibida).
+- Las lupas se abren tocando los botones: excitatoria (azul sobre roja), inhibitoria (morada sobre naranja), placa motora, huso.
+- Las imágenes de ChatGPT pesan 1,3-1,6 MB: bajarlas (≈1152 px, .jpg el base) antes de usarlas.
+
 ## 5. Pendientes
 
-1. **Imágenes** de `docs/prompts-imagenes.md` §7 (`rotuliano.png`, `retirada.png`, `sinapsis-central.png`, `placa-motora.png`) → `img/reflejo/`.
-2. Implementar el rediseño (§4) reutilizando `rompecabezas.js` (huecos en vez de punto exacto), `circuito.js` (fondo fijo) y el corte por color de las neuronas.
+1. Implementar el rediseño (§4 + §4b): base `esquema-base.png`, neuronas en SVG, lupas; reutilizar `rompecabezas.js` (huecos en vez de punto exacto: las piezas se cortan de `esquema-base.png`) y `circuito.js` (fondo fijo).
+2. Optimizar las imágenes nuevas de `img/reflejo/` y sacar del repo las piezas viejas (`arco.jpg`, `tablero.jpg`, `piel.png`, `musculo.png`, `nervio.png`, `raiz-*.png`) cuando el rediseño las reemplace.
 3. Ayudantes: actualizar `docs/practico-2_tareas.md` (revisar casos clínicos del nivel V, textos de lupas sinápticas, láminas de glía).
 4. Glía del SNC III-IV (MHS-240 y UCSF-163) y Glía del SNP: revisar con ojo docente.
 5. Arreglar el título «Nivel II: sNC frente a SNP» (la barra pasa la primera letra a minúscula y rompe las siglas).
@@ -71,13 +89,14 @@ Un solo esquema al que se le van agregando capas, en niveles de la misma activid
 ```
 Retomo NeuroLab (C:\repo\neurolab). Lee docs/sesiones/sesion-06_circuito-reflejo.md completo
 (y la sesión 05 para el práctico II y la sesión 04 para el estilo de la guía y la mesa de trabajo).
-Ya dejé en img/reflejo/ las imágenes de docs/prompts-imagenes.md §7 (rotuliano.png, retirada.png,
-sinapsis-central.png, placa-motora.png): revísalas (orientación dorsal arriba, colores puros de cada
-neurona, botones terminales) y dime si sirven antes de cortarlas.
-Luego implementa el rediseño del circuito reflejo de la §4: un solo esquema por capas en 5 niveles
-(médula sola → extremos con huecos para emparejar → rotuliano con lupas sinápticas → retirada con
-interneurona → cortes emparejando 3 casos con 3 sitios), sin lámina real. Reutiliza rompecabezas.js,
-circuito.js y molde/zonas. Revisa conmigo los casos clínicos del nivel V.
+Implementa el rediseño del circuito reflejo de la §4 y §4b: un solo esquema por capas sobre
+img/reflejo/esquema-base.png en 5 niveles (médula sola → extremos con huecos para emparejar →
+rotuliano con inhibición recíproca y lupas sinápticas → retirada con interneuronas → cortes
+emparejando 3 casos con 3 sitios), sin lámina real. Las neuronas las dibujas tú en SVG (somas con
+los íconos de img/tipos/, axones y botones por su camino real, todo del lado izquierdo); las lupas
+son sinapsis-excitatoria, sinapsis-inhibitoria, placa-motora y huso-muscular. Reutiliza
+rompecabezas.js, circuito.js y molde/zonas. Antes de programar muéstrame un boceto del trazado de
+las neuronas sobre el esquema base, y revisa conmigo los casos clínicos del nivel V.
 Implementa por partes, probando con PHP 8.3 + Playwright en 1366×660 y celular; commits locales con
 mi autoría; dime exactamente qué subir. Al cerrar, escribe docs/sesiones/sesion-07_*.md con reporte
 + prompt siguiente.
