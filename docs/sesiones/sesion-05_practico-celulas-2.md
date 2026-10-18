@@ -46,6 +46,19 @@
 | Glía SNC nivel I | Completar (escribir de memoria) en vez de esquema, porque el esquema todavía no existe. Cuando esté, se puede pasar a identificación |
 | LabiMed | Era LABIM3D: el pie ya enlazaba DigitalDuck y LABIM3D |
 
+## 3b. Integración de los PR de Kaira (2026-10-18)
+
+Kaira trabajó sobre `origin/main` sin los commits de esta sesión (aún no se había hecho push). Se integraron sus dos PR en `main` con commits de merge, así que GitHub los marca como fusionados con su autoría.
+
+| PR | Qué quedó | Archivos |
+|---|---|---|
+| #13 Esquemas de glía (tarea B) | Sus esquemas son el **nivel I «Esquema»** (identificación) de Glía del SNC y Glía del SNP. El resto corre un número: SNC II «Cada célula, su función», III canal + sustancia blanca, IV motoneurona; SNP II cuadro, III ganglio, IV nervio. Sus partes pasan a las actividades 10 y 11. El aviso del cerebro de rata queda solo en la lámina del práctico I | `img/glia-snc.jpg`, `img/glia-snp.jpg`, `data/seed.sql`, `data/practicos.php`, `_partials/mesa.php`, `docs/prompts-imagenes.md` (§4 esquemas; íconos pasan a §5) |
+| #14 Preguntas de láminas (tarea C) | Se combinaron con las publicadas sin repetir; el detalle está al inicio de `docs/practico-2_preguntas-laminas.md` | `data/seed.sql`, `docs/practico-2_preguntas-laminas.md` |
+
+Ahora la guía de `celulas-2` tiene **11 secciones** (antes 9). Se probó todo como estudiante y con «Completar todo el práctico» (11/11, sin errores).
+
+**Subir:** `_partials/mesa.php css/mesa.css data/practicos.php data/seed.sql img/glia-snc.jpg img/glia-snp.jpg` y luego `admin/seed.php` (actividades: 12).
+
 ## 4. Para producción (Fer)
 
 1. GitHub Desktop → `main` → **Push origin**.

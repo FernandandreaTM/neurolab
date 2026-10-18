@@ -41,8 +41,8 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 | # | Actividad | Niveles | Mecánica | Va a la guía |
 |---|---|---|---|---|
 | 1 | Circuito reflejo | 2 | I: capturar y etiquetar médula + ganglio (MH-047) · II: **sobre la propia captura**, ubicar neurona sensitiva, interneurona y motoneurona, conectarlas en orden (impulso animado) y responder | Captura etiquetada + circuito dibujado |
-| 2 | Glía del SNC | 3 | I: escribir la célula que describe cada frase · II: canal central y sustancia blanca (MHS-240, H&E) · III: motoneurona y su glía (UCSF-163, cresil) | Tabla + capturas + preguntas |
-| 3 | Glía del SNP | 3 | I: frases → tarjetas → cuadro SNC/SNP · II: ganglio y células satélite (MH-051) · III: nervio periférico (MH-052) | Cuadro + capturas + preguntas |
+| 2 | Glía del SNC | 4 | I: esquema (identificación) · II: escribir la célula que describe cada frase · III: canal central y sustancia blanca (MHS-240, H&E) · IV: motoneurona y su glía (UCSF-163, cresil) | Esquema rotulado + tabla + capturas + preguntas |
+| 3 | Glía del SNP | 4 | I: esquema (identificación) · II: frases → tarjetas → cuadro SNC/SNP · III: ganglio y células satélite (MH-051) · IV: nervio periférico (MH-052) | Esquema rotulado + cuadro + capturas + preguntas |
 | 4 | Quiz de cierre | 1 | 15 preguntas (7 conceptos + 4 casos + 4 de la carrera), algunas con tarjetas | Resultado + explicaciones |
 
 Cada nivel puede tener un recuadro **«¿Para qué te sirve?»** propio de TO o Fono.
