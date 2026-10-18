@@ -2,6 +2,9 @@
  * NeuroLab — rompecabezas.js
  * Nivel «rompecabezas» de una lámina: sobre un tablero (imagen con una parte fija, p. ej. la médula)
  * el estudiante pone cada pieza en su lugar: toca la pieza y luego dónde va, o la arrastra (mouse o dedo).
+ * Con `huecos` el tablero muestra la silueta punteada de cada pieza: también vale tocar primero el hueco y
+ * después la pieza, y cualquier punto de la silueta es correcto. Con `grupos` las piezas salen por etapas
+ * (p. ej. primero el lado sensitivo y después el motor).
  * El lugar de cada pieza no va al navegador: se revisa en api/circuito_check.php (accion=pieza), que
  * devuelve su caja al acertar. Luego, preguntas. Avance en localStorage (nl_rompe_<clave>).
  * Al completar: markDone(clave) y la sección (imagen armada + piezas + preguntas) va a la guía.
@@ -40,6 +43,10 @@ function iniciar(raiz) {
     try { piezas = JSON.parse(d.piezas || '[]'); } catch { piezas = []; }
     try { preguntas = JSON.parse(d.preguntas || '[]'); } catch { preguntas = []; }
     const clave = d.clave, KEY = 'nl_rompe_' + clave;
+    const huecos = !!d.huecos;
+    let grupos = null;
+    try { grupos = JSON.parse(d.grupos || 'null'); } catch { grupos = null; }
+    const ordenGrupos = grupos ? Object.keys(grupos) : [];
     const ruta = new URLSearchParams(location.search).get('ruta') || '';
     const vista = raiz.querySelector('#nl-rompe-vista');
     const panel = raiz.querySelector('#nl-rompe-trabajo');
@@ -64,8 +71,17 @@ function iniciar(raiz) {
 
     const armado = () => piezas.every(p => est.ok[p.clave]);
     const paso = () => !armado() ? 'armar' : !est.listo ? 'preguntas' : 'listo';
-    let sel = piezas.find(p => !est.ok[p.clave])?.clave || null;
+    // Grupo en curso: el primero con piezas sin poner (sin grupos, todas las piezas a la vez)
+    const grupoActual = () => ordenGrupos.find(g => piezas.some(p => p.grupo === g && !est.ok[p.clave])) || null;
+    const visibles = () => {
+        if (!grupos) return piezas;
+        const iG = ordenGrupos.indexOf(grupoActual());
+        return piezas.filter(p => iG < 0 || ordenGrupos.indexOf(p.grupo) <= iG);
+    };
+    const primeraLibre = () => huecos ? null : (visibles().find(p => !est.ok[p.clave])?.clave || null);
+    let sel = primeraLibre();
     let aviso = '', ocupado = false, enRespuesta = null, marca = null;   // marca: último punto mal puesto
+    let pendiente = null;   // hueco tocado antes de elegir la pieza
 
     /* ---------------- Vista: tablero + piezas puestas ---------------- */
     function pintarVista() {
@@ -78,22 +94,30 @@ function iniciar(raiz) {
                             style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">`;
               }).join('')}
               ${marca ? `<span class="nl-rompe__marca" style="left:${marca[0]}%;top:${marca[1]}%">✗</span>` : ''}
+              ${pendiente ? `<span class="nl-rompe__marca is-pendiente" style="left:${pendiente[0]}%;top:${pendiente[1]}%">?</span>` : ''}
             </div>
-            <p class="nl-lam__ayuda-vista">${p === 'armar' ? (sel ? `Toca dónde va: <strong>${esc(nombre(sel))}</strong> (o arrástrala desde el panel)` : 'Elige una pieza en el panel')
+            <p class="nl-lam__ayuda-vista">${p === 'armar' ? (sel ? `Toca dónde va: <strong>${esc(nombre(sel))}</strong> (o arrástrala desde el panel)`
+                    : pendiente ? 'Ahora elige en el panel <strong>qué pieza va en ese hueco</strong>'
+                    : huecos ? 'Toca un hueco punteado o elige una pieza en el panel' : 'Elige una pieza en el panel')
                 : 'Tu arco reflejo armado'}</p>`;
         const tab = vista.querySelector('#nl-rompe-tablero');
         tab.addEventListener('click', ev => {
-            if (paso() !== 'armar' || !sel || ocupado) return;
+            if (paso() !== 'armar' || ocupado || (!sel && !huecos)) return;
             const r = tab.querySelector('img').getBoundingClientRect();
             const x = (ev.clientX - r.left) / r.width * 100, y = (ev.clientY - r.top) / r.height * 100;
-            if (x >= 0 && x <= 100 && y >= 0 && y <= 100) poner(sel, [x, y]);
+            if (x < 0 || x > 100 || y < 0 || y > 100) return;
+            if (sel) poner(sel, [x, y]);
+            else if (huecos) {
+                pendiente = [x, y]; marca = null; pintar();
+                if (angosta()) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     }
     const nombre = k => (piezas.find(p => p.clave === k) || {}).nombre || k;
 
     async function poner(k, xy) {
         if (instr) instr.open = false;
-        ocupado = true;
+        ocupado = true; pendiente = null;
         const r = await revisar({ slug: d.slug, n: d.n, accion: 'pieza', pieza: k, x: xy[0].toFixed(1), y: xy[1].toFixed(1) });
         ocupado = false;
         if (r.red) { aviso = r.feedback; pintar(); return; }
@@ -101,7 +125,7 @@ function iniciar(raiz) {
             est.ok[k] = r.caja;
             est.exp[k] = { exp: r.exp || '', e: (est.mal[k] || []).length };
             marca = null;
-            sel = piezas.find(p => !est.ok[p.clave])?.clave || null;
+            sel = primeraLibre();
         } else {
             est.mal[k] = (est.mal[k] || []).concat([r.feedback]);
             est.err++;
@@ -157,10 +181,12 @@ function iniciar(raiz) {
         const p = paso();
         if (p === 'armar') {
             const malSel = sel && !est.ok[sel] ? (est.mal[sel] || []) : [];
+            const g = grupoActual();
             panel.innerHTML = `${av}
-                <p class="nl-lab__paso"><span class="nl-lab__badge">1</span> Arma el arco reflejo</p>
-                <p class="nl-lab__ayuda">Toca una pieza y luego su lugar en el tablero, o arrástrala. La médula ya está puesta.</p>
-                <div class="nl-rompe__bandeja">${piezas.map(pz => {
+                <p class="nl-lab__paso"><span class="nl-lab__badge">1</span> ${grupos && g ? esc(grupos[g]) : 'Arma el arco reflejo'}</p>
+                <p class="nl-lab__ayuda">${huecos ? (pendiente ? '<strong>¿Qué pieza va en el hueco que tocaste?</strong>' : 'Toca un hueco y luego su pieza, o toca la pieza y luego su hueco. También puedes arrastrarla.')
+                    : 'Toca una pieza y luego su lugar en el tablero, o arrástrala.'} La médula ya está puesta.</p>
+                <div class="nl-rompe__bandeja">${visibles().map(pz => {
                     const ok = !!est.ok[pz.clave];
                     return `<button type="button" class="nl-rompe__pieza${ok ? ' is-ok' : ''}${pz.clave === sel ? ' is-sel' : ''}" data-clave="${esc(pz.clave)}"${ok ? ' disabled' : ''}>
                         <span class="nl-rompe__mini"><img src="${esc(pz.img)}" alt="" draggable="false"></span>
@@ -170,6 +196,7 @@ function iniciar(raiz) {
                 ${piezas.filter(pz => est.ok[pz.clave]).map(pz => bloque(pz.nombre, est.exp[pz.clave].exp)).join('')}`;
             panel.querySelectorAll('.nl-rompe__pieza:not([disabled])').forEach(b => {
                 b.addEventListener('click', () => {
+                    if (pendiente) { const xy = pendiente; sel = b.dataset.clave; poner(b.dataset.clave, xy); return; }
                     sel = b.dataset.clave; marca = null; pintar();
                     if (angosta()) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
@@ -291,8 +318,8 @@ function iniciar(raiz) {
     raiz.querySelector('#nl-rompe-reset')?.addEventListener('click', () => {
         if (Object.keys(est.ok).length && !confirm('Esto desarma tu rompecabezas y borra tus respuestas de este nivel. ¿Seguro?')) return;
         est = { ok: {}, mal: {}, exp: {}, preg: {}, err: 0 };
-        guardar(); guiaHecha = false; enRespuesta = null; marca = null;
-        sel = piezas[0]?.clave || null;
+        guardar(); guiaHecha = false; enRespuesta = null; marca = null; pendiente = null;
+        sel = primeraLibre();
         pintar();
     });
     pintar();

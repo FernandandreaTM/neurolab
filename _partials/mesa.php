@@ -210,21 +210,33 @@ nl_barra([
 </div>
 
 <?php elseif (!empty($esCircuito)):
-    // Reflejos y cortes sobre la captura encajada de un nivel anterior (js/circuito.js). Zonas, puntos,
-    // orden y rutas no se mandan: se revisan en api/circuito_check.php
+    // Circuito (js/circuito.js) sobre una imagen fija (`fondo`) o la captura encajada de un nivel anterior.
+    // Zonas, puntos, trazos de lo que falta ubicar, orden, rutas y sitios de los casos no se mandan:
+    // se revisan en api/circuito_check.php
     $basePrev = $nivelLam['base'] ?? [];
     $baseCirc = ['clave' => $act['slug'] . ':' . (int)($basePrev['nivel'] ?? 1), 'captura' => (string)($basePrev['captura'] ?? '')];
     $iconosCirc = [];
     $circuitos = array_map(function ($c) use (&$iconosCirc) {
         return ['clave' => $c['clave'], 'titulo' => $c['titulo'], 'sub' => $c['sub'] ?? '', 'estimulo' => $c['estimulo'] ?? '',
                 'receptor' => $c['receptor'] ?? 'Receptor', 'efector' => $c['efector'] ?? 'Músculo', 'preguntas' => $c['preguntas'] ?? [],
+                'vias' => array_map(function ($v) { return ['titulo' => $v['titulo'] ?? '', 'n' => count($v['orden'] ?? [])]; },
+                                    $c['vias'] ?? (!empty($c['orden']) ? [['titulo' => '', 'orden' => $c['orden']]] : [])),
+                'lupas' => $c['lupas'] ?? [],
                 'piezas' => array_map(function ($p) use (&$iconosCirc) {
-                    $iconosCirc[$p['clave']] = $p['icono'] ?? '';
-                    return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'detalle' => $p['detalle'] ?? ''];
+                    if (!empty($p['icono'])) $iconosCirc[$p['clave']] = $p['icono'];
+                    $q = ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'detalle' => $p['detalle'] ?? '', 'color' => $p['color'] ?? ''];
+                    if (!empty($p['dada'])) { $q['dada'] = true; $q['punto'] = $p['punto']; $q['trazo'] = $p['trazo'] ?? null; $q['zona'] = $p['zona_nombre'] ?? ''; $q['exp'] = $p['exp'] ?? ''; }
+                    return $q;
                 }, $c['piezas'] ?? [])];
     }, $nivelLam['circuitos'] ?? []);
     $cortes = isset($nivelLam['cortes']) ? ['titulo' => $nivelLam['cortes']['titulo'] ?? '',
-        'casos' => array_map(function ($k) { return ['caso' => $k['caso']]; }, $nivelLam['cortes']['casos'] ?? [])] : null;
+        'sitios' => array_map(function ($s) { return ['letra' => $s['letra'], 'x' => $s['x'], 'y' => $s['y']]; }, $nivelLam['cortes']['sitios'] ?? []),
+        'casos' => array_map(function ($k) { return ['caso' => $k['caso'], 'titulo' => $k['titulo'] ?? '']; }, $nivelLam['cortes']['casos'] ?? [])] : null;
+    $iconosUrl = [];
+    foreach (['Pseudounipolar', 'Motoneurona', 'Multipolar'] as $t) {
+        $png = 'img/tipos/' . nl_clave_icono($t) . '.png';
+        if (is_file(__DIR__ . '/../' . $png)) $iconosUrl[$t] = $png . '?v=' . filemtime(__DIR__ . '/../' . $png);
+    }
 ?>
 <div class="nl-mesa nl-mesa--lamina nl-mesa--circ container" id="nl-circ"
      data-slug="<?= htmlspecialchars($act['slug']) ?>"
@@ -235,6 +247,10 @@ nl_barra([
      data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
      data-molde="<?= htmlspecialchars($nivelLam['molde'] ?? '') ?>"
      data-fondo="<?= htmlspecialchars(!empty($nivelLam['fondo']) ? $nivelLam['fondo'] . '?v=' . (@filemtime(__DIR__ . '/../' . $nivelLam['fondo']) ?: 1) : '') ?>"
+     data-vb="<?= htmlspecialchars(json_encode($nivelLam['vb'] ?? null)) ?>"
+     data-etiquetas="<?= !empty($nivelLam['etiquetas']) ? '1' : '' ?>"
+     data-iconos="<?= htmlspecialchars(json_encode($iconosUrl, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-neuronas="<?= htmlspecialchars(json_encode($nivelLam['neuronas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-base="<?= htmlspecialchars(json_encode($baseCirc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-circuitos="<?= htmlspecialchars(json_encode($circuitos, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-cortes="<?= htmlspecialchars(json_encode($cortes, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
@@ -264,7 +280,7 @@ nl_barra([
 <?php elseif (!empty($esRompe)):
     // Rompecabezas (js/rompecabezas.js): el lugar de cada pieza se revisa en api/circuito_check.php
     $piezasR = array_map(function ($p) {
-        return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'img' => $p['img'], 'w' => $p['caja'][2]];
+        return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'img' => $p['img'], 'w' => $p['caja'][2], 'grupo' => $p['grupo'] ?? ''];
     }, $nivelLam['piezas'] ?? []);
     $fotoR = __DIR__ . '/../' . ($nivelLam['tablero'] ?? '');
 ?>
@@ -277,6 +293,8 @@ nl_barra([
      data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
      data-tablero="<?= htmlspecialchars(($nivelLam['tablero'] ?? '') . '?v=' . (@filemtime($fotoR) ?: 1)) ?>"
      data-piezas="<?= htmlspecialchars(json_encode($piezasR, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-huecos="<?= !empty($nivelLam['huecos']) ? '1' : '' ?>"
+     data-grupos="<?= htmlspecialchars(json_encode($nivelLam['grupos'] ?? null, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-preguntas="<?= htmlspecialchars(json_encode($nivelLam['preguntas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
     <div class="nl-lab__candado" hidden>
         <strong>🔒 Nivel bloqueado</strong>

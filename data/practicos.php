@@ -64,11 +64,13 @@ return [
         'intro'      => 'Avanza a tu ritmo, en orden. Cada actividad se corrige sola: cuando completes un nivel, se suma a tu guía de estudio. Al final descarga tu guía con todo lo que trabajaste.',
         'pasos' => [
             ['slug' => 'circuito-reflejo',
-             'titulo' => 'Circuito reflejo (3 niveles)',
-             'tarea' => 'Oriéntate en una médula real teñida con cresil: captúrala, encaja la silueta y ubica sus partes. Luego arma el arco reflejo como un rompecabezas y, sobre él, dos reflejos (sin y con interneurona); al final predice qué pasa si se corta el arco. Cada nivel suma una sección a tu guía.',
-             'guia' => ['circuito-reflejo:1' => 'Nivel I: orientación en la médula',
-                        'circuito-reflejo:2' => 'Nivel II: armar el arco reflejo',
-                        'circuito-reflejo:3' => 'Nivel III: reflejos y cortes'],
+             'titulo' => 'Circuito reflejo (5 niveles)',
+             'tarea' => 'Un solo esquema que se arma por capas: ubica las partes de la médula, completa los extremos del arco, arma el reflejo rotuliano y el de retirada neurona por neurona (con sus sinapsis bajo la lupa) y, al final, empareja tres casos clínicos con el sitio de la lesión. Cada nivel suma una sección a tu guía.',
+             'guia' => ['circuito-reflejo:1' => 'Nivel I: la médula',
+                        'circuito-reflejo:2' => 'Nivel II: los extremos del arco',
+                        'circuito-reflejo:3' => 'Nivel III: reflejo rotuliano',
+                        'circuito-reflejo:4' => 'Nivel IV: reflejo de retirada',
+                        'circuito-reflejo:5' => 'Nivel V: ¿dónde se cortó el arco?'],
              'conexion' => [
                 'circuito-reflejo:1' => [
                     'terapia-ocupacional' => 'Orientarte en el corte (dorsal y ventral, entrada y salida) permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',
@@ -79,6 +81,12 @@ return [
                 'circuito-reflejo:3' => [
                     'terapia-ocupacional' => 'Los reflejos osteotendíneos (rotuliano, bicipital, aquíleo) evalúan el circuito: disminuidos indican falla en el arco (nervio, raíz o motoneurona); exaltados, falla del control que baja desde el encéfalo, como tras un ACV.',
                     'fonoaudiologia' => 'Los reflejos orofaríngeos (nauseoso, deglutorio, tusígeno) siguen la misma lógica: vía sensitiva, centro en el tronco encefálico y vía motora. Evaluarlos en la disfagia orienta qué tramo del circuito está fallando.'],
+                'circuito-reflejo:4' => [
+                    'terapia-ocupacional' => 'La inhibición recíproca explica por qué un movimiento es fluido: cuando falla el control que baja del encéfalo (ACV, parálisis cerebral), agonista y antagonista se activan juntos y aparecen la espasticidad y la cocontracción que dificultan alcanzar, agarrar o caminar.',
+                    'fonoaudiologia' => 'La deglución y la tos también coordinan músculos que se activan mientras otros se inhiben (cerrar la vía aérea mientras se abre el esfínter esofágico superior). Las interneuronas del tronco encefálico organizan esa secuencia.'],
+                'circuito-reflejo:5' => [
+                    'terapia-ocupacional' => 'Distinguir si falla la sensibilidad, la fuerza o ambas orienta la intervención: no se trabaja igual una radiculopatía (dolor, hormigueo) que una lesión de motoneurona (debilidad, atrofia) o de nervio periférico (protección de la zona sin sensibilidad).',
+                    'fonoaudiologia' => 'En la evaluación orofacial se aplica el mismo razonamiento: si un reflejo falta y la sensibilidad también, sospechas de la vía sensitiva o del nervio; si la sensibilidad está y falla la fuerza, de la motoneurona del núcleo motor.'],
              ]],
             ['slug' => 'glia-snc',
              'titulo' => 'Glía del SNC (4 niveles)',
