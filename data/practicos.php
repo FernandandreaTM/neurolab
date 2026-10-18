@@ -77,36 +77,40 @@ return [
                     'fonoaudiologia' => 'Los reflejos orofaríngeos (nauseoso, deglutorio, tusígeno) siguen la misma lógica: vía sensitiva, centro en el tronco encefálico y vía motora. Evaluarlos en la disfagia orienta qué tramo del circuito está fallando.'],
              ]],
             ['slug' => 'glia-snc',
-             'titulo' => 'Glía del SNC (3 niveles)',
-             'tarea' => 'Primero reconoce cada célula glial del SNC por su función; luego encuéntrala en cortes reales de médula: el canal central y la sustancia blanca con H&E, y la motoneurona con su glía con cresil violeta. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-snc:1' => 'Nivel I: cada célula, su función',
-                        'glia-snc:2' => 'Nivel II: canal central y sustancia blanca',
-                        'glia-snc:3' => 'Nivel III: motoneurona y su glía'],
+             'titulo' => 'Glía del SNC (4 niveles)',
+             'tarea' => 'Identifica cada célula glial del SNC en un esquema y reconócela por su función; luego encuéntrala en cortes reales de médula: el canal central y la sustancia blanca con H&E, y la motoneurona con su glía con cresil violeta. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-snc:1' => 'Nivel I: esquema',
+                        'glia-snc:2' => 'Nivel II: cada célula, su función',
+                        'glia-snc:3' => 'Nivel III: canal central y sustancia blanca',
+                        'glia-snc:4' => 'Nivel IV: motoneurona y su glía'],
              'conexion' => [
                 'glia-snc:1' => [
                     'terapia-ocupacional' => 'La glía explica síntomas que verás en la práctica: la fatiga y la lentitud de la esclerosis múltiple (oligodendrocitos) o la cicatriz tras un ACV o un traumatismo (astrocitos), que hace que la recuperación dependa de la plasticidad y no de la regeneración.',
                     'fonoaudiologia' => 'Cuando se pierde la mielina de la vía auditiva central o de las vías motoras del habla, la señal se enlentece: cuesta comprender el habla rápida y se altera la coordinación de la articulación.'],
-                'glia-snc:2' => [
+                'glia-snc:2' => null,
+                'glia-snc:3' => [
                     'terapia-ocupacional' => 'Si el LCR no circula bien (hidrocefalia), sube la presión dentro del cráneo y pueden aparecer alteraciones de la marcha, la atención y el control de esfínteres que afectan el desempeño diario.',
                     'fonoaudiologia' => 'En la hidrocefalia infantil, la presión del LCR daña la sustancia blanca que rodea los ventrículos: puede retrasar el desarrollo del lenguaje y afectar la atención y el procesamiento auditivo.'],
-                'glia-snc:3' => [
+                'glia-snc:4' => [
                     'terapia-ocupacional' => 'En la ELA mueren las motoneuronas del asta ventral y la glía vecina participa (excitotoxicidad, inflamación): la debilidad avanza y la intervención adapta actividades y entorno para mantener la autonomía.',
                     'fonoaudiologia' => 'En la ELA de inicio bulbar mueren las motoneuronas del tronco que mueven lengua, labios y laringe: aparecen disartria y disfagia progresivas, y la intervención apoya la comunicación (incluso con sistemas alternativos) y una deglución segura.'],
              ]],
             ['slug' => 'glia-snp',
-             'titulo' => 'Glía del SNP (3 niveles)',
-             'tarea' => 'Compara la glía del SNP con la del SNC armando un cuadro; luego reconoce las células satélite en un ganglio y las envolturas y fibras de un nervio periférico. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-snp:1' => 'Nivel I: SNC frente a SNP',
-                        'glia-snp:2' => 'Nivel II: ganglio y células satélite',
-                        'glia-snp:3' => 'Nivel III: nervio periférico'],
+             'titulo' => 'Glía del SNP (4 niveles)',
+             'tarea' => 'Identifica la glía del SNP en un esquema y compárala con la del SNC armando un cuadro; luego reconoce las células satélite en un ganglio y las envolturas y fibras de un nervio periférico. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-snp:1' => 'Nivel I: esquema',
+                        'glia-snp:2' => 'Nivel II: SNC frente a SNP',
+                        'glia-snp:3' => 'Nivel III: ganglio y células satélite',
+                        'glia-snp:4' => 'Nivel IV: nervio periférico'],
              'conexion' => [
                 'glia-snp:1' => [
                     'terapia-ocupacional' => 'Guillain-Barré (células de Schwann) y la esclerosis múltiple (oligodendrocitos) pueden dar una debilidad parecida, pero con pronóstico distinto: en el SNP la mielina y el axón pueden regenerar, y la rehabilitación apunta a recuperar funciones.',
                     'fonoaudiologia' => 'En Guillain-Barré puede haber debilidad facial y bulbar (voz débil, disfagia). Como el SNP regenera, la intervención acompaña una recuperación que suele tomar semanas a meses.'],
-                'glia-snp:2' => [
+                'glia-snp:2' => null,
+                'glia-snp:3' => [
                     'terapia-ocupacional' => 'El dolor neuropático (tras un herpes zóster o en la neuropatía diabética) limita el uso de la mano y altera el sueño: el manejo del dolor y la desensibilización son parte de la intervención.',
                     'fonoaudiologia' => 'En la neuralgia del trigémino, cuyas neuronas sensitivas están en el ganglio de Gasser, el dolor aparece al hablar, masticar o tocarse la cara, e interfiere con la comunicación y la alimentación.'],
-                'glia-snp:3' => [
+                'glia-snp:4' => [
                     'terapia-ocupacional' => 'Tras una lesión de nervio de la mano (mediano, cubital) el axón vuelve a crecer guiado por las células de Schwann, cerca de 1 mm al día: mientras tanto se mantiene la movilidad, se protege la piel insensible y se reeduca la sensibilidad.',
                     'fonoaudiologia' => 'Tras una lesión del nervio facial o del laríngeo recurrente, el axón puede volver a crecer guiado por las células de Schwann: la terapia mantiene la musculatura y acompaña la recuperación de la expresión facial o de la voz.'],
              ]],

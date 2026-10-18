@@ -655,6 +655,8 @@
 }
 @media (max-width: 900px) { .nl-circ__lienzo.is-armado .nl-circ__etq b { display: none; } }
 @media (max-width: 600px) {
-    .nl-tip__cuadro.is-grande th, .nl-tip__cuadro.is-grande td { hyphens: auto; overflow-wrap: anywhere; }
-    .nl-tip__cuadro.is-grande { font-size: .68rem; }
+    .nl-tip__cuadro.is-grande th, .nl-tip__cuadro.is-grande td { hyphens: auto; overflow-wrap: break-word; padding-left: .2rem; padding-right: .2rem; }
+    .nl-tip__cuadro.is-grande { font-size: .64rem; border-spacing: 2px; }
+    .nl-tip__cuadro.is-grande thead th:first-child { width: 18%; }
+    .nl-tip__cuadro.is-grande tbody th { overflow-wrap: normal; hyphens: manual; }
 }
