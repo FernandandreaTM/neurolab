@@ -17,7 +17,7 @@
 Formato del sitio: pregunta, 4 alternativas (✅ = correcta; en el sitio va primera y se baraja), pista (sin dar la
 respuesta) y explicación. Links al campo y pistas de «Dónde buscar» en `docs/practico-2_donde-buscar.md`.
 
-## 1 · I Orientación · MH-047 (médula de ratón + ganglio de la raíz dorsal, H&E)
+## 1 · I Orientación · MH-047 (médula de roedor + ganglio de la raíz dorsal, H&E)
 
 **1.** Con H&E, la sustancia gris de tu captura se ve más morada que la sustancia blanca. ¿Qué explica la diferencia?
 - ✅ La gris tiene muchos somas, con núcleos y Nissl que toman la hematoxilina

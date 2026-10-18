@@ -40,6 +40,25 @@ foreach (((@include __DIR__ . '/../data/practicos.php') ?: []) as $rr) {
     }
 }
 
+/** Aviso plegable de un nivel («¿Por qué…?»): se abre la primera vez; si el estudiante lo cierra, queda cerrado. */
+$aviso = function ($clave) {
+    $avisos = [
+        'rata'   => ['🐀 ¿Por qué un cerebro de rata?',
+                     'El objetivo <strong>no es aprender la anatomía de la rata</strong>, sino orientarte en el corte para interpretar las <strong>imágenes reales</strong> de los niveles siguientes. Su cerebro no es idéntico al humano, pero tiene estructuras equivalentes que se reconocen (corteza, hipocampo, cerebelo, tronco) y <strong>sus neuronas cumplen las mismas funciones</strong>.'],
+        'roedor' => ['🐭 ¿Por qué el corte de un animal pequeño?',
+                     'En un roedor, la médula, la vértebra, los ganglios y los músculos de la espalda <strong>caben en un solo corte</strong>: ves de una vez dónde está cada cosa. La organización de la médula (astas, raíces, ganglio de la raíz dorsal) es <strong>la misma que en el ser humano</strong>; cambia el tamaño.'],
+    ];
+    if (!isset($avisos[$clave])) return '';
+    $id = 'nl-aviso-' . $clave;
+    ob_start(); ?>
+    <details class="nl-mesa__aviso" id="<?= $id ?>" open>
+        <summary><?= $avisos[$clave][0] ?></summary>
+        <p><?= $avisos[$clave][1] ?></p>
+    </details>
+    <script>(function () { var d = document.getElementById('<?= $id ?>'); try { if (localStorage.getItem('nl_aviso_<?= $clave ?>')) d.open = false; } catch (e) {} d.addEventListener('toggle', function () { try { if (!d.open) localStorage.setItem('nl_aviso_<?= $clave ?>', '1'); } catch (e) {} }); })();</script>
+    <?php return ob_get_clean();
+};
+
 /** Conexión con la carrera: plantilla que el JS muestra (plegada) en el cierre y copia a la guía. */
 $conexion = function () use ($carreras, $cxNivel) {
     $items = [];
@@ -112,13 +131,7 @@ nl_barra([
     </div>
     <aside class="nl-mesa__panel">
         <?= $instrucciones('Toca un número de la imagen (o un círculo de aquí abajo). Escribe de memoria el nombre de esa estructura y presiona Enter: verás la respuesta correcta. Luego elige su función entre las alternativas. <strong>Verde</strong>: nombre y función correctos. <strong style="color:#FFB4AE">Rojo</strong>: el nombre quedó por repasar. <strong style="color:#FCD34D">Naranjo</strong>: la estructura que estás respondiendo.') ?>
-        <?php if ($lamPorNiveles && !empty($nivelLam['aviso_rata'])): ?>
-        <details class="nl-mesa__aviso" id="nl-aviso-rata" open>
-            <summary>🐀 ¿Por qué un cerebro de rata?</summary>
-            <p>El objetivo <strong>no es aprender la anatomía de la rata</strong>, sino orientarte en el corte para interpretar las <strong>imágenes reales</strong> de los niveles siguientes. Su cerebro no es idéntico al humano, pero tiene estructuras equivalentes que se reconocen (corteza, hipocampo, cerebelo, tronco) y <strong>sus neuronas cumplen las mismas funciones</strong>.</p>
-        </details>
-        <script>(function () { var d = document.getElementById('nl-aviso-rata'); try { if (localStorage.getItem('nl_aviso_rata')) d.open = false; } catch (e) {} d.addEventListener('toggle', function () { try { if (!d.open) localStorage.setItem('nl_aviso_rata', '1'); } catch (e) {} }); })();</script>
-        <?php endif; ?>
+        <?php if ($lamPorNiveles && !empty($nivelLam['aviso_rata'])) echo $aviso('rata'); ?>
         <div class="nl-lab__estado">
             <span class="nl-lab__contador" id="nl-lab-contador">0 / <?= count($partesLab) ?></span>
             <span class="nl-lab__errores" id="nl-lab-errores"></span>
@@ -245,6 +258,7 @@ nl_barra([
     $lamsNivel = [];
     foreach (($nivelLam['laminas'] ?? []) as $k) { if (isset($tareas['laminas'][$k])) $lamsNivel[$k] = $tareas['laminas'][$k]; }
     $primera = $lamsNivel ? reset($lamsNivel) : null;
+    $capsNivel = array_map(function ($c) { unset($c['zonas']); return $c; }, $nivelLam['capturas'] ?? []);   // las zonas se revisan en api/lamina_check.php
 ?>
 <div class="nl-mesa nl-mesa--lamina nl-mesa--capturas container" id="nl-lam"
      data-slug="<?= htmlspecialchars($act['slug']) ?>"
@@ -252,7 +266,8 @@ nl_barra([
      data-titulo="<?= htmlspecialchars($act['titulo'] . ' — Nivel ' . $nivelLam['romano'] . ': ' . $nivelLam['titulo']) ?>"
      data-requiere="<?= htmlspecialchars($nivelLam['requiere']) ?>"
      data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
-     data-capturas="<?= htmlspecialchars(json_encode($nivelLam['capturas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-n="<?= (int)$nivelLam['n'] ?>"
+     data-capturas="<?= htmlspecialchars(json_encode($capsNivel, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-laminas="<?= htmlspecialchars(json_encode($lamsNivel, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
     <div class="nl-lab__candado" hidden>
         <strong>🔒 Nivel bloqueado</strong>
@@ -277,6 +292,7 @@ nl_barra([
     </div>
     <aside class="nl-mesa__panel">
         <?= $instrucciones($nivelLam['instrucciones'] ?? '') ?>
+        <?= !empty($nivelLam['aviso']) ? $aviso($nivelLam['aviso']) : '' ?>
         <div class="nl-lab__estado">
             <span class="nl-lab__contador" id="nl-lam-contador"></span>
             <span class="nl-lab__errores" id="nl-lam-errores"></span>

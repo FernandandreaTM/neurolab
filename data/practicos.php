@@ -65,12 +65,12 @@ return [
         'pasos' => [
             ['slug' => 'circuito-reflejo',
              'titulo' => 'Circuito reflejo (2 niveles)',
-             'tarea' => 'Oriéntate en un corte de médula con su ganglio: captúralo y etiqueta sus partes. Luego arma sobre tu captura el circuito reflejo y marca por dónde viaja la información. Cada nivel suma una sección a tu guía.',
-             'guia' => ['circuito-reflejo:1' => 'Nivel I: orientación en la médula',
+             'tarea' => 'Oriéntate en un corte real de médula en su vértebra: captúralo, encaja la silueta y ubica sus partes. Luego arma sobre tu captura dos reflejos (sin y con interneurona) y predice qué pasa si se corta una raíz. Cada nivel suma una sección a tu guía.',
+             'guia' => ['circuito-reflejo:1' => 'Nivel I: orientación en el corte',
                         'circuito-reflejo:2' => 'Nivel II: el circuito reflejo'],
              'conexion' => [
                 'circuito-reflejo:1' => [
-                    'terapia-ocupacional' => 'Saber dónde están las astas y las raíces permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',
+                    'terapia-ocupacional' => 'Orientarte en el corte (dorsal y ventral, entrada y salida) permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',
                     'fonoaudiologia' => 'La misma organización (núcleos sensitivos que reciben y núcleos motores que envían) se repite en el tronco encefálico, donde están los núcleos de los nervios craneales que controlan el habla, la voz y la deglución.'],
                 'circuito-reflejo:2' => [
                     'terapia-ocupacional' => 'Los reflejos osteotendíneos (rotuliano, bicipital, aquíleo) evalúan el circuito: disminuidos indican falla en el arco (nervio, raíz o motoneurona); exaltados, falla del control que baja desde el encéfalo, como tras un ACV.',

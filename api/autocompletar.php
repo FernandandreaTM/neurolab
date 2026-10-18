@@ -5,11 +5,13 @@
  *   GET tipo=labeling&slug=<actividad>  -> { partes: [{ id, n, f, d }] }
  *   GET tipo=practica&nivel=<id>        -> { tipo: 'armar'|'elegir', items: { <id>: estado } }
  *   GET tipo=circuito&slug=<act>&n=<N>  -> { piezas: [{ clave, zona, exp }], orden: [clave…] }
+ *   GET tipo=lamina&slug=<act>&n=<N>    -> { pines: { <captura>: { <etiqueta>: [x, y] } } } (capturas con molde)
  * La lámina y el quiz se completan en el navegador con los datos de la página.
  */
 error_reporting(0);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/practica_lib.php';
+require_once __DIR__ . '/zonas_lib.php';
 require_once __DIR__ . '/../_partials/docente.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -75,6 +77,15 @@ try {
             nl_ac_json(['ok' => true, 'piezas' => $piezas, 'orden' => array_values($nv['orden'])]);
         }
         nl_ac_json(['ok' => false, 'error' => 'Nivel no encontrado.'], 404);
+    }
+
+    if ($tipo === 'lamina') {
+        $nv = nl_tareas_nivel((string)($_GET['slug'] ?? ''), (int)($_GET['n'] ?? 0));
+        $pines = [];
+        foreach ((array)($nv['capturas'] ?? []) as $c) {
+            foreach ((array)($c['zonas'] ?? []) as $etq => $z) $pines[$c['clave']][$etq] = nl_zona_centro($z);
+        }
+        nl_ac_json(['ok' => true, 'pines' => $pines ?: new stdClass()]);
     }
 
     nl_ac_json(['ok' => false, 'error' => 'Tipo no reconocido.'], 400);

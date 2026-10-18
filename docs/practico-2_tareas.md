@@ -6,7 +6,7 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 | Código | Tejido · tinción | Link |
 |---|---|---|
-| MH-047 | Médula de ratón + ganglio de la raíz dorsal · H&E | https://histologyguide.com/slideview/MH-047-spinal-cord/06-slide-2.html |
+| MH-047 | Médula de roedor + ganglio de la raíz dorsal · H&E | https://histologyguide.com/slideview/MH-047-spinal-cord/06-slide-2.html |
 | MHS-240 | Médula de conejo · H&E | https://histologyguide.com/slideview/MHS-240-spinal-cord/06-slide-1.html |
 | UCSF-163 | Médula de gato · cresil violeta | https://histologyguide.com/slideview/UCSF-163-spinal-cord/06-slide-1.html |
 | MH-051 | Ganglio de la raíz dorsal · Azan | https://histologyguide.com/slideview/MH-051-dorsal-root-ganglion/06-slide-1.html |

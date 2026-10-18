@@ -21,10 +21,10 @@ async function api(params) {
     return d;
 }
 
-/** Imagen de ejemplo para la lámina (en lugar de la captura del estudiante). */
-function imagenEjemplo(titulo) {
+/** Imagen de ejemplo para la lámina (en lugar de la captura del estudiante); cuadrada si la captura usa molde. */
+function imagenEjemplo(titulo, cuadrada = false) {
     const c = document.createElement('canvas');
-    c.width = 900; c.height = 560;
+    c.width = 900; c.height = cuadrada ? 900 : 560;
     const g = c.getContext('2d');
     const gr = g.createLinearGradient(0, 0, 900, 560);
     gr.addColorStop(0, '#E9D9B8'); gr.addColorStop(1, '#C9B08A');
@@ -72,12 +72,13 @@ async function completarNivel() {
     } else if (raiz.id === 'nl-lam') {
         const caps = JSON.parse(d.capturas || '[]');
         const est = { caps: {}, err: 0 };
+        const conMolde = caps.some(c => c.molde) ? (await api({ tipo: 'lamina', slug: d.slug, n: d.n })).pines : {};
         caps.forEach(c => {
             const pines = {};
-            (c.etiquetas || []).forEach((t, i, a) => { pines[t] = [20 + 60 * (i + 0.5) / a.length, 25 + (i % 2) * 45]; });
+            (c.etiquetas || []).forEach((t, i, a) => { pines[t] = (conMolde[c.clave] || {})[t] || [20 + 60 * (i + 0.5) / a.length, 25 + (i % 2) * 45]; });
             const preg = {};
             (c.preguntas || []).forEach((q, i) => { preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
-            est.caps[c.clave] = { paso: 'preguntas', listo: true, img: imagenEjemplo(c.titulo), pines, preg, err: 0 };
+            est.caps[c.clave] = { paso: 'preguntas', listo: true, img: imagenEjemplo(c.titulo, !!c.molde), pines, malp: {}, preg, err: 0 };
         });
         poner('nl_lam_' + d.clave, est);
     } else if (raiz.id === 'nl-quiz') {

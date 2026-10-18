@@ -5,8 +5,11 @@
  * Panel: por cada captura, 4 pasos:
  *   1. Buscar   -> dónde buscar; «Capturar» toma la pestaña (getDisplayMedia, con permiso) y la
  *                  recorta al área de la lámina; de respaldo se pega (Ctrl+V) o se sube la captura
- *   2. Recortar -> se arrastra un rectángulo sobre la captura (o se usa completa)
- *   3. Etiquetar-> se toca una etiqueta (lista fija) y luego su lugar en la imagen
+ *   2. Recortar -> se arrastra un rectángulo sobre la captura (o se usa completa).
+ *                  Si la captura tiene `molde` (js/molde.js): se encaja la silueta sobre la captura
+ *                  y el recorte queda en el marco del molde (misma geometría para todos)
+ *   3. Etiquetar-> se toca una etiqueta (lista fija) y luego su lugar en la imagen. Con molde
+ *                  («Ubicar») cada punto se revisa en api/lamina_check.php
  *   4. Preguntas-> alternativas; la incorrecta queda en rojo con su pista, hasta acertar
  * Verde = correcto · rojo suave = por repasar · naranjo = lo que se está haciendo.
  * El navegador no puede leer el iframe de otro sitio: la captura de la pestaña necesita el permiso del estudiante.
@@ -17,12 +20,14 @@
 import { markDone, isDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia } from './carrera.js';
+import { svgMolde } from './molde.js';
 
 const RAIZ = document.getElementById('nl-lam');
 const KEY_BASE = 'nl_lam_';
 const MAX_BRUTA = 1400;    // captura sin recortar (lado mayor)
 const MAX_FINAL = 900;     // captura recortada que se guarda
 const MAX_GUIA = 760;      // imagen anotada para la guía
+const LADO_MOLDE = 900;    // captura encajada en el molde (cuadrada)
 
 function leer(clave) {
     let e = null;
@@ -82,6 +87,32 @@ async function procesar(fuente, maxLado, rec) {
     } finally {
         if (typeof fuente !== 'string') URL.revokeObjectURL(url);
     }
+}
+
+/** Recorta la captura al cuadro del molde: {cx, cy} centro y {s} lado, en fracción del ancho. */
+async function encajar(src, e) {
+    const img = await cargar(src);
+    const lado = e.s * img.width;
+    const sx = e.cx * img.width - lado / 2, sy = e.cy * img.height - lado / 2;
+    const c = document.createElement('canvas');
+    c.width = c.height = LADO_MOLDE;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff';
+    g.fillRect(0, 0, LADO_MOLDE, LADO_MOLDE);
+    const k = LADO_MOLDE / lado;
+    g.drawImage(img, -sx * k, -sy * k, img.width * k, img.height * k);
+    return c.toDataURL('image/jpeg', 0.85);
+}
+
+/** Revisa en el servidor si el punto cae en la zona de la etiqueta (captura con molde). */
+async function revisarPunto(datos) {
+    try {
+        const r = await fetch('api/lamina_check.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: new URLSearchParams(datos).toString(),
+        });
+        return await r.json();
+    } catch { return { correcto: false, red: true, pista: 'No pudimos revisar tu punto. ¿Hay conexión?' }; }
 }
 
 /** La etiqueta va a la derecha del punto, salvo cerca del borde derecho. */
@@ -160,10 +191,12 @@ function iniciar(raiz) {
     let lamActual = null;
     let recorte = null;            // rectángulo en % mientras se recorta
     let etqSel = null;             // etiqueta elegida para poner
+    let enc = null;                // encaje del molde mientras se ajusta: { cx, cy, s }
     let aviso = '';
 
     const cs = c => {
         if (!est.caps[c.clave]) est.caps[c.clave] = { paso: 'buscar', pines: {}, preg: {}, err: 0 };
+        if (!est.caps[c.clave].malp) est.caps[c.clave].malp = {};
         return est.caps[c.clave];
     };
     function guardar() {
@@ -211,6 +244,14 @@ function iniciar(raiz) {
             return;
         }
         const s = cs(sel);
+        if (s.paso === 'recortar' && s.bruta && sel.molde) {
+            editor.innerHTML = `<div class="nl-lam__lienzo is-encaje" id="nl-lam-lienzo">
+                  <img src="${s.bruta}" alt="Tu captura" draggable="false">
+                  <div class="nl-lam__molde">${svgMolde(sel.molde)}</div></div>
+                <p class="nl-lam__ayuda-vista">Arrastra la silueta y ajusta su tamaño hasta que calce con tu lámina</p>`;
+            enlazarEncaje();
+            return;
+        }
         if (s.paso === 'recortar' && s.bruta) {
             editor.innerHTML = `<div class="nl-lam__lienzo is-recorte" id="nl-lam-lienzo">
                   <img src="${s.bruta}" alt="Tu captura" draggable="false">
@@ -221,26 +262,39 @@ function iniciar(raiz) {
         if (!s.img) { editor.innerHTML = ''; return; }
         const etiquetando = s.paso === 'etiquetar';
         editor.innerHTML = `<div class="nl-lam__lienzo${etiquetando && etqSel ? ' is-poner' : ''}" id="nl-lam-lienzo">
-              ${imgConPines(s.img, s.pines, etiquetando ? etqSel : null)}</div>
+              ${imgConPines(s.img, s.pines, etiquetando ? etqSel : null, s.malp)}</div>
             ${etiquetando ? `<p class="nl-lam__ayuda-vista">${etqSel ? `Toca dónde está: <strong>${escapar(etqSel)}</strong>` : 'Elige una etiqueta en el panel'}</p>` : ''}`;
         if (etiquetando) {
             const lz = editor.querySelector('#nl-lam-lienzo');
-            lz.addEventListener('click', ev => {
-                if (!etqSel) return;
+            lz.addEventListener('click', async ev => {
+                if (!etqSel || lz.classList.contains('is-esperando')) return;
                 const r = lz.querySelector('img').getBoundingClientRect();
                 const x = (ev.clientX - r.left) / r.width * 100, y = (ev.clientY - r.top) / r.height * 100;
                 if (x < 0 || x > 100 || y < 0 || y > 100) return;
-                s.pines[etqSel] = [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
-                etqSel = sel.etiquetas.find(t => !s.pines[t]) || null;   // pasa sola a la siguiente
+                const t = etqSel;
+                s.pines[t] = [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+                if (sel.molde) {
+                    lz.classList.add('is-esperando');
+                    const res = await revisarPunto({ slug: d.slug, n: d.n, captura: sel.clave, etiqueta: t, x: s.pines[t][0], y: s.pines[t][1] });
+                    lz.classList.remove('is-esperando');
+                    if (res.correcto) delete s.malp[t];
+                    else {
+                        s.malp[t] = res.pista || 'Ese no es el lugar.';
+                        if (!res.red) { s.err = (s.err || 0) + 1; est.err++; }
+                        guardar(); pintarEditor(); pintarPanel(); actualizar();
+                        return;   // la etiqueta sigue elegida para volver a ponerla
+                    }
+                }
+                etqSel = sel.etiquetas.find(e => !s.pines[e] || s.malp[e]) || null;   // pasa sola a la siguiente
                 guardar();
                 pintarEditor(); pintarPanel();
             });
         }
     }
 
-    function imgConPines(src, pines, activa) {
+    function imgConPines(src, pines, activa, malp) {
         return `<img src="${src}" alt="" draggable="false">` + Object.entries(pines || {}).map(([t, [x, y]]) =>
-            `<span class="nl-lam__pin${ladoIzq(x) ? ' is-izq' : ''}${t === activa ? ' is-sel' : ''}" style="left:${x}%;top:${y}%">
+            `<span class="nl-lam__pin${ladoIzq(x) ? ' is-izq' : ''}${t === activa ? ' is-sel' : ''}${malp && malp[t] ? ' is-mal' : ''}" style="left:${x}%;top:${y}%">
                <i></i><b>${escapar(t)}</b></span>`).join('');
     }
 
@@ -285,6 +339,57 @@ function iniciar(raiz) {
         lz.addEventListener('pointercancel', fin);
     }
 
+    /* Encaje del molde: arrastrar mueve; rueda, pellizco o el control del panel cambian el tamaño */
+    function enlazarEncaje() {
+        const lz = editor.querySelector('#nl-lam-lienzo');
+        const img = lz.querySelector('img');
+        const caja = lz.querySelector('.nl-lam__molde');
+        const listo = () => {
+            const W = img.clientWidth, H = img.clientHeight;
+            if (!W || !H) return;
+            if (!enc) enc = { cx: 0.5, cy: 0.5, s: 0.86 * Math.min(1, H / W) };
+            const lado = enc.s * W;
+            Object.assign(caja.style, { width: lado + 'px', height: lado + 'px',
+                left: (img.offsetLeft + enc.cx * W - lado / 2) + 'px', top: (img.offsetTop + enc.cy * H - lado / 2) + 'px' });
+            const rango = panel.querySelector('.nl-lam__tam');
+            if (rango) rango.value = Math.round(enc.s * 100);
+        };
+        if (img.complete) listo(); else img.addEventListener('load', listo);
+        const punteros = new Map();
+        let ini = null;
+        const reiniciar = () => { ini = punteros.size ? { enc: { ...enc }, pts: new Map(punteros) } : null; };
+        caja.addEventListener('pointerdown', ev => {
+            ev.preventDefault();
+            caja.setPointerCapture(ev.pointerId);
+            punteros.set(ev.pointerId, [ev.clientX, ev.clientY]);
+            reiniciar();
+        });
+        caja.addEventListener('pointermove', ev => {
+            if (!punteros.has(ev.pointerId) || !ini) return;
+            punteros.set(ev.pointerId, [ev.clientX, ev.clientY]);
+            const W = img.clientWidth, H = img.clientHeight;
+            const act = [...punteros.values()], ant = [...ini.pts.values()];
+            if (act.length >= 2 && ant.length >= 2) {   // pellizco: escala
+                const dist = p => Math.hypot(p[0][0] - p[1][0], p[0][1] - p[1][1]) || 1;
+                enc.s = Math.min(3, Math.max(0.15, ini.enc.s * dist(act) / dist(ant)));
+            } else {
+                enc.cx = ini.enc.cx + (act[0][0] - ant[0][0]) / W;
+                enc.cy = ini.enc.cy + (act[0][1] - ant[0][1]) / H;
+            }
+            listo();
+        });
+        const fin = ev => { punteros.delete(ev.pointerId); reiniciar(); };
+        caja.addEventListener('pointerup', fin);
+        caja.addEventListener('pointercancel', fin);
+        lz.addEventListener('wheel', ev => {
+            ev.preventDefault();
+            enc.s = Math.min(3, Math.max(0.15, enc.s * (ev.deltaY < 0 ? 1.04 : 1 / 1.04)));
+            listo();
+        }, { passive: false });
+        lz._encaje = listo;
+    }
+    window.addEventListener('resize', () => editor.querySelector('#nl-lam-lienzo')?._encaje?.());
+
     /* --- Chips de capturas --- */
     function pintarChips() {
         chips.innerHTML = caps.map(c => {
@@ -303,7 +408,7 @@ function iniciar(raiz) {
     }
 
     function elegir(c) {
-        sel = c; verCierre = false; recorte = null; etqSel = null; aviso = '';
+        sel = c; verCierre = false; recorte = null; etqSel = null; enc = null; aviso = '';
         if (c.lamina) ponerLamina(c.lamina);
         const s = cs(c);
         pintar();
@@ -317,7 +422,7 @@ function iniciar(raiz) {
         const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> ${escapar(sel.titulo)}</p>`;
         const pasos = ['buscar', 'recortar', 'etiquetar', 'preguntas'];
         const iP = s.listo ? 4 : pasos.indexOf(s.paso);
-        const linea = `<ol class="nl-lam__pasos">${['Buscar', 'Recortar', 'Etiquetar', 'Preguntas'].map((t, i) =>
+        const linea = `<ol class="nl-lam__pasos">${(sel.molde ? ['Buscar', 'Encajar', 'Ubicar', 'Preguntas'] : ['Buscar', 'Recortar', 'Etiquetar', 'Preguntas']).map((t, i) =>
             `<li class="${i < iP ? 'is-ok' : i === iP ? 'is-actual' : ''}">${t}</li>`).join('')}</ol>`;
         const av = aviso ? `<p class="nl-lab__aviso-act">${escapar(aviso)}</p>` : '';
         aviso = '';
@@ -328,6 +433,7 @@ function iniciar(raiz) {
         if (s.paso === 'buscar') {
             panel.innerHTML = `${av}${cab}${linea}
                 <div class="nl-ficha__bloque"><span class="nl-ficha__etq">Dónde buscar</span><p>${escapar(sel.busca)}</p></div>
+                <button type="button" class="nl-lab__nose nl-lam__inicial">↺ Volver a la vista inicial de la lámina</button>
                 ${puedeCapturar() ? `<div class="nl-lam__capt">
                     <button type="button" class="btn btn-primary btn-sm nl-lam__capturar">📷 Capturar la lámina</button>
                     <span>Haz zoom en la lámina hasta que ${sel.objeto || (/capa|cerebelo/i.test(sel.titulo) ? 'la zona' : 'la neurona')} se vea bien y presiona <strong>Capturar</strong>. El navegador te pedirá compartir <strong>esta pestaña</strong>: acepta y se abre el recorte.</span>
@@ -338,10 +444,35 @@ function iniciar(raiz) {
                     <label class="btn btn-ghost btn-sm nl-lam__subir">o súbela desde tu equipo<input type="file" accept="image/*" hidden></label>
                 </div>`;
             panel.querySelector('.nl-lam__capturar')?.addEventListener('click', capturar);
+            panel.querySelector('.nl-lam__inicial').addEventListener('click', () => {
+                const k = sel.lamina || lamActual;
+                if (laminas[k]) { lamActual = null; ponerLamina(k); }
+                verVista('lamina');
+            });
             panel.querySelector('input[type=file]').addEventListener('change', ev => {
                 const f = ev.target.files && ev.target.files[0];
                 if (f) recibir(f);
             });
+            return;
+        }
+
+        if (s.paso === 'recortar' && sel.molde) {
+            panel.innerHTML = `${av}${cab}${linea}
+                <p class="nl-lab__ayuda">La silueta muestra la forma del corte. <strong>Arrástrala</strong> hasta que la médula, la vértebra y los ganglios calcen con tu lámina, y <strong>ajusta su tamaño</strong> con el control, la rueda del mouse o pellizcando.</p>
+                <label class="nl-lam__tam-etq">Tamaño de la silueta
+                    <input type="range" class="nl-lam__tam" min="15" max="300" value="${Math.round((enc ? enc.s : 0.5) * 100)}"></label>
+                <div class="nl-ficha__acciones">
+                    <button type="button" class="btn btn-primary btn-sm nl-lam__usar">✓ Calza: usar</button>
+                </div>
+                <p class="nl-lab__ayuda">Si en tu captura no se ve el corte completo, vuelve a la lámina, aleja el zoom y captura otra vez.</p>
+                <button type="button" class="nl-lab__nose nl-lam__otra">Cambiar la captura</button>`;
+            panel.querySelector('.nl-lam__tam').addEventListener('input', ev => {
+                if (!enc) return;
+                enc.s = Number(ev.target.value) / 100;
+                editor.querySelector('#nl-lam-lienzo')?._encaje?.();
+            });
+            panel.querySelector('.nl-lam__usar').addEventListener('click', usarEncaje);
+            panel.querySelector('.nl-lam__otra').addEventListener('click', otraCaptura);
             return;
         }
 
@@ -360,11 +491,15 @@ function iniciar(raiz) {
         }
 
         if (s.paso === 'etiquetar') {
-            const puestas = sel.etiquetas.filter(t => s.pines[t]).length;
+            const puestas = sel.etiquetas.filter(t => s.pines[t] && !s.malp[t]).length;
+            const malSel = etqSel && s.malp[etqSel];
             panel.innerHTML = `${av}${cab}${linea}
-                <p class="nl-lab__ayuda">Toca una etiqueta y luego su lugar en tu imagen. Para moverla, tócala otra vez y elige otro lugar.</p>
-                <div class="nl-lam__etqs">${sel.etiquetas.map(t =>
-                    `<button type="button" class="nl-lam__etq${s.pines[t] ? ' is-ok' : ''}${t === etqSel ? ' is-sel' : ''}" data-t="${escapar(t)}">${s.pines[t] ? '✓ ' : ''}${escapar(t)}</button>`).join('')}</div>
+                <p class="nl-lab__ayuda">${sel.molde ? 'Toca una estructura y luego su lugar en tu imagen: cada punto se revisa al ponerlo.' : 'Toca una etiqueta y luego su lugar en tu imagen. Para moverla, tócala otra vez y elige otro lugar.'}</p>
+                <div class="nl-lam__etqs">${sel.etiquetas.map(t => {
+                    const ok = s.pines[t] && !s.malp[t];
+                    return `<button type="button" class="nl-lam__etq${ok ? ' is-ok' : ''}${s.malp[t] ? ' is-mal' : ''}${t === etqSel ? ' is-sel' : ''}" data-t="${escapar(t)}">${ok ? '✓ ' : s.malp[t] ? '✗ ' : ''}${escapar(t)}</button>`;
+                }).join('')}</div>
+                ${malSel ? `<p class="nl-lab__q-fb">✗ Ahí no está <strong>${escapar(etqSel)}</strong>. Pista: ${escapar(s.malp[etqSel])} Toca otro lugar.</p>` : ''}
                 <p class="nl-lab__ayuda">${puestas} / ${sel.etiquetas.length} etiquetas</p>
                 <div class="nl-ficha__acciones">
                     <button type="button" class="btn btn-primary btn-sm nl-lam__listo"${puestas === sel.etiquetas.length ? '' : ' disabled'}>Listo: a las preguntas →</button>
@@ -537,11 +672,30 @@ function iniciar(raiz) {
         verVista('captura');
     }
 
+    async function usarEncaje() {
+        const s = cs(sel);
+        if (!enc) return;
+        panel.classList.add('is-esperando');
+        try {
+            s.img = await encajar(s.bruta, enc);
+            delete s.bruta;
+            s.pines = {}; s.malp = {};
+            s.paso = 'etiquetar';
+            etqSel = sel.etiquetas[0];
+            enc = null;
+            guardar();
+        } catch { aviso = 'No pudimos encajar la imagen. Intenta de nuevo.'; }
+        panel.classList.remove('is-esperando');
+        pintar();
+        verVista('captura');
+        if (angosta()) raiz.querySelector('.nl-lam__vista').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function otraCaptura() {
         const s = cs(sel);
         delete s.bruta; delete s.img;
-        s.pines = {}; s.paso = 'buscar';
-        recorte = null; etqSel = null;
+        s.pines = {}; s.malp = {}; s.paso = 'buscar';
+        recorte = null; etqSel = null; enc = null;
         guardar();
         pintar();
         verVista('lamina');
@@ -564,7 +718,7 @@ function iniciar(raiz) {
         panel.className = 'nl-lab__trabajo is-cierre';
         panel.innerHTML = `
             <p class="nl-lab__cierre-tit">🎉 ¡Nivel completado!</p>
-            <p>${caps.length} capturas etiquetadas · ${est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}` : 'sin errores'}</p>
+            <p>${caps.length} ${caps.length === 1 ? 'captura etiquetada' : 'capturas etiquetadas'} · ${est.err ? `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}` : 'sin errores'}</p>
             ${rep.length ? `<p class="nl-lab__alt nl-lab__repasar">↺ Por repasar: ${rep.map(c => escapar(c.titulo)).join(' · ')}</p>` : ''}
             ${d.siguiente ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${escapar(d.siguiente)}">Siguiente nivel →</a>`
                           : (hrefRuta ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefRuta}">Volver a la ruta →</a>` : '')}

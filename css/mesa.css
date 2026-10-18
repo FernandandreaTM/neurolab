@@ -488,6 +488,8 @@
 .nl-lam__mini { margin: 0; flex: 1 1 260px; max-width: 48%; text-align: center; }
 .nl-lam__mini .nl-lam__lienzo img { max-height: 40vh; border-radius: 8px; border: 2px solid #86EFAC; }
 .nl-lam__mini.is-repasar .nl-lam__lienzo img { border-color: var(--repasar-claro); }
+.nl-lam__mini:only-child { max-width: 100%; flex-basis: 100%; }
+.nl-lam__mini:only-child .nl-lam__lienzo img { max-height: calc(var(--alto) - 8rem); width: auto; }
 .nl-lam__mini figcaption { margin-top: .3rem; font-size: .85rem; font-weight: 700; color: var(--gray-100); line-height: 1.3; }
 
 /* Panel: capturas, pasos, pegar, etiquetas */
@@ -534,6 +536,24 @@
 }
 .nl-lam__etq.is-ok { color: #86EFAC; background: rgba(22,163,74,.2); }
 .nl-lam__etq.is-sel { color: #1A0E2E; background: #F59E0B; }
+.nl-lam__etq.is-mal { color: var(--repasar-claro, #FFB4AE); background: rgba(220,38,38,.18); }
+.nl-lam__etq.is-mal.is-sel { color: #1A0E2E; background: #F59E0B; }
+.nl-lam__pin.is-mal i { background: #EF4444; }
+.nl-lam__pin.is-mal b { background: rgba(127,29,29,.92); }
+.nl-lam__pin.is-mal b::before { background: #EF4444; }
+.nl-lam__lienzo.is-esperando { cursor: progress; }
+
+/* Encaje del molde (js/molde.js): silueta translúcida que se mueve y escala sobre la captura */
+.nl-lam__lienzo.is-encaje { overflow: hidden; touch-action: none; }
+.nl-lam__molde { position: absolute; cursor: move; touch-action: none; outline: 2px dashed rgba(252,211,77,.9); box-shadow: 0 0 0 9999px rgba(15,8,32,.45); }
+.nl-molde { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.nl-molde__medula, .nl-molde__ganglio, .nl-molde__hueso { fill: none; vector-effect: non-scaling-stroke; stroke-width: 2.5; }
+.nl-molde__medula { stroke: #22D3EE; fill: rgba(34,211,238,.10); }
+.nl-molde__ganglio { stroke: #FCD34D; fill: rgba(252,211,77,.14); }
+.nl-molde__hueso { stroke: #F472B6; stroke-dasharray: 6 4; }
+.nl-molde__txt { font: 700 3.4px Arial, sans-serif; fill: #fff; paint-order: stroke; stroke: rgba(26,14,46,.85); stroke-width: .9px; text-anchor: middle; }
+.nl-lam__tam-etq { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: var(--gray-300); margin: .4rem 0 .2rem; }
+.nl-lam__tam { width: 100%; accent-color: #F59E0B; }
 
 @media (max-width: 900px) {
     .nl-mesa--capturas .nl-mesa__iframe { height: 60vh; }
