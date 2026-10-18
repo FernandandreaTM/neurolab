@@ -67,7 +67,7 @@ return [
              'titulo' => 'Circuito reflejo (2 niveles)',
              'tarea' => 'Oriéntate en un corte real de médula en su vértebra: captúralo, encaja la silueta y ubica sus partes. Luego arma sobre tu captura dos reflejos (sin y con interneurona) y predice qué pasa si se corta una raíz. Cada nivel suma una sección a tu guía.',
              'guia' => ['circuito-reflejo:1' => 'Nivel I: orientación en el corte',
-                        'circuito-reflejo:2' => 'Nivel II: el circuito reflejo'],
+                        'circuito-reflejo:2' => 'Nivel II: armar el reflejo'],
              'conexion' => [
                 'circuito-reflejo:1' => [
                     'terapia-ocupacional' => 'Orientarte en el corte (dorsal y ventral, entrada y salida) permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',

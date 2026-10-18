@@ -4,7 +4,7 @@
  * Entrega las respuestas de un nivel para que js/docente.js lo deje completo.
  *   GET tipo=labeling&slug=<actividad>  -> { partes: [{ id, n, f, d }] }
  *   GET tipo=practica&nivel=<id>        -> { tipo: 'armar'|'elegir', items: { <id>: estado } }
- *   GET tipo=circuito&slug=<act>&n=<N>  -> { piezas: [{ clave, zona, exp }], orden: [clave…] }
+ *   GET tipo=circuito&slug=<act>&n=<N>  -> { circuitos: { <clave>: { orden, ruta, exp, piezas } }, casos: [{ pos, resp, exp }] }
  *   GET tipo=lamina&slug=<act>&n=<N>    -> { pines: { <captura>: { <etiqueta>: [x, y] } } } (capturas con molde)
  * La lámina y el quiz se completan en el navegador con los datos de la página.
  */
@@ -65,18 +65,19 @@ try {
     }
 
     if ($tipo === 'circuito') {
-        $st = $pdo->prepare("SELECT r.url FROM actividad_recursos r JOIN actividades a ON a.id = r.actividad_id
-                             WHERE a.slug = ? AND r.tipo = 'tareas' LIMIT 1");
-        $st->execute([(string)($_GET['slug'] ?? '')]);
-        $t = json_decode((string)$st->fetchColumn(), true);
-        foreach ((array)($t['niveles'] ?? []) as $nv) {
-            if ((int)($nv['n'] ?? 0) !== (int)($_GET['n'] ?? 0) || ($nv['tipo'] ?? '') !== 'circuito') continue;
-            $piezas = array_map(function ($p) {
-                return ['clave' => $p['clave'], 'zona' => (string)$p['zona'], 'exp' => (string)($p['exp'] ?? '')];
-            }, $nv['piezas']);
-            nl_ac_json(['ok' => true, 'piezas' => $piezas, 'orden' => array_values($nv['orden'])]);
+        $nv = nl_tareas_nivel((string)($_GET['slug'] ?? ''), (int)($_GET['n'] ?? 0));
+        if (!$nv || ($nv['tipo'] ?? '') !== 'circuito') nl_ac_json(['ok' => false, 'error' => 'Nivel no encontrado.'], 404);
+        $circ = [];
+        foreach ((array)($nv['circuitos'] ?? []) as $c) {
+            $circ[$c['clave']] = ['orden' => array_values($c['orden']), 'ruta' => $c['ruta'], 'exp' => (string)($c['orden_exp'] ?? ''),
+                'piezas' => array_map(function ($p) {
+                    return ['clave' => $p['clave'], 'punto' => $p['punto'], 'zona' => (string)$p['zona_nombre'], 'exp' => (string)($p['exp'] ?? '')];
+                }, $c['piezas'])];
         }
-        nl_ac_json(['ok' => false, 'error' => 'Nivel no encontrado.'], 404);
+        $casos = array_map(function ($k) {
+            return ['pos' => nl_zona_centro($k['zona']), 'resp' => (string)$k['respuesta'], 'exp' => (string)$k['exp']];
+        }, $nv['cortes']['casos'] ?? []);
+        nl_ac_json(['ok' => true, 'circuitos' => $circ, 'casos' => $casos]);
     }
 
     if ($tipo === 'lamina') {

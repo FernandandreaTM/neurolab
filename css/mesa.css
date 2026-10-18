@@ -680,3 +680,23 @@
     .nl-tip__cuadro.is-grande thead th:first-child { width: 18%; }
     .nl-tip__cuadro.is-grande tbody th { overflow-wrap: normal; hyphens: manual; }
 }
+
+/* Circuito sobre la captura encajada (js/circuito.js): esquema, rutas, cortes y secciones A · B · C */
+.nl-circ__lienzo .nl-circ__esquema { pointer-events: none; }
+.nl-circ__svg.is-tenue { opacity: .45; }
+.nl-circ__fin.is-entra, .nl-circ__fin.is-sale { transform: translate(0, -50%); font-size: .7rem; }
+.nl-circ__corte {
+    position: absolute; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 1rem; color: #fff; background: #DC2626; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.5); pointer-events: none; animation: nlFade .3s ease;
+}
+.nl-circ__corte b { position: absolute; top: -9px; right: -9px; width: 18px; height: 18px; border-radius: 50%; font-size: .68rem; line-height: 18px; text-align: center; color: #1A0E2E; background: #FCD34D; }
+.nl-circ__corte.is-mal { background: rgba(127,29,29,.75); opacity: .75; }
+.nl-circ__sub { font-size: .75rem; font-weight: 600; color: var(--gray-400); }
+.nl-circ__estimulo { margin: .2rem 0 .5rem; padding: .45rem .6rem; border-radius: 8px; font-size: .85rem; line-height: 1.4; color: #FDE68A; background: rgba(245,158,11,.1); border-left: 3px solid #F59E0B; }
+.nl-circ__mini { margin-bottom: .5rem; }
+#nl-circ-pasos { margin-bottom: .6rem; }
+#nl-circ-pasos li { padding: 0; }
+#nl-circ-pasos li::before { content: none; }
+#nl-circ-pasos button { width: 100%; padding: .35rem .2rem; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; border-radius: 6px; }
+#nl-circ-pasos button[disabled] { cursor: default; }
+#nl-circ-pasos li.is-viendo { outline: 2px solid #FCD34D; outline-offset: 1px; }

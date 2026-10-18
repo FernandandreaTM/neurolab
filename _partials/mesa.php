@@ -210,14 +210,21 @@ nl_barra([
 </div>
 
 <?php elseif (!empty($esCircuito)):
-    // Circuito sobre la captura de un nivel anterior (js/circuito.js). La zona de cada neurona y el
-    // orden no se mandan: se revisan en api/circuito_check.php
+    // Reflejos y cortes sobre la captura encajada de un nivel anterior (js/circuito.js). Zonas, puntos,
+    // orden y rutas no se mandan: se revisan en api/circuito_check.php
     $basePrev = $nivelLam['base'] ?? [];
-    $baseCirc = ['clave' => $act['slug'] . ':' . (int)($basePrev['nivel'] ?? 1), 'captura' => (string)($basePrev['captura'] ?? ''),
-                 'centro' => (string)($basePrev['centro'] ?? '')];
-    $piezasCirc = array_map(function ($p) {
-        return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'detalle' => $p['detalle'] ?? '', 'icono' => $p['icono'] ?? ''];
-    }, $nivelLam['piezas'] ?? []);
+    $baseCirc = ['clave' => $act['slug'] . ':' . (int)($basePrev['nivel'] ?? 1), 'captura' => (string)($basePrev['captura'] ?? '')];
+    $iconosCirc = [];
+    $circuitos = array_map(function ($c) use (&$iconosCirc) {
+        return ['clave' => $c['clave'], 'titulo' => $c['titulo'], 'sub' => $c['sub'] ?? '', 'estimulo' => $c['estimulo'] ?? '',
+                'receptor' => $c['receptor'] ?? 'Receptor', 'efector' => $c['efector'] ?? 'Músculo', 'preguntas' => $c['preguntas'] ?? [],
+                'piezas' => array_map(function ($p) use (&$iconosCirc) {
+                    $iconosCirc[$p['clave']] = $p['icono'] ?? '';
+                    return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'detalle' => $p['detalle'] ?? ''];
+                }, $c['piezas'] ?? [])];
+    }, $nivelLam['circuitos'] ?? []);
+    $cortes = isset($nivelLam['cortes']) ? ['titulo' => $nivelLam['cortes']['titulo'] ?? '',
+        'casos' => array_map(function ($k) { return ['caso' => $k['caso']]; }, $nivelLam['cortes']['casos'] ?? [])] : null;
 ?>
 <div class="nl-mesa nl-mesa--lamina nl-mesa--circ container" id="nl-circ"
      data-slug="<?= htmlspecialchars($act['slug']) ?>"
@@ -226,9 +233,10 @@ nl_barra([
      data-titulo="<?= htmlspecialchars($act['titulo'] . ' — Nivel ' . $nivelLam['romano'] . ': ' . $nivelLam['titulo']) ?>"
      data-requiere="<?= htmlspecialchars($nivelLam['requiere']) ?>"
      data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
+     data-molde="<?= htmlspecialchars($nivelLam['molde'] ?? '') ?>"
      data-base="<?= htmlspecialchars(json_encode($baseCirc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
-     data-piezas="<?= htmlspecialchars(json_encode($piezasCirc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
-     data-preguntas="<?= htmlspecialchars(json_encode($nivelLam['preguntas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+     data-circuitos="<?= htmlspecialchars(json_encode($circuitos, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-cortes="<?= htmlspecialchars(json_encode($cortes, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
     <div class="nl-lab__candado" hidden>
         <strong>🔒 Nivel bloqueado</strong>
         <p>Completa primero el nivel anterior para desbloquear este.</p>
@@ -248,7 +256,7 @@ nl_barra([
         <div class="nl-lab__trabajo" id="nl-circ-trabajo" role="status" aria-live="polite"></div>
     </aside>
     <template id="nl-circ-iconos">
-        <?php foreach ($piezasCirc as $p): ?><span data-clave="<?= htmlspecialchars($p['clave']) ?>"><?= nl_icono_neurona($p['icono']) ?></span><?php endforeach; ?>
+        <?php foreach ($iconosCirc as $k => $ico): ?><span data-clave="<?= htmlspecialchars($k) ?>"><?= nl_icono_neurona($ico) ?></span><?php endforeach; ?>
     </template>
 </div>
 
