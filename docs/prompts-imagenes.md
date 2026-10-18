@@ -85,3 +85,70 @@ Los tres niveles usan la MISMA neurona:
 |---|---|---|
 | `img/neurona-base.jpg` | `img/_fuentes/base-espinas.png` (ChatGPT: imagen 2 sin zooms + espinas en todas las dendritas) | I y II |
 | `img/neurona-nivel3-zoom.jpg` | Composición: 4 zooms (A espina = `_fuentes/zoom-espina.png`, B axón, C cono y D botón = `_fuentes/neurona-nivel2-actina.png`) + miniatura de la base con líneas | III |
+
+## 4. Esquemas de glía (práctico II) → `img/glia-snc.jpg`, `img/glia-snp.jpg`
+
+Adjuntar `img/neurona-base.jpg` como referencia de estilo. Formato 1536 × 1024, optimizadas a JPG (< 300 KB).
+Originales en `img/_fuentes/glia-snc.png` y `img/_fuentes/glia-snp.png`. Números: `data/seed.sql` (actividades 9 y 10).
+
+### Glía del SNC → `img/glia-snc.jpg`
+
+```
+Adjunto una ilustración de referencia. Crea una NUEVA ilustración científica con exactamente
+el mismo estilo: dibujo médico-educativo semi-realista y limpio, trazo suave, fondo blanco puro,
+sin sombras duras. Neuronas en lila/violeta (#8B5CF6 a #C4B5FD) y mielina celeste translúcida.
+
+Formato horizontal 3:2 (1536 × 1024 px). SIN texto, SIN letras, SIN números, SIN flechas ni
+líneas de indicación. Deja espacio blanco alrededor de cada célula para poner etiquetas.
+
+Escena: un trozo de tejido del sistema nervioso central con cuatro tipos de glía, cada una en
+una zona propia, bien separadas y fáciles de señalar con un punto. Evita verde, rojo y naranjo.
+- Al centro, el soma de una neurona multipolar (violeta) con algunas dendritas.
+- Arriba a la izquierda, un CAPILAR pequeño con 2–3 glóbulos rojos.
+- ASTROCITO (rosado suave #F9A8D4): grande, en forma de estrella; una o dos prolongaciones
+  terminan en pies ensanchados que abrazan el capilar y otra toca el soma de la neurona.
+- OLIGODENDROCITO (azul #60A5FA): soma pequeño y redondo con 3–4 prolongaciones; cada una
+  forma un segmento de mielina celeste en un axón DISTINTO (3–4 axones paralelos a la derecha).
+- MICROGLÍA (gris azulado #94A3B8): la más pequeña, núcleo alargado y ramas muy finas.
+- CÉLULAS EPENDIMARIAS (amarillo pálido #FDE68A): abajo, una hilera de 6–8 células cúbicas
+  que revisten una cavidad celeste muy pálida, con cilios finos hacia la cavidad.
+```
+
+### Glía del SNP → `img/glia-snp.jpg`
+
+```
+Adjunto una ilustración de referencia. Crea una NUEVA ilustración científica con exactamente
+el mismo estilo: dibujo médico-educativo semi-realista y limpio, trazo suave, fondo blanco puro,
+sin sombras duras. Neuronas en lila/violeta (#8B5CF6 a #C4B5FD) y mielina celeste translúcida.
+
+Formato horizontal 3:2 (1536 × 1024 px). SIN texto, SIN letras, SIN números, SIN flechas ni
+líneas de indicación. Deja espacio blanco alrededor de cada célula para poner etiquetas.
+
+Escena: sistema nervioso periférico. Evita verde, rojo y naranjo.
+- A la izquierda, el soma grande y redondo de una neurona pseudounipolar (violeta) con su
+  prolongación en «T». Alrededor del soma, un anillo continuo de 8–10 CÉLULAS SATÉLITE
+  aplanadas (color arena #E7D7C1) con núcleo pequeño.
+- La rama periférica va hacia la derecha con 3 segmentos de mielina celeste separados por
+  nódulos. Cada segmento es una CÉLULA DE SCHWANN (celeste intenso #38BDF8) con su núcleo
+  alargado por fuera, sobre la mielina.
+- Abajo a la derecha, un RECUADRO DE AMPLIACIÓN circular (corte transversal), unido con una
+  línea gris fina a la rama periférica: (a) un axón mielinizado con anillos de mielina y el
+  núcleo de Schwann por fuera; (b) una sola CÉLULA DE SCHWANN NO MIELINIZANTE que envuelve
+  5–6 axones delgados violeta, cada uno hundido en un surco, sin mielina.
+- Arriba a la derecha, un recuadro circular más pequeño con un OLIGODENDROCITO (azul #60A5FA)
+  mielinizando 3 axones, para comparar.
+```
+
+**Ojo:** ChatGPT dibujó la neurona con dos prolongaciones separadas (forma bipolar) aunque se le pidió la T.
+Se corrigió a mano: tallo único que llega al medio de una fibra continua (T en un nódulo de Ranvier),
+mielina a ambos lados de la T y terminaciones periféricas libres (sin botones). Después se pidió a ChatGPT
+sólo un retoque de estilo, con este prompt y la imagen corregida adjunta:
+
+```
+Adjunto un esquema científico. Quiero que lo PULAS para que todo se vea con el mismo
+acabado de ilustración médico-educativa semi-realista, pero SIN CAMBIAR la composición
+ni la anatomía. Es un retoque, no un dibujo nuevo.
+[…] La neurona es PSEUDOUNIPOLAR: del soma sale UNA SOLA prolongación corta (el tallo),
+que llega al medio de una fibra continua formando una «T». No agregues ni quites
+prolongaciones al soma. […] Formato 3:2 (1536 × 1024 px), fondo blanco puro, SIN texto.
+```

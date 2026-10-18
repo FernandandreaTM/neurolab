@@ -112,7 +112,7 @@ nl_barra([
     </div>
     <aside class="nl-mesa__panel">
         <?= $instrucciones('Toca un número de la imagen (o un círculo de aquí abajo). Escribe de memoria el nombre de esa estructura y presiona Enter: verás la respuesta correcta. Luego elige su función entre las alternativas. <strong>Verde</strong>: nombre y función correctos. <strong style="color:#FFB4AE">Rojo</strong>: el nombre quedó por repasar. <strong style="color:#FCD34D">Naranjo</strong>: la estructura que estás respondiendo.') ?>
-        <?php if ($lamPorNiveles): ?>
+        <?php if ($lamPorNiveles && !empty($nivelLam['aviso_rata'])): ?>
         <details class="nl-mesa__aviso" id="nl-aviso-rata" open>
             <summary>🐀 ¿Por qué un cerebro de rata?</summary>
             <p>El objetivo <strong>no es aprender la anatomía de la rata</strong>, sino orientarte en el corte para interpretar las <strong>imágenes reales</strong> de los niveles siguientes. Su cerebro no es idéntico al humano, pero tiene estructuras equivalentes que se reconocen (corteza, hipocampo, cerebelo, tronco) y <strong>sus neuronas cumplen las mismas funciones</strong>.</p>
