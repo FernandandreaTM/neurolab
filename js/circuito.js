@@ -76,8 +76,10 @@ function iniciar(raiz) {
         return;
     }
 
-    // Captura del nivel base, encajada en el molde (las capturas encajadas guardan `malp`)
-    const capBase = (leerJSON('nl_lam_' + base.clave, {}).caps || {})[base.captura] || {};
+    // Fondo: una imagen fija (`data-fondo`, p. ej. el rompecabezas armado) o la captura del nivel base,
+    // encajada en el molde (las capturas encajadas guardan `malp`)
+    const capBase = d.fondo ? { img: d.fondo, listo: true, malp: {} }
+        : (leerJSON('nl_lam_' + base.clave, {}).caps || {})[base.captura] || {};
     if (!capBase.img || !capBase.listo || !capBase.malp) {
         vista.innerHTML = `<p class="nl-lam__ayuda-vista">No encontramos tu captura del nivel I en este navegador.</p>`;
         panel.innerHTML = `<p class="nl-lab__paso">Falta tu captura</p>
@@ -167,7 +169,7 @@ function iniciar(raiz) {
                 : `${esc(c.titulo)}: el impulso va del receptor al efector`;
         }
         vista.innerHTML = `<div class="nl-lam__lienzo nl-circ__lienzo${clase}" id="nl-circ-lienzo">
-              <img src="${capBase.img}" alt="Tu captura de la médula" draggable="false">
+              <img src="${capBase.img}" alt="Arco reflejo" draggable="false">
               ${svgMolde(molde, 'esquema', 'nl-circ__esquema')}
               ${capas}
             </div>
@@ -291,7 +293,7 @@ function iniciar(raiz) {
             const malSel = sel ? (e.mal[sel.clave] || []) : [];
             const ultimoMal = sel && !e.ok[sel.clave] && e.pos[sel.clave] && malSel.length ? malSel[malSel.length - 1] : '';
             panel.innerHTML = `${av}${cab}
-                <p class="nl-lab__ayuda">Elige una neurona y toca su lugar: en tu captura o en el esquema.</p>
+                <p class="nl-lab__ayuda">Elige una neurona y toca su lugar en la imagen.</p>
                 <div class="nl-circ__piezas">${c.piezas.map(pz => {
                     const ok = e.ok[pz.clave];
                     return `<button type="button" class="nl-circ__pieza${ok ? ' is-ok' : ''}${pz.clave === selPieza ? ' is-sel' : ''}" data-clave="${esc(pz.clave)}" style="--c:${color(pz.clave)}">
@@ -398,7 +400,7 @@ function iniciar(raiz) {
     function panelCortes(av) {
         const letra = LETRAS[secciones.indexOf('cortes')];
         const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${letra}</span> ${esc(cortes.titulo || 'Cortes')}</p>
-            <p class="nl-lab__ayuda">Lee el caso y toca en el esquema el lugar donde se interrumpió el arco reflejo.</p>`;
+            <p class="nl-lab__ayuda">Lee el caso y toca en la imagen el lugar donde se interrumpió el arco reflejo.</p>`;
         if (casoOk != null) {
             const k = ek(casoOk);
             panel.className = 'nl-lab__trabajo ' + (k.mal.length ? 'is-repasar' : 'is-ok');

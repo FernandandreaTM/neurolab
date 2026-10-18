@@ -234,6 +234,7 @@ nl_barra([
      data-requiere="<?= htmlspecialchars($nivelLam['requiere']) ?>"
      data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
      data-molde="<?= htmlspecialchars($nivelLam['molde'] ?? '') ?>"
+     data-fondo="<?= htmlspecialchars(!empty($nivelLam['fondo']) ? $nivelLam['fondo'] . '?v=' . (@filemtime(__DIR__ . '/../' . $nivelLam['fondo']) ?: 1) : '') ?>"
      data-base="<?= htmlspecialchars(json_encode($baseCirc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-circuitos="<?= htmlspecialchars(json_encode($circuitos, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-cortes="<?= htmlspecialchars(json_encode($cortes, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
@@ -258,6 +259,43 @@ nl_barra([
     <template id="nl-circ-iconos">
         <?php foreach ($iconosCirc as $k => $ico): ?><span data-clave="<?= htmlspecialchars($k) ?>"><?= nl_icono_neurona($ico) ?></span><?php endforeach; ?>
     </template>
+</div>
+
+<?php elseif (!empty($esRompe)):
+    // Rompecabezas (js/rompecabezas.js): el lugar de cada pieza se revisa en api/circuito_check.php
+    $piezasR = array_map(function ($p) {
+        return ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'img' => $p['img'], 'w' => $p['caja'][2]];
+    }, $nivelLam['piezas'] ?? []);
+    $fotoR = __DIR__ . '/../' . ($nivelLam['tablero'] ?? '');
+?>
+<div class="nl-mesa nl-mesa--lamina nl-mesa--rompe container" id="nl-rompe"
+     data-slug="<?= htmlspecialchars($act['slug']) ?>"
+     data-n="<?= (int)$nivelLam['n'] ?>"
+     data-clave="<?= htmlspecialchars($nivelLam['clave']) ?>"
+     data-titulo="<?= htmlspecialchars($act['titulo'] . ' — Nivel ' . $nivelLam['romano'] . ': ' . $nivelLam['titulo']) ?>"
+     data-requiere="<?= htmlspecialchars($nivelLam['requiere']) ?>"
+     data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
+     data-tablero="<?= htmlspecialchars(($nivelLam['tablero'] ?? '') . '?v=' . (@filemtime($fotoR) ?: 1)) ?>"
+     data-piezas="<?= htmlspecialchars(json_encode($piezasR, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-preguntas="<?= htmlspecialchars(json_encode($nivelLam['preguntas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+    <div class="nl-lab__candado" hidden>
+        <strong>🔒 Nivel bloqueado</strong>
+        <p>Completa primero el nivel anterior para desbloquear este.</p>
+    </div>
+    <div class="nl-mesa__vista nl-lam__vista">
+        <div class="nl-lam__editor nl-rompe__vista" id="nl-rompe-vista"></div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?= $instrucciones($nivelLam['instrucciones'] ?? '') ?>
+        <div class="nl-lab__estado">
+            <span class="nl-lab__contador" id="nl-rompe-contador"></span>
+            <span class="nl-lab__errores" id="nl-rompe-errores"></span>
+            <button type="button" class="nl-lab__reset" id="nl-rompe-reset">Empezar de nuevo</button>
+        </div>
+        <ol class="nl-lam__pasos" id="nl-rompe-pasos"></ol>
+        <?= $conexion() ?>
+        <div class="nl-lab__trabajo" id="nl-rompe-trabajo" role="status" aria-live="polite"></div>
+    </aside>
 </div>
 
 <?php elseif ($esLamina):

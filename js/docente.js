@@ -6,7 +6,7 @@
  */
 import { carrera } from './carrera.js';
 import { arMolde } from './molde.js';
-const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ');
+const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ, #nl-rompe');
 const url = new URL(location.href);
 
 function leer(k, def) { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? def; } catch { return def; } }
@@ -73,6 +73,12 @@ async function completarNivel() {
         });
         casos.forEach((k, i) => { est.k[i] = { mal: [], pos: k.pos, ok: true, resp: k.resp, exp: k.exp }; });
         poner('nl_circ_' + d.clave, est);
+    } else if (raiz.id === 'nl-rompe') {
+        const { piezas } = await api({ tipo: 'rompecabezas', slug: d.slug, n: d.n });
+        const est = { ok: {}, mal: {}, exp: {}, preg: {}, err: 0, listo: true };
+        piezas.forEach(p => { est.ok[p.clave] = p.caja; est.exp[p.clave] = { exp: p.exp, e: 0 }; });
+        JSON.parse(d.preguntas || '[]').forEach((q, i) => { est.preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
+        poner('nl_rompe_' + d.clave, est);
     } else if (raiz.id === 'nl-lam') {
         const caps = JSON.parse(d.capturas || '[]');
         const est = { caps: {}, err: 0 };

@@ -700,3 +700,24 @@
 #nl-circ-pasos button { width: 100%; padding: .35rem .2rem; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; border-radius: 6px; }
 #nl-circ-pasos button[disabled] { cursor: default; }
 #nl-circ-pasos li.is-viendo { outline: 2px solid #FCD34D; outline-offset: 1px; }
+
+/* Rompecabezas (js/rompecabezas.js) */
+.nl-rompe__tablero { background: #fff; border-radius: 8px; }
+.nl-rompe__tablero > img:first-child { border-radius: 8px; }
+.nl-rompe__puesta { position: absolute; max-width: none; max-height: none; pointer-events: none; animation: nlFade .35s ease; filter: drop-shadow(0 2px 3px rgba(0,0,0,.18)); }
+.nl-rompe__marca {
+    position: absolute; transform: translate(-50%, -50%); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    font-weight: 800; color: #fff; background: #DC2626; border: 2px solid #fff; pointer-events: none; animation: nlFade .3s ease;
+}
+.nl-rompe__bandeja { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: .45rem; margin: .5rem 0; }
+.nl-rompe__pieza {
+    display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .45rem; border-radius: 10px; cursor: grab; touch-action: none;
+    font: inherit; color: var(--gray-100); background: rgba(255,255,255,.05); border: 2px solid rgba(255,255,255,.12);
+}
+.nl-rompe__pieza strong { font-size: .8rem; line-height: 1.2; text-align: center; }
+.nl-rompe__mini { width: 100%; height: 64px; display: grid; place-items: center; background: #fff; border-radius: 6px; }
+.nl-rompe__mini img { max-width: 92%; max-height: 58px; object-fit: contain; }
+.nl-rompe__pieza.is-sel { border-color: #F59E0B; background: rgba(245,158,11,.14); }
+.nl-rompe__pieza.is-ok { opacity: .55; cursor: default; border-color: rgba(134,239,172,.5); }
+.nl-rompe__pieza.is-ok strong { color: #86EFAC; }
+.nl-rompe__fantasma { position: fixed; z-index: 1000; transform: translate(-50%, -50%); pointer-events: none; opacity: .85; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); }

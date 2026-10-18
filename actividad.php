@@ -118,11 +118,14 @@ try {
             }
         } elseif (($nivelLam['tipo'] ?? '') === 'circuito') {
             $esCircuito = true;
+        } elseif (($nivelLam['tipo'] ?? '') === 'rompecabezas') {
+            $esRompe = true;
         } else {
             $esLamina = true;
         }
     }
     $esCircuito = !empty($esCircuito);
+    $esRompe = !empty($esRompe);
 
     $nivelesLab = [];   // otras actividades de identificación del mismo tema (niveles)
     $requiereLab = $lamPorNiveles ? (string)$nivelLam['requiere'] : '';
@@ -225,7 +228,7 @@ try {
     }
     // Todo va en mesa de trabajo (vista a la izquierda, panel a la derecha). Lo que no tiene motor
     // propio usa la mesa genérica: recursos (imagen, simulador, ficha) en la vista y la tarea en el panel.
-    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esCircuito || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
+    $esGenerica = !($esLabeling || $esTipos || $esLamina || $esCircuito || $esRompe || $esQuiz || $esPractica || (is_array($tareas) && $tieneIframe));
     // Las que tienen motor propio (lámina, identificación, tipos, quiz, práctica) siempre van en mesa;
     // las genéricas también, salvo tareas sin lámina en iframe (diseño con sección «Tu trabajo»).
     $modoMesa = !$esGenerica || !(is_array($tareas) && !$tieneIframe);
@@ -490,6 +493,8 @@ try {
     <?php endif; ?>
     <?php if ($esCircuito): ?>
     <script type="module" src="js/circuito.js?v=<?= nl_ver('js/circuito.js') ?>"></script>
+    <?php elseif ($esRompe): ?>
+    <script type="module" src="js/rompecabezas.js?v=<?= nl_ver('js/rompecabezas.js') ?>"></script>
     <?php elseif ($esLamina): ?>
     <script type="module" src="js/lamina.js?v=<?= nl_ver('js/lamina.js') ?>"></script>
     <?php elseif (is_array($tareas) && !$lamPorNiveles): ?>

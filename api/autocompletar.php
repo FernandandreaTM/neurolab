@@ -5,6 +5,7 @@
  *   GET tipo=labeling&slug=<actividad>  -> { partes: [{ id, n, f, d }] }
  *   GET tipo=practica&nivel=<id>        -> { tipo: 'armar'|'elegir', items: { <id>: estado } }
  *   GET tipo=circuito&slug=<act>&n=<N>  -> { circuitos: { <clave>: { orden, ruta, exp, piezas } }, casos: [{ pos, resp, exp }] }
+ *   GET tipo=rompecabezas&slug=<act>&n=<N> -> { piezas: [{ clave, caja, exp }] }
  *   GET tipo=lamina&slug=<act>&n=<N>    -> { pines: { <captura>: { <etiqueta>: [x, y] } } } (capturas con molde)
  * La lámina y el quiz se completan en el navegador con los datos de la página.
  */
@@ -78,6 +79,12 @@ try {
             return ['pos' => nl_zona_centro($k['zona']), 'resp' => (string)$k['respuesta'], 'exp' => (string)$k['exp']];
         }, $nv['cortes']['casos'] ?? []);
         nl_ac_json(['ok' => true, 'circuitos' => $circ, 'casos' => $casos]);
+    }
+
+    if ($tipo === 'rompecabezas') {
+        $nv = nl_tareas_nivel((string)($_GET['slug'] ?? ''), (int)($_GET['n'] ?? 0));
+        $piezas = array_map(function ($p) { return ['clave' => $p['clave'], 'caja' => $p['caja'], 'exp' => (string)($p['exp'] ?? '')]; }, $nv['piezas'] ?? []);
+        nl_ac_json(['ok' => true, 'piezas' => $piezas]);
     }
 
     if ($tipo === 'lamina') {

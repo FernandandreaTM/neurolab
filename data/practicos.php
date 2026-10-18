@@ -64,15 +64,19 @@ return [
         'intro'      => 'Avanza a tu ritmo, en orden. Cada actividad se corrige sola: cuando completes un nivel, se suma a tu guía de estudio. Al final descarga tu guía con todo lo que trabajaste.',
         'pasos' => [
             ['slug' => 'circuito-reflejo',
-             'titulo' => 'Circuito reflejo (2 niveles)',
-             'tarea' => 'Oriéntate en una médula real teñida con cresil: captúrala, encaja la silueta y ubica sus partes. Luego completa junto a tu captura lo que la lámina no muestra, arma dos reflejos (sin y con interneurona) y predice qué pasa si se corta el arco. Cada nivel suma una sección a tu guía.',
+             'titulo' => 'Circuito reflejo (3 niveles)',
+             'tarea' => 'Oriéntate en una médula real teñida con cresil: captúrala, encaja la silueta y ubica sus partes. Luego arma el arco reflejo como un rompecabezas y, sobre él, dos reflejos (sin y con interneurona); al final predice qué pasa si se corta el arco. Cada nivel suma una sección a tu guía.',
              'guia' => ['circuito-reflejo:1' => 'Nivel I: orientación en la médula',
-                        'circuito-reflejo:2' => 'Nivel II: completar el arco y armar el reflejo'],
+                        'circuito-reflejo:2' => 'Nivel II: armar el arco reflejo',
+                        'circuito-reflejo:3' => 'Nivel III: reflejos y cortes'],
              'conexion' => [
                 'circuito-reflejo:1' => [
                     'terapia-ocupacional' => 'Orientarte en el corte (dorsal y ventral, entrada y salida) permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',
                     'fonoaudiologia' => 'La misma organización (núcleos sensitivos que reciben y núcleos motores que envían) se repite en el tronco encefálico, donde están los núcleos de los nervios craneales que controlan el habla, la voz y la deglución.'],
                 'circuito-reflejo:2' => [
+                    'terapia-ocupacional' => 'Todo reflejo tiene las mismas cinco partes (receptor, vía aferente, centro, vía eferente y efector): ordenarlas te permite razonar qué tramo falla cuando un reflejo o una sensación está alterada.',
+                    'fonoaudiologia' => 'Los nervios craneales que evalúas (trigémino, facial, glosofaríngeo, vago, hipogloso) también tienen ganglios sensitivos y núcleos motores: el mismo arco, con el centro en el tronco encefálico.'],
+                'circuito-reflejo:3' => [
                     'terapia-ocupacional' => 'Los reflejos osteotendíneos (rotuliano, bicipital, aquíleo) evalúan el circuito: disminuidos indican falla en el arco (nervio, raíz o motoneurona); exaltados, falla del control que baja desde el encéfalo, como tras un ACV.',
                     'fonoaudiologia' => 'Los reflejos orofaríngeos (nauseoso, deglutorio, tusígeno) siguen la misma lógica: vía sensitiva, centro en el tronco encefálico y vía motora. Evaluarlos en la disfagia orienta qué tramo del circuito está fallando.'],
              ]],

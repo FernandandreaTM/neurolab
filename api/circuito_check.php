@@ -6,6 +6,7 @@
  *   POST slug, n, accion=ubicar, circuito, pieza, x, y -> { correcto, feedback, exp, zona, punto }
  *   POST slug, n, accion=orden,  circuito, orden (JSON) -> { correcto, feedback, ruta }
  *   POST slug, n, accion=corte,  caso, x, y              -> { correcto, feedback, respuesta, exp }
+ *   POST slug, n, accion=pieza,  pieza, x, y             -> { correcto, feedback, caja, exp }  (nivel «rompecabezas»)
  */
 error_reporting(0);
 require_once __DIR__ . '/zonas_lib.php';
@@ -17,10 +18,21 @@ function nl_circ_json($d) { echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; 
 
 try {
     $nivel = nl_tareas_nivel((string)($_POST['slug'] ?? ''), (int)($_POST['n'] ?? 0));
-    if (!$nivel || ($nivel['tipo'] ?? '') !== 'circuito') nl_circ_json(['correcto' => false, 'red' => true, 'feedback' => 'Nivel no encontrado.']);
+    if (!$nivel || !in_array($nivel['tipo'] ?? '', ['circuito', 'rompecabezas'], true)) nl_circ_json(['correcto' => false, 'red' => true, 'feedback' => 'Nivel no encontrado.']);
     $accion = (string)($_POST['accion'] ?? '');
     $x = (float)($_POST['x'] ?? -1);
     $y = (float)($_POST['y'] ?? -1);
+
+    if ($accion === 'pieza') {
+        // Correcta si el punto (centro de la pieza al soltarla) cae cerca del centro de su caja
+        $pieza = null;
+        foreach ((array)($nivel['piezas'] ?? []) as $p) { if ($p['clave'] === (string)($_POST['pieza'] ?? '')) $pieza = $p; }
+        if (!$pieza) nl_circ_json(['correcto' => false, 'red' => true, 'feedback' => 'Pieza no reconocida.']);
+        list($cx, $cy, $cw, $ch) = $pieza['caja'];
+        $ok = abs($x - ($cx + $cw / 2)) <= max(7, $cw * 0.35) && abs($y - ($cy + $ch / 2)) <= max(9, $ch * 0.35);
+        nl_circ_json($ok ? ['correcto' => true, 'caja' => $pieza['caja'], 'exp' => (string)($pieza['exp'] ?? '')]
+                         : ['correcto' => false, 'feedback' => 'No va ahí. Pista: ' . (string)($pieza['pista'] ?? '')]);
+    }
 
     if ($accion === 'corte') {
         $caso = $nivel['cortes']['casos'][(int)($_POST['caso'] ?? -1)] ?? null;
