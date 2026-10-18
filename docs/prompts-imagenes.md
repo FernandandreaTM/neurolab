@@ -212,3 +212,32 @@ Es un esquema del arco reflejo del lado IZQUIERDO del cuerpo, visto en corte tra
 
 Guárdala como `img/reflejo/arco.png` (crea la carpeta) y avísame: la corto, ajusto las piezas al
 marco de la captura y el nivel II pasa de esquema a rompecabezas.
+
+## 7. Circuito reflejo por capas (rediseño, sesión 06) → `img/reflejo/`
+
+Reemplaza a §6. Cada imagen se corta en capas: la médula, cada pieza periférica y **cada neurona por su
+color** (por eso los colores puros y distintos). Adjunta siempre `img/_fuentes/reflejo-arco.png` como
+referencia de **composición** (misma ubicación de médula, raíces, ganglio, nervio, piel y músculo) y
+`img/tipos/multipolar.png` como referencia de estilo.
+
+Bloque común (va al inicio de cada prompt):
+
+```
+Adjunto dos imágenes: la primera es la referencia de COMPOSICIÓN (mantén exactamente la misma ubicación,
+tamaño y forma de la médula, las raíces, el ganglio, el nervio, la piel y el músculo); la segunda es la
+referencia de ESTILO: ilustración médico-educativa semi-realista y limpia, trazo grueso, fondo blanco puro.
+Formato horizontal 1536 × 1024 px. SIN texto, SIN letras, SIN números, SIN flechas.
+Las neuronas van dibujadas ENCIMA del esquema, cada una en UN color plano y puro (sin degradados que se
+mezclen con el fondo), con morfología realista: soma, núcleo, dendritas y axón bien diferenciados.
+Donde una neurona contacta a otra o al músculo, dibuja un botón terminal (pequeño engrosamiento redondo)
+tocando claramente a la célula que recibe.
+```
+
+| Archivo | Qué agregar al bloque común |
+|---|---|
+| `rotuliano.png` | Músculo de abajo = cuádriceps, con un **huso muscular** visible (cápsula fusiforme dentro del músculo) y una **placa motora** sobre una fibra. NEURONA SENSITIVA en AZUL (#2563EB): pseudounipolar, soma redondo DENTRO del ganglio y prolongación en T; su rama periférica va por el nervio y se enrolla en espiral alrededor del huso; su rama central entra por la raíz dorsal, cruza la sustancia gris y termina con botones sobre el soma de la motoneurona. MOTONEURONA en ROJO (#DC2626): soma multipolar grande en el asta ventral, con dendritas; su axón (más grueso) sale por la raíz ventral, sigue por el nervio y termina en la placa motora. Sin interneurona. La piel se dibuja sin neuronas. |
+| `retirada.png` | Músculo de abajo = músculo flexor (isquiotibiales), con una **placa motora**. En la piel, una terminación nerviosa libre (nociceptor). NEURONA SENSITIVA en CELESTE (#0891B2): pseudounipolar, soma en el ganglio; rama periférica hasta la terminación libre de la piel; rama central entra por la raíz dorsal y termina con botones sobre una INTERNEURONA en VERDE (#16A34A): pequeña, multipolar, en la sustancia gris entre el asta dorsal y la ventral; su axón corto termina con botones sobre la MOTONEURONA en ROJO (#DC2626) del asta ventral, cuyo axón sale por la raíz ventral hasta la placa motora del flexor. |
+| `sinapsis-central.png` (cuadrada 1024 × 1024, sin la referencia de composición) | Vista ampliada dentro de un CÍRCULO (como lupa): un botón terminal AZUL de la neurona sensitiva sobre el soma ROJO de la motoneurona. Dentro del botón, vesículas sinápticas redondas; entre ambas células, la hendidura sináptica; en la membrana de la motoneurona, receptores; algunas vesículas liberando su contenido (puntos) en la hendidura. |
+| `placa-motora.png` (cuadrada 1024 × 1024, sin la referencia de composición) | Vista ampliada dentro de un CÍRCULO: el terminal ROJO del axón de la motoneurona, ramificado en botones, sobre una fibra muscular estriada (rojo-rosado con estrías transversales), con los pliegues de la membrana muscular bajo cada botón y vesículas dentro de los botones. |
+
+Guárdalas en `img/reflejo/` con esos nombres.
