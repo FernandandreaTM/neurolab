@@ -181,37 +181,9 @@ Opcional, para el circuito reflejo: `img/tipos/interneurona.png` (neurona MULTIP
 pocas dendritas cortas y un axón corto que no sale del dibujo). Si la subes, avísame para usarla
 en lugar del ícono multipolar.
 
-## 6. Práctico II · Rompecabezas del arco reflejo → `img/reflejo/arco.png`
+## 6. (Obsoleta) Rompecabezas del arco reflejo
 
-Una sola imagen: la corto en piezas (ganglio, raíz dorsal, raíz ventral, nervio espinal, piel, músculo)
-para que calcen perfecto entre sí. La médula de la imagen sólo sirve de referencia: en la actividad,
-las piezas se arman **junto a la captura real** de la médula (UCSF-163, nivel I). Adjunta
-`img/tipos/multipolar.png` y `img/glia/celula-satelite.png` como referencia de estilo.
-
-```
-Adjunto dos íconos de referencia. Crea una ilustración horizontal (1536 × 1024 px) con exactamente
-el mismo estilo: médico-educativa semi-realista y limpia, trazo grueso, colores suaves, fondo blanco
-puro, SIN texto, SIN letras, SIN números, SIN flechas y SIN neuronas dibujadas.
-Es un esquema del arco reflejo del lado IZQUIERDO del cuerpo, visto en corte transversal:
-- A la DERECHA (ocupando el tercio derecho): corte transversal de la médula espinal con la cara
-  dorsal ARRIBA: sustancia gris en forma de mariposa (lila), sustancia blanca alrededor (rosado muy
-  pálido), canal central pequeño, astas dorsales delgadas arriba y astas ventrales anchas abajo,
-  fisura media ventral abajo.
-- Desde el borde dorsolateral izquierdo de la médula sale la RAÍZ DORSAL (cordón beige-amarillo)
-  hacia la izquierda, y en ella el GANGLIO DE LA RAÍZ DORSAL (óvalo amarillo ocre con células
-  redondas pequeñas).
-- Desde el borde ventrolateral izquierdo sale la RAÍZ VENTRAL (cordón beige más delgado) hacia la
-  izquierda y hacia arriba, y se une con la raíz dorsal justo a la izquierda del ganglio.
-- Ambas forman el NERVIO ESPINAL (cordón grueso beige), que sigue a la izquierda y se divide en dos
-  ramas: una sube hasta un trozo de PIEL en la esquina superior izquierda (bloque rectangular con
-  epidermis rosada y dermis más clara) y otra baja hasta un MÚSCULO esquelético en la esquina
-  inferior izquierda (vientre muscular rojo con estrías).
-- Cada elemento con contorno bien definido y separado del resto por fondo blanco, salvo donde
-  se conectan (raíces con la médula y con el nervio).
-```
-
-Guárdala como `img/reflejo/arco.png` (crea la carpeta) y avísame: la corto, ajusto las piezas al
-marco de la captura y el nivel II pasa de esquema a rompecabezas.
+Reemplazada por la §7 (circuito por capas, sesión 06). La imagen `img/reflejo/arco.png` ya no se usa.
 
 ## 7. Circuito reflejo por capas (rediseño, sesión 06) → `img/reflejo/`
 
@@ -245,3 +217,34 @@ tocando claramente a la célula que recibe.
 | `placa-motora.png` (cuadrada 1024 × 1024, sin la referencia de composición) | Vista ampliada dentro de un CÍRCULO: el terminal ROJO del axón de la motoneurona, ramificado en botones, sobre una fibra muscular estriada (rojo-rosado con estrías transversales), con los pliegues de la membrana muscular bajo cada botón y vesículas dentro de los botones. |
 
 Guárdalas en `img/reflejo/` con esos nombres.
+
+
+## 8. Práctico 2 (solo glía) · sesión 08 → `img/glia-snc-tejido.jpg` y `img/glia-accion/`
+
+Adjuntar `img/glia-snc.jpg` (esquema de Kaira) como referencia de estilo. 1536 × 1024, sin texto.
+Originales en `img/_fuentes/` (`glia-snc-tejido-original.jpg`, `glia-accion/*.png`).
+
+**Lecciones:** ChatGPT inventa elementos (vesículas sueltas), corta axones o los hace nacer de vasos y fusiona prolongaciones.
+Por eso todos los prompts llevan el bloque de reglas biológicas. Después de la primera imagen, corregir **solo con selección de zona**,
+nunca «rehazla» (cada regeneración rompe otra cosa y obliga a recalibrar etiquetas).
+`glia-snc-tejido.jpg`: el capilar terminaba en punta y un tallo rosado tocaba la mielina; se retocó a mano (sale del plano).
+
+```
+REGLAS BIOLÓGICAS (obligatorias):
+- Cada axón nace de un soma (cono axónico) o entra y sale por el borde de la imagen; ninguno empieza ni termina en medio.
+- Cada prolongación pertenece visiblemente a su célula; las de glía nunca se fusionan con axones ni con vasos.
+- Los vasos entran y salen por los bordes o se difuminan hacia el fondo; nunca terminan en punta.
+- Neuronas completamente violeta (soma, dendritas, cono y axón).
+- No agregues nada que no pida: ni vesículas, ni puntos, ni partículas sueltas.
+```
+
+| Archivo | Uso | Contenido pedido |
+|---|---|---|
+| `glia-snc-tejido.jpg` | Conoce la glía · nivel II | Sustancia gris (2 neuronas, astrocito protoplasmático, microglía, capilar con pies) → transición gradual → sustancia blanca (axones mielinizados, oligodendrocito con cada prolongación a un axón distinto, astrocito fibroso en un nodo) y ventrículo con epéndimo continuo abajo |
+| `glia-accion/neurovascular.jpg` | La glía en acción · I | Capilar transversal (endotelio con uniones, glóbulo rojo, lámina basal, pericito, pies astrocitarios) — soma de UN astrocito — sinapsis ampliada envuelta por el mismo astrocito |
+| `glia-accion/mielina.jpg` | La glía en acción · II | Arriba SNC (oligodendrocito con 2 internodos en un axón y 1 en otro; astrocito fibroso tocando el nodo); abajo SNP (2 Schwann con lámina basal); recuadro del nodo (asas paranodales, canales) |
+| `glia-accion/lesion-snp.jpg` | La glía en acción · III (piezas) | 4 viñetas: sano → corte y degeneración walleriana → macrófagos y tubo de Schwann → regeneración con internodos más cortos |
+| `glia-accion/lesion-snc.jpg` | La glía en acción · III (piezas) | 4 viñetas: sano → corte sin limpieza → microglía activada y astrocitos hipertróficos → cicatriz glial y bulbo de retracción |
+
+El tablero `lesion-tablero.jpg` y las piezas `piezas/*.webp` se generan recortando las dos tiras (no son de ChatGPT).
+Se probó también Gemini (Nano Banana) con un prompt único para las 5 imágenes: pendiente de comparar.

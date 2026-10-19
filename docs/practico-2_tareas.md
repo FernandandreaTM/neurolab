@@ -1,12 +1,18 @@
-# Práctico II · Células nerviosas II: circuitos y glía
+# Práctico II · Células nerviosas II: la glía
 
-Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Breve: la anatomía de la médula ya la vieron; aquí va lo biológico-funcional.
+Ruta `celulas-2` (desde la sesión 08 el práctico 2 es **solo glía**; el circuito reflejo pasa al práctico 4, «Sinapsis, neurotransmisores y circuitos»). Cada nivel se corrige solo y suma una sección a la guía.
+
+| Práctico | Fecha | Contenido |
+|---|---|---|
+| 1 | 07-10 | Células I: la neurona |
+| 2 | 21-10 | Células II: la glía |
+| 3 | 28-10 | Potencial de acción y canales iónicos |
+| 4 | 04-11 | Sinapsis, neurotransmisores y circuitos (aquí va el circuito reflejo) |
 
 ## Láminas (histologyguide)
 
 | Código | Tejido · tinción | Link |
 |---|---|---|
-| MH-047 | Médula de roedor + ganglio de la raíz dorsal · H&E | https://histologyguide.com/slideview/MH-047-spinal-cord/06-slide-2.html |
 | MHS-240 | Médula de conejo · H&E | https://histologyguide.com/slideview/MHS-240-spinal-cord/06-slide-1.html |
 | UCSF-163 | Médula de gato · cresil violeta | https://histologyguide.com/slideview/UCSF-163-spinal-cord/06-slide-1.html |
 | MH-051 | Ganglio de la raíz dorsal · Azan | https://histologyguide.com/slideview/MH-051-dorsal-root-ganglion/06-slide-1.html |
@@ -15,41 +21,41 @@ Ruta `celulas-2`. Cada nivel se corrige solo y suma una sección a la guía. Bre
 
 ## Ruta
 
-| # | Actividad | Nivel | Qué hacen | Lámina |
+| # | Actividad (slug) | Nivel | Qué hacen | Imagen |
 |---|---|---|---|---|
-| 1 | Circuito reflejo (un solo esquema, por capas) | I · La médula | Ubican 7 partes sobre la médula sola | Esquema |
-| | | II · Los extremos | Completan los huecos: piel, extensor con huso, nervio, ganglio, raíz dorsal → raíz ventral, flexor | Esquema |
-| | | III · Reflejo rotuliano | Ubican 4 neuronas (aparecen dibujadas), conectan la vía directa y la de inhibición recíproca, 4 lupas (huso, excitatoria, inhibitoria, placa motora) | Esquema |
-| | | IV · Reflejo de retirada | Ubican la sensitiva y 2 interneuronas, conectan 2 vías, 2 lupas | Esquema |
-| | | V · ¿Dónde se cortó? | Emparejan 3 casos (hernia L4, atrofia muscular espinal, nervio femoral) con 3 sitios | Esquema |
-| 2 | Glía del SNC | I · Esquema | Identifican astrocito, oligodendrocito, microglía, ependimaria y eligen su función | Esquema |
-| | | II · En el corte | Canal central (ependimarias) y sustancia blanca (núcleos de oligodendrocitos). ¿Por qué con H&E solo se ven núcleos? | MHS-240 |
-| | | III · Motoneurona y su glía | Motoneurona del asta ventral, núcleos de glía alrededor, axón vs dendrita por el Nissl | UCSF-163 |
-| 3 | Glía del SNP | I · Esquema y tarjetas | Schwann mielinizante, Schwann no mielinizante, satélite vs oligodendrocito → cuadro SNC/SNP | Esquema |
-| | | II · Ganglio | Neurona del ganglio + células satélite; es la pseudounipolar del circuito | MH-051 |
-| | | III · Nervio | Epi-, peri- y endoneuro, Schwann, mielina; nodo de Ranvier en el longitudinal | MH-052 |
-| 4 | Quiz de cierre | — | Alternativas con íconos de neuronas y glía, sin repetir el práctico I | — |
+| 1 | Conoce la glía (`glia-conoce`) | I · Glía del SNC | Identifican astrocito, oligodendrocito, microglía, ependimaria y eligen su función | Esquema de Kaira |
+| | | II · La glía en su tejido | 11 estructuras: astrocito protoplasmático y fibroso, oligodendrocito, mielina, nodo, microglía, capilar, ependimaria, ventrículo, sustancia gris y blanca | `glia-snc-tejido.jpg` |
+| | | III · Glía del SNP | Satélite, Schwann mielinizante y no mielinizante, oligodendrocito para comparar | Esquema de Kaira |
+| | | IV · Cada célula en su lugar | 18 frases → cuadro de las 6 células (dónde está, qué hace, si falla) | Tarjetas |
+| 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Ependimarias y núcleos de oligodendrocitos con H&E | MHS-240 |
+| | | II · Motoneurona y su glía | Glía perineuronal, axón frente a dendrita por el Nissl, neuropilo | UCSF-163 |
+| | | III · Ganglio y nervio periférico | Células satélite; epi-, peri- y endoneuro, Schwann | MH-051 y MH-052 |
+| | | IV · Glía con anticuerpos | 10 imágenes reales (GFAP, Iba1, coronina, Rip, NG2, S100/MBP, laminina): qué célula marca cada color | `img/glia-if/` (Wikimedia) |
+| 3 | La glía en acción (`glia-accion`) | I · Unidad neurovascular y sinapsis tripartita | 10 estructuras (endotelio, unión estrecha, pericito, pie astrocitario, sinapsis envuelta) | `glia-accion/neurovascular.jpg` |
+| | | II · Mielina y nodo de Ranvier | 8 estructuras (internodo, nodo, asas paranodales, canales de Na+) | `glia-accion/mielina.jpg` |
+| | | III · Tras la lesión | Rompecabezas: ordenar 4 etapas en el SNP y 4 en el SNC + 3 preguntas | `glia-accion/lesion-tablero.jpg` |
+| | | IV · Glía que cambia | 9 casos: glutamato, M1/M2, gliosis, poda, glía radial, bandas de Büngner, fibras C, remielinización, epéndimo | Tarjetas |
+| 4 | Quiz de cierre | — | 15 preguntas, solo de glía | — |
 
 ## Actividades adicionales del atlas (fuera de la ruta)
 
 | Actividad | Lámina | Idea |
 |---|---|---|
-| Más casos del arco | — | Banco de casos TO y Fono para variar el nivel V (mismo formato: caso → sitio → por qué) |
+| Circuito reflejo (5 niveles) | Esquema | Queda en el atlas; vuelve como integración del práctico 4 |
 | Mielina en el ganglio | MHS-286 | Weigert: mielinizadas vs no mielinizadas y velocidad de conducción |
 | Una tinción, dos miradas | MH-051 vs MHS-285 | Misma estructura con Azan y toluidina: qué tiñe cada una |
 
 ## Tareas para ayudantes
 
-Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. Fernanda revisa, mergea y sube al servidor. Lo técnico nuevo (arrastrar neuronas sobre la captura y corregir por zonas) lo hace Fernanda.
-
-Las tareas A–H de la sesión 05 ya están en el sitio. Quedan estas:
+Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. Fernanda revisa, mergea y sube al servidor.
 
 | Tarea | Qué queda en el sitio | Rama |
 |---|---|---|
-| I. Casos del arco | 4–6 casos más (mitad TO, mitad Fono) para el nivel V del circuito, con sitio (nervio, raíz dorsal o asta ventral), pista y «para recordar». En `data/seed.sql`, actividad 9, nivel 5 (`cortes.casos`) | `feat/p2-casos-arco` |
-| J. Revisar las lupas | Leer las preguntas de las 6 lupas (niveles III y IV) mirando cada imagen de `img/reflejo/`; proponer cambios si algo no se ve en la imagen | `feat/p2-lupas` |
-| K. Revisar láminas de glía | Recorrer Glía del SNC III–IV y Glía del SNP II–IV en histologyguide: que los links abran en el campo correcto y las preguntas se respondan con lo que se ve | `feat/p2-revision-glia` |
+| K. Revisar láminas de glía | Recorrer La glía en el tejido I–III en histologyguide: que los links abran en el campo correcto y las preguntas se respondan con lo que se ve | `feat/p2-revision-glia` |
 | L. Mielina en el ganglio | Actividad adicional con MHS-286 (Weigert): mielinizadas frente a no mielinizadas y velocidad de conducción | `feat/p2-mielina-ganglio` |
+| M. Probar el práctico 2 en celular | Recorrer las 3 actividades en el teléfono (sobre todo el rompecabezas de la lesión y los anticuerpos) y anotar en el PR qué se ve mal o cuesta tocar | `fix/p2-celular` |
+| N. Revisar «La glía en acción» | Leer las estructuras de los niveles I–II y los 9 casos del nivel IV con la clase de Células II y Neuroplasticidad III; proponer cambios si algo no calza con la imagen o con la clase | `feat/p2-glia-accion` |
+| I y J (práctico 4) | Casos del arco y revisión de lupas: quedan para cuando el circuito vuelva en el práctico 4 | — |
 
 **¿Quién tiene qué tarea?** La que tenga un Pull Request abierto en GitHub (pestaña *Pull requests*). Antes de elegir, revisa ahí que nadie la haya tomado. Una tarea a la vez.
 
