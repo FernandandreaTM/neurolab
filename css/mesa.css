@@ -432,6 +432,11 @@
 .nl-tip__cuadro.is-grande th { color: #5B21B6; font-size: .85rem; }
 .nl-tip__cuadro.is-grande td { background: #F5F3FF; color: #1A0E2E; padding: .5rem .6rem; }
 .nl-tip__cuadro.is-grande .nl-tip__celda + .nl-tip__celda { border-top-color: #DDD6FE; }
+/* Cuadro con más de 4 columnas (p. ej. las 6 células gliales): palabras largas cortadas con guion */
+.nl-tip__cuadro.is-ancho td, .nl-tip__cuadro.is-ancho thead th { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; }
+.nl-tip__cuadro.is-ancho thead th:first-child { width: 13%; }
+.nl-tip__cuadro.is-grande.is-ancho { font-size: .8rem; }
+.nl-tip__cuadro.is-grande.is-ancho td { padding: .45rem .4rem; }
 
 @media (max-width: 900px) {
     .nl-tip__frase-caja { min-height: 0; padding: 1rem; gap: .8rem; }

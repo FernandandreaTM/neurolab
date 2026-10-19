@@ -107,6 +107,13 @@ try {
         $nivelLam['requiere']  = $iL > 0 ? $act['slug'] . ':' . (int)$nivs[$iL - 1]['n'] : '';
         $nivelLam['siguiente'] = isset($nivs[$iL + 1]) ? $nivelesNav[$iL + 1]['href'] : '';
         if (($nivelLam['tipo'] ?? '') === 'identificar' && !empty($labelParts) && !empty($nivelLam['img'])) {
+            // "partes": [desde, hasta] = sólo las labeling_parts con ese rango de orden (varios esquemas en una actividad)
+            if (!empty($nivelLam['partes']) && is_array($nivelLam['partes'])) {
+                list($oDesde, $oHasta) = array_map('intval', $nivelLam['partes']);
+                $labelParts = array_values(array_filter($labelParts, function ($lp) use ($oDesde, $oHasta) {
+                    return (int)$lp['orden'] >= $oDesde && (int)$lp['orden'] <= $oHasta;
+                }));
+            }
             $esLabeling = true;
             $imgLab     = $nivelLam['img'];
             $claveLab   = $nivelLam['clave'];

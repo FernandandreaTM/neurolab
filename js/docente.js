@@ -51,7 +51,8 @@ async function completarNivel() {
     if (raiz.id === 'nl-lab') {
         const { partes } = await api({ tipo: 'labeling', slug: d.slug });
         const est = { partes: {}, err: 0 };
-        partes.forEach(p => { est.partes[p.id] = { n: p.n, f: p.f, d: p.d, a: [], nombreOk: true, r: p.n, errF: 0 }; });
+        const enPagina = new Set(JSON.parse(d.partes || '[]').map(p => p.id));   // nivel con "partes": sólo las de este esquema
+        partes.filter(p => !enPagina.size || enPagina.has(p.id)).forEach(p => { est.partes[p.id] = { n: p.n, f: p.f, d: p.d, a: [], nombreOk: true, r: p.n, errF: 0 }; });
         poner('nl_lab2_' + (d.clave || d.slug), est);   // la lámina usa '<slug>:1'
     } else if (raiz.id === 'nl-tip') {
         const { items } = await api({ tipo: 'practica', nivel: d.nivel });

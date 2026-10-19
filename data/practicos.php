@@ -58,73 +58,42 @@ return [
         ],
     ],
     'celulas-2' => [
-        'titulo'     => 'Células nerviosas II: circuitos y glía',
+        'titulo'     => 'Células nerviosas II: la glía',
         'asignatura' => 'ETMP097 Neurobiología',
-        'objetivo'   => 'Relacionar la organización de la médula espinal con el circuito reflejo y describir la morfología y la función de la glía del SNC y del SNP en cortes reales.',
+        'objetivo'   => 'Describir la morfología y la función de la glía del SNC y del SNP, reconocerla en esquemas y en cortes reales, y relacionar su falla con la clínica.',
         'intro'      => 'Avanza a tu ritmo, en orden. Cada actividad se corrige sola: cuando completes un nivel, se suma a tu guía de estudio. Al final descarga tu guía con todo lo que trabajaste.',
         'pasos' => [
-            ['slug' => 'circuito-reflejo',
-             'titulo' => 'Circuito reflejo (5 niveles)',
-             'tarea' => 'Un solo esquema que se arma por capas: ubica las partes de la médula, completa los extremos del arco, arma el reflejo rotuliano y el de retirada neurona por neurona (con sus sinapsis bajo la lupa) y, al final, empareja tres casos clínicos con el sitio de la lesión. Cada nivel suma una sección a tu guía.',
-             'guia' => ['circuito-reflejo:1' => 'Nivel I: la médula',
-                        'circuito-reflejo:2' => 'Nivel II: los extremos del arco',
-                        'circuito-reflejo:3' => 'Nivel III: reflejo rotuliano',
-                        'circuito-reflejo:4' => 'Nivel IV: reflejo de retirada',
-                        'circuito-reflejo:5' => 'Nivel V: ¿dónde se cortó el arco?'],
+            ['slug' => 'glia-conoce',
+             'titulo' => 'Conoce la glía (3 niveles)',
+             'tarea' => 'Identifica las células gliales del SNC y del SNP en dos esquemas y luego arma el cuadro de las seis: dónde está cada una, qué hace y qué pasa si falla. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-conoce:1' => 'Nivel I: glía del SNC',
+                        'glia-conoce:2' => 'Nivel II: glía del SNP',
+                        'glia-conoce:3' => 'Nivel III: cada célula en su lugar'],
              'conexion' => [
-                'circuito-reflejo:1' => [
-                    'terapia-ocupacional' => 'Orientarte en el corte (dorsal y ventral, entrada y salida) permite entender por qué una lesión medular afecta la fuerza y la sensibilidad por segmentos: el nivel de la lesión anticipa qué funciones y qué actividades se verán comprometidas.',
-                    'fonoaudiologia' => 'La misma organización (núcleos sensitivos que reciben y núcleos motores que envían) se repite en el tronco encefálico, donde están los núcleos de los nervios craneales que controlan el habla, la voz y la deglución.'],
-                'circuito-reflejo:2' => [
-                    'terapia-ocupacional' => 'Todo reflejo tiene las mismas cinco partes (receptor, vía aferente, centro, vía eferente y efector): ordenarlas te permite razonar qué tramo falla cuando un reflejo o una sensación está alterada.',
-                    'fonoaudiologia' => 'Los nervios craneales que evalúas (trigémino, facial, glosofaríngeo, vago, hipogloso) también tienen ganglios sensitivos y núcleos motores: el mismo arco, con el centro en el tronco encefálico.'],
-                'circuito-reflejo:3' => [
-                    'terapia-ocupacional' => 'Los reflejos osteotendíneos (rotuliano, bicipital, aquíleo) evalúan el circuito: disminuidos indican falla en el arco (nervio, raíz o motoneurona); exaltados, falla del control que baja desde el encéfalo, como tras un ACV.',
-                    'fonoaudiologia' => 'Los reflejos orofaríngeos (nauseoso, deglutorio, tusígeno) siguen la misma lógica: vía sensitiva, centro en el tronco encefálico y vía motora. Evaluarlos en la disfagia orienta qué tramo del circuito está fallando.'],
-                'circuito-reflejo:4' => [
-                    'terapia-ocupacional' => 'La inhibición recíproca explica por qué un movimiento es fluido: cuando falla el control que baja del encéfalo (ACV, parálisis cerebral), agonista y antagonista se activan juntos y aparecen la espasticidad y la cocontracción que dificultan alcanzar, agarrar o caminar.',
-                    'fonoaudiologia' => 'La deglución y la tos también coordinan músculos que se activan mientras otros se inhiben (cerrar la vía aérea mientras se abre el esfínter esofágico superior). Las interneuronas del tronco encefálico organizan esa secuencia.'],
-                'circuito-reflejo:5' => [
-                    'terapia-ocupacional' => 'Distinguir si falla la sensibilidad, la fuerza o ambas orienta la intervención: no se trabaja igual una radiculopatía (dolor, hormigueo) que una lesión de motoneurona (debilidad, atrofia) o de nervio periférico (protección de la zona sin sensibilidad).',
-                    'fonoaudiologia' => 'En la evaluación orofacial se aplica el mismo razonamiento: si un reflejo falta y la sensibilidad también, sospechas de la vía sensitiva o del nervio; si la sensibilidad está y falla la fuerza, de la motoneurona del núcleo motor.'],
-             ]],
-            ['slug' => 'glia-snc',
-             'titulo' => 'Glía del SNC (4 niveles)',
-             'tarea' => 'Identifica cada célula glial del SNC en un esquema y reconócela por su función; luego encuéntrala en cortes reales de médula: el canal central y la sustancia blanca con H&E, y la motoneurona con su glía con cresil violeta. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-snc:1' => 'Nivel I: esquema',
-                        'glia-snc:2' => 'Nivel II: cada célula, su función',
-                        'glia-snc:3' => 'Nivel III: canal central y sustancia blanca',
-                        'glia-snc:4' => 'Nivel IV: motoneurona y su glía'],
-             'conexion' => [
-                'glia-snc:1' => [
+                'glia-conoce:1' => [
                     'terapia-ocupacional' => 'La glía explica síntomas que verás en la práctica: la fatiga y la lentitud de la esclerosis múltiple (oligodendrocitos) o la cicatriz tras un ACV o un traumatismo (astrocitos), que hace que la recuperación dependa de la plasticidad y no de la regeneración.',
                     'fonoaudiologia' => 'Cuando se pierde la mielina de la vía auditiva central o de las vías motoras del habla, la señal se enlentece: cuesta comprender el habla rápida y se altera la coordinación de la articulación.'],
-                'glia-snc:2' => null,
-                'glia-snc:3' => [
-                    'terapia-ocupacional' => 'Si el LCR no circula bien (hidrocefalia), sube la presión dentro del cráneo y pueden aparecer alteraciones de la marcha, la atención y el control de esfínteres que afectan el desempeño diario.',
-                    'fonoaudiologia' => 'En la hidrocefalia infantil, la presión del LCR daña la sustancia blanca que rodea los ventrículos: puede retrasar el desarrollo del lenguaje y afectar la atención y el procesamiento auditivo.'],
-                'glia-snc:4' => [
-                    'terapia-ocupacional' => 'En la ELA mueren las motoneuronas del asta ventral y la glía vecina participa (excitotoxicidad, inflamación): la debilidad avanza y la intervención adapta actividades y entorno para mantener la autonomía.',
-                    'fonoaudiologia' => 'En la ELA de inicio bulbar mueren las motoneuronas del tronco que mueven lengua, labios y laringe: aparecen disartria y disfagia progresivas, y la intervención apoya la comunicación (incluso con sistemas alternativos) y una deglución segura.'],
-             ]],
-            ['slug' => 'glia-snp',
-             'titulo' => 'Glía del SNP (4 niveles)',
-             'tarea' => 'Identifica la glía del SNP en un esquema y compárala con la del SNC armando un cuadro; luego reconoce las células satélite en un ganglio y las envolturas y fibras de un nervio periférico. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-snp:1' => 'Nivel I: esquema',
-                        'glia-snp:2' => 'Nivel II: SNC frente a SNP',
-                        'glia-snp:3' => 'Nivel III: ganglio y células satélite',
-                        'glia-snp:4' => 'Nivel IV: nervio periférico'],
-             'conexion' => [
-                'glia-snp:1' => [
+                'glia-conoce:2' => [
                     'terapia-ocupacional' => 'Guillain-Barré (células de Schwann) y la esclerosis múltiple (oligodendrocitos) pueden dar una debilidad parecida, pero con pronóstico distinto: en el SNP la mielina y el axón pueden regenerar, y la rehabilitación apunta a recuperar funciones.',
                     'fonoaudiologia' => 'En Guillain-Barré puede haber debilidad facial y bulbar (voz débil, disfagia). Como el SNP regenera, la intervención acompaña una recuperación que suele tomar semanas a meses.'],
-                'glia-snp:2' => null,
-                'glia-snp:3' => [
-                    'terapia-ocupacional' => 'El dolor neuropático (tras un herpes zóster o en la neuropatía diabética) limita el uso de la mano y altera el sueño: el manejo del dolor y la desensibilización son parte de la intervención.',
-                    'fonoaudiologia' => 'En la neuralgia del trigémino, cuyas neuronas sensitivas están en el ganglio de Gasser, el dolor aparece al hablar, masticar o tocarse la cara, e interfiere con la comunicación y la alimentación.'],
-                'glia-snp:4' => [
-                    'terapia-ocupacional' => 'Tras una lesión de nervio de la mano (mediano, cubital) el axón vuelve a crecer guiado por las células de Schwann, cerca de 1 mm al día: mientras tanto se mantiene la movilidad, se protege la piel insensible y se reeduca la sensibilidad.',
-                    'fonoaudiologia' => 'Tras una lesión del nervio facial o del laríngeo recurrente, el axón puede volver a crecer guiado por las células de Schwann: la terapia mantiene la musculatura y acompaña la recuperación de la expresión facial o de la voz.'],
+                'glia-conoce:3' => null,
+             ]],
+            ['slug' => 'glia-tejido',
+             'titulo' => 'La glía en el tejido (3 niveles)',
+             'tarea' => 'Encuentra la glía en cortes reales: el canal central y la sustancia blanca de la médula con H&E, la motoneurona y su glía con cresil violeta, y las células satélite y las envolturas en el ganglio y el nervio periférico. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-tejido:1' => 'Nivel I: canal central y sustancia blanca',
+                        'glia-tejido:2' => 'Nivel II: motoneurona y su glía',
+                        'glia-tejido:3' => 'Nivel III: ganglio y nervio periférico'],
+             'conexion' => [
+                'glia-tejido:1' => [
+                    'terapia-ocupacional' => 'Si el LCR no circula bien (hidrocefalia), sube la presión dentro del cráneo y pueden aparecer alteraciones de la marcha, la atención y el control de esfínteres que afectan el desempeño diario.',
+                    'fonoaudiologia' => 'En la hidrocefalia infantil, la presión del LCR daña la sustancia blanca que rodea los ventrículos: puede retrasar el desarrollo del lenguaje y afectar la atención y el procesamiento auditivo.'],
+                'glia-tejido:2' => [
+                    'terapia-ocupacional' => 'En la ELA mueren las motoneuronas del asta ventral y la glía vecina participa (excitotoxicidad, inflamación): la debilidad avanza y la intervención adapta actividades y entorno para mantener la autonomía.',
+                    'fonoaudiologia' => 'En la ELA de inicio bulbar mueren las motoneuronas del tronco que mueven lengua, labios y laringe: aparecen disartria y disfagia progresivas, y la intervención apoya la comunicación (incluso con sistemas alternativos) y una deglución segura.'],
+                'glia-tejido:3' => [
+                    'terapia-ocupacional' => 'El dolor neuropático (tras un herpes zóster o en la neuropatía diabética) limita el uso de la mano y altera el sueño; y tras una lesión de nervio el axón vuelve a crecer guiado por las células de Schwann, cerca de 1 mm al día, mientras se protege la piel insensible y se reeduca la sensibilidad.',
+                    'fonoaudiologia' => 'En la neuralgia del trigémino (ganglio de Gasser) el dolor aparece al hablar o masticar; y tras una lesión del nervio facial o del laríngeo recurrente, el axón puede volver a crecer guiado por las células de Schwann mientras la terapia mantiene la musculatura.'],
              ]],
             ['slug' => 'quiz-celulas-nerviosas-2',
              'titulo' => 'Quiz de cierre',

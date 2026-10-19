@@ -1,0 +1,80 @@
+[
+ {
+  "id": "c01",
+  "carrera": "comun",
+  "pregunta": "¿Cuál es el orden de los componentes de un arco reflejo?",
+  "opciones": [
+   "Receptor → neurona sensitiva → interneurona → motoneurona → efector",
+   "Receptor → motoneurona → interneurona → neurona sensitiva → efector",
+   "Efector → neurona sensitiva → interneurona → motoneurona → receptor",
+   "Receptor → interneurona → neurona sensitiva → motoneurona → efector"
+  ],
+  "correcta": 0,
+  "feedback": "La información entra por la vía sensitiva, se integra en la médula y sale por la vía motora hacia el efector (músculo o glándula)."
+ },
+ {
+  "id": "c02",
+  "carrera": "comun",
+  "pregunta": "¿Qué lleva la raíz dorsal y qué lleva la raíz ventral de un nervio espinal?",
+  "opciones": [
+   "Dorsal: información sensitiva que entra; ventral: órdenes motoras que salen",
+   "Dorsal: órdenes motoras que salen; ventral: información sensitiva que entra",
+   "Dorsal y ventral: ambas llevan información sensitiva y órdenes motoras",
+   "Dorsal y ventral: ambas llevan solo órdenes motoras hacia los músculos"
+  ],
+  "correcta": 0,
+  "feedback": "Raíz dorsal = entrada sensitiva (con su ganglio); raíz ventral = salida motora. Después se unen y el nervio espinal es mixto."
+ },
+ {
+  "id": "c03",
+  "carrera": "comun",
+  "pregunta": "Un nervio periférico mixto contiene axones de neuronas cuyos somas están en:",
+  "opciones": [
+   "El ganglio de la raíz dorsal (sensitivas) y el asta ventral (motoras)",
+   "El asta dorsal (sensitivas) y el ganglio de la raíz ventral (motoras)",
+   "El propio nervio, repartidos entre los fascículos de sus fibras",
+   "La corteza cerebral, desde donde los axones bajan sin interrupción"
+  ],
+  "correcta": 0,
+  "feedback": "El nervio solo tiene axones y glía (Schwann). Los somas están en el ganglio (sensitivas) o en el asta ventral de la médula (motoneuronas)."
+ },
+ {
+  "id": "t1",
+  "carrera": "terapia-ocupacional",
+  "pregunta": "Al golpear el tendón rotuliano la pierna no se extiende, pero la persona siente el golpe. ¿Dónde está la falla más probable del circuito?",
+  "opciones": [
+   "En la motoneurona del asta ventral o en su axón por la raíz ventral",
+   "En la neurona sensitiva del ganglio o en su rama por la raíz dorsal",
+   "En la corteza motora, que no alcanza a enviar la orden voluntaria",
+   "En el cerebelo, que no alcanza a coordinar la contracción del músculo"
+  ],
+  "correcta": 0,
+  "feedback": "Si siente el golpe, la vía sensitiva funciona. La falla está en la salida motora. El reflejo no necesita la corteza ni el cerebelo."
+ },
+ {
+  "id": "t4",
+  "carrera": "terapia-ocupacional",
+  "pregunta": "Retiras la mano de una olla caliente antes de sentir dolor. ¿Qué permite que la orden salga tan rápido?",
+  "opciones": [
+   "Interneuronas de la médula conectan la vía sensitiva con la motora",
+   "La corteza motora recibe el estímulo antes que el resto del encéfalo",
+   "Las neuronas sensitivas llegan directo al músculo sin pasar por la médula",
+   "El cerebelo envía la orden de retirada antes que la corteza"
+  ],
+  "correcta": 0,
+  "feedback": "Es un reflejo de retirada (polisináptico): el circuito se cierra en la médula. La sensación de dolor llega después, cuando la señal sube a la corteza."
+ },
+ {
+  "id": "f1",
+  "carrera": "fonoaudiologia",
+  "pregunta": "El reflejo nauseoso se gatilla al tocar la pared posterior de la faringe. Como todo reflejo tiene vía sensitiva, centro y vía motora. ¿Dónde se cierra su circuito?",
+  "opciones": [
+   "En el tronco encefálico, en núcleos de los nervios craneales",
+   "En el asta ventral de la médula espinal, a nivel cervical",
+   "En la corteza motora orofacial del lóbulo frontal izquierdo",
+   "En el ganglio sensitivo del nervio que inerva la faringe"
+  ],
+  "correcta": 0,
+  "feedback": "Los reflejos de la cabeza y el cuello (nauseoso, deglutorio, corneal) se integran en el tronco encefálico, con vías por los nervios craneales (IX y X en el nauseoso)."
+ }
+]

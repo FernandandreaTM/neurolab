@@ -250,7 +250,7 @@ function iniciar(raiz) {
         const conCuadro = filas.length > 0;
         const frase = it => esc(it.e).replace('{}', '<span class="nl-tip__hueco">____</span>');
         function cuadro(grande) {
-            return `<table class="nl-tip__cuadro${grande ? ' is-grande' : ''}">
+            return `<table class="nl-tip__cuadro${grande ? ' is-grande' : ''}${opciones.length > 4 ? ' is-ancho' : ''}">
                 <thead><tr><th></th>${opciones.map(o => `<th><span>${esc(o)}</span></th>`).join('')}</tr></thead>
                 <tbody>${filas.map(f => `<tr class="${!grande && !verCierre && sel.fila === f ? 'is-actual' : ''}"><th>${esc(f)}</th>${opciones.map(o => {
                     const c = items.filter(it => it.fila === f && hecho(it) && hecho(it).r === o);
