@@ -4,7 +4,8 @@
  * observa va en la vista (izquierda) y lo que se responde en el panel (derecha). Un nivel por página.
  *   · completar -> la frase con el espacio en la vista; se escribe la respuesta en el panel
  *   · elegir    -> la frase (y una imagen, si tiene) con tarjetas en la vista; si los ítems traen
- *                  `fila`, cada acierto escribe una celda del cuadro comparativo del panel
+ *                  `fila`, cada acierto escribe una celda del cuadro comparativo del panel.
+ *                  Con `data-img` no hay tarjetas: se toca la célula en la imagen (zonas en el servidor)
  * Verde = correcto al primer intento · rojo suave = por repasar · naranjo = activo.
  * Respuestas en api/practica_check.php. Avance: localStorage nl_mprac_<nivelId>.
  * Al completar: markDone('<slug>:<número>') y la sección se guarda sola en la guía con esa clave.
@@ -34,8 +35,9 @@ function leer(nivel) {
 function escribir(nivel, est) {
     try { localStorage.setItem(KEY_BASE + nivel, JSON.stringify(est)); } catch { /* modo privado */ }
 }
-async function revisar(itemId, respuesta) {
-    const body = 'item_id=' + encodeURIComponent(itemId) + '&respuesta=' + encodeURIComponent(respuesta);
+async function revisar(itemId, respuesta, xy) {
+    let body = 'item_id=' + encodeURIComponent(itemId) + '&respuesta=' + encodeURIComponent(respuesta);
+    if (xy) body += '&x=' + xy[0] + '&y=' + xy[1];   // «elegir» sobre la imagen: el servidor ve qué célula se tocó
     try {
         const r = await fetch('api/practica_check.php', {
             method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body,
@@ -258,8 +260,35 @@ function iniciar(raiz) {
                                            : '<span class="nl-tip__vacia">·</span>'}</td>`;
                 }).join('')}</tr>`).join('')}</tbody></table>`;
         }
+        /** Frase arriba y la imagen debajo: se toca la célula (✗ donde se equivocó, ✓ donde acertó). */
+        function vistaImagen() {
+            const s = hecho(sel), m = mal(sel);
+            const marca = (xy, ok, txt) => `<span class="nl-mprac__marca${ok ? ' is-ok' : ''}${xy[0] > 55 ? ' is-izq' : ''}" style="left:${xy[0]}%;top:${xy[1]}%">${ok ? '✓' : '✗'}<em>${esc(txt)}</em></span>`;
+            vista.innerHTML = `<div class="nl-tip__frase-caja is-img">
+                <p class="nl-tip__fila-etq">${sel.fila ? esc(sel.fila) + ' · ' : ''}ejercicio ${num(sel)} de ${items.length}</p>
+                <p class="nl-tip__frase">${frase(sel)}</p>
+                <div class="nl-mprac__lienzo${s ? '' : ' is-tocable'}"><img src="${esc(d.img)}" alt="Esquema" draggable="false">
+                  ${m.filter(x => x.xy).map(x => marca(x.xy, false, x.t ? 'No es ' + x.t.toLowerCase() : '')).join('')}
+                  ${s && s.xy ? marca(s.xy, true, s.r) : ''}</div></div>`;
+            const lz = vista.querySelector('.nl-mprac__lienzo');
+            lz.addEventListener('click', async ev => {
+                if (hecho(sel) || panel.classList.contains('is-esperando')) return;
+                cerrarInstr();
+                const r0 = lz.querySelector('img').getBoundingClientRect();
+                const xy = [Math.round((ev.clientX - r0.left) / r0.width * 1000) / 10, Math.round((ev.clientY - r0.top) / r0.height * 1000) / 10];
+                const it = sel;
+                panel.classList.add('is-esperando');
+                const r = await revisar(it.id, '', xy);
+                panel.classList.remove('is-esperando');
+                if (r.red || r.fuera) { avisar(r.feedback); return; }
+                if (!r.correcto) { fallo(it, r.feedback, { t: r.tocada || '', xy }); pintar(); return; }
+                acierto(it, r, { xy }); pintar();
+                if (angosta()) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
         return {
             vista() {
+                if (!verCierre && d.img) { vistaImagen(); return; }
                 if (verCierre) {
                     vista.innerHTML = conCuadro
                         ? `<div class="nl-tip__frase-caja is-cierre"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>`
@@ -298,6 +327,14 @@ function iniciar(raiz) {
                 if (hecho(sel)) { mostrarFicha(sel, esc(hecho(sel).r)); return; }
                 const m = mal(sel);
                 panel.className = 'nl-lab__trabajo is-pregunta';
+                if (d.img) {
+                    const ult = m[m.length - 1];
+                    panel.innerHTML = `
+                    <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> Toca la célula</p>
+                    <p class="nl-lab__ayuda">Lee la frase y toca en la imagen la célula que describe.${sel.fila ? ` Fila del cuadro: <strong>${esc(sel.fila)}</strong>.` : ''}</p>
+                    ${ult ? `<p class="nl-lab__q-fb">✗ ${ult.t ? 'No es ' + esc(ult.t.toLowerCase()) + '. ' : ''}${esc(ult.p)}</p>` : ''}`;
+                    return;
+                }
                 panel.innerHTML = `
                     <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> Elige la tarjeta correcta</p>
                     <p class="nl-lab__ayuda">Toca la tarjeta en la imagen.${sel.fila ? ` Fila del cuadro: <strong>${esc(sel.fila)}</strong>.` : ''}</p>

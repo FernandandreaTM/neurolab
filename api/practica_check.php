@@ -19,6 +19,7 @@
 error_reporting(0);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/practica_lib.php';
+require_once __DIR__ . '/zonas_lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -146,6 +147,21 @@ try {
         nl_prac_json(['correcto' => false, 'feedback' => 'No encontramos ese ejercicio.']);
     }
 
+    // --- Nivel "elegir" sobre una imagen: POST x, y (en %) -> la célula tocada, según las zonas del nivel
+    //     (recurso «tareas»: nivel n con "zonas": { "<respuesta>": zona }). Las zonas no van al navegador.
+    $tocada = '';
+    if (isset($_POST['x'], $_POST['y'])) {
+        $sn = $pdo->prepare("SELECT n.numero, a.slug FROM practica_niveles n JOIN actividades a ON a.id = n.actividad_id WHERE n.id = ?");
+        $sn->execute([(int)$item['nivel_id']]);
+        $nv = $sn->fetch();
+        $tn = $nv ? nl_tareas_nivel($nv['slug'], (int)$nv['numero']) : null;
+        foreach ((array)($tn['zonas'] ?? []) as $nombre => $z) {
+            if (nl_zona_contiene($z, (float)$_POST['x'], (float)$_POST['y'])) { $tocada = (string)$nombre; break; }
+        }
+        if ($tocada === '') nl_prac_json(['correcto' => false, 'fuera' => true, 'feedback' => 'Ahí no hay ninguna de las células del ejercicio: toca justo sobre una célula.']);
+        $respuesta = $tocada;
+    }
+
     // --- Nivel "armar": se revisa la neurona construida ---
     if ($item['nivel_tipo'] === 'armar') {
         $piezas = json_decode(isset($_POST['construccion']) ? (string)$_POST['construccion'] : '', true);
@@ -206,7 +222,7 @@ try {
 
     $pista = $item['pista'] ? ' Pista: ' . $item['pista'] : '';
     if ($esOpcion || $item['nivel_tipo'] === 'elegir') {
-        nl_prac_json(['correcto' => false, 'feedback' => 'Todavía no.' . $pista]);
+        nl_prac_json(['correcto' => false, 'feedback' => 'Todavía no.' . $pista, 'tocada' => $tocada]);
     }
 
     $lista = implode(', ', array_keys($opciones));

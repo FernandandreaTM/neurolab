@@ -199,6 +199,7 @@ try {
         $nivelPrac['romano']   = $nivelLam['romano'];
         $nivelPrac['requiere'] = $nivelLam['requiere'];
         $nivelPrac['ultimo']   = $nivelLam['siguiente'] === '';
+        $nivelPrac['img']      = $nivelLam['img'] ?? '';   // «elegir» tocando la célula en esta imagen (zonas en api/practica_check.php)
         $siguientePrac = $nivelLam['siguiente'];
     } elseif (!$esTipos && !$lamPorNiveles && !empty($niveles)) {
         $jugP = array_values(array_filter($niveles, function ($n) { return (int)$n['activo'] && !empty($n['items']); }));

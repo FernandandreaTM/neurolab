@@ -65,22 +65,22 @@ return [
         'pasos' => [
             ['slug' => 'glia-conoce',
              'titulo' => 'Conoce la glía (4 niveles)',
-             'tarea' => 'Identifica las células gliales del SNC en un esquema y luego en su tejido (vasos, sustancia gris y blanca, ventrículo), identifica las del SNP y al final arma el cuadro de las seis: dónde está cada una, qué hace y qué pasa si falla. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-conoce:1' => 'Nivel I: glía del SNC',
-                        'glia-conoce:2' => 'Nivel II: la glía en su tejido',
-                        'glia-conoce:3' => 'Nivel III: glía del SNP',
-                        'glia-conoce:4' => 'Nivel IV: cada célula en su lugar'],
+             'tarea' => 'Primero ubica la sustancia gris y la blanca y nombra cada célula del SNC en su tejido; luego nombra la glía del SNP. Después lee qué hace cada célula, tócala en la imagen y arma el cuadro: dónde está, qué hace y qué pasa si falla. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-conoce:1' => 'Nivel I: la glía del SNC en su tejido',
+                        'glia-conoce:2' => 'Nivel II: la glía del SNP',
+                        'glia-conoce:3' => 'Nivel III: qué hace cada una (SNC)',
+                        'glia-conoce:4' => 'Nivel IV: qué hace cada una (SNP)'],
              'conexion' => [
                 'glia-conoce:1' => [
-                    'terapia-ocupacional' => 'La glía explica síntomas que verás en la práctica: la fatiga y la lentitud de la esclerosis múltiple (oligodendrocitos) o la cicatriz tras un ACV o un traumatismo (astrocitos), que hace que la recuperación dependa de la plasticidad y no de la regeneración.',
-                    'fonoaudiologia' => 'Cuando se pierde la mielina de la vía auditiva central o de las vías motoras del habla, la señal se enlentece: cuesta comprender el habla rápida y se altera la coordinación de la articulación.'],
-                'glia-conoce:2' => [
                     'terapia-ocupacional' => 'Cada glía trabaja en un lugar: en la sustancia gris cuida las sinapsis donde ocurre el aprendizaje motor; en la blanca sostiene la conducción rápida entre regiones. Por eso una lesión de sustancia blanca (EM, ACV subcortical) enlentece el movimiento y la respuesta aunque las neuronas sigan vivas.',
                     'fonoaudiologia' => 'Las vías del lenguaje (como el fascículo arqueado, entre las áreas de Broca y Wernicke) son sustancia blanca: si su mielina se daña, la persona puede comprender y producir palabras, pero repetir o procesar habla rápida se vuelve difícil.'],
+                'glia-conoce:2' => null,
                 'glia-conoce:3' => [
+                    'terapia-ocupacional' => 'La glía explica síntomas que verás en la práctica: la fatiga y la lentitud de la esclerosis múltiple (oligodendrocitos) o la cicatriz tras un ACV o un traumatismo (astrocitos), que hace que la recuperación dependa de la plasticidad y no de la regeneración.',
+                    'fonoaudiologia' => 'Cuando se pierde la mielina de la vía auditiva central o de las vías motoras del habla, la señal se enlentece: cuesta comprender el habla rápida y se altera la coordinación de la articulación.'],
+                'glia-conoce:4' => [
                     'terapia-ocupacional' => 'Guillain-Barré (células de Schwann) y la esclerosis múltiple (oligodendrocitos) pueden dar una debilidad parecida, pero con pronóstico distinto: en el SNP la mielina y el axón pueden regenerar, y la rehabilitación apunta a recuperar funciones.',
                     'fonoaudiologia' => 'En Guillain-Barré puede haber debilidad facial y bulbar (voz débil, disfagia). Como el SNP regenera, la intervención acompaña una recuperación que suele tomar semanas a meses.'],
-                'glia-conoce:4' => null,
              ]],
             ['slug' => 'glia-tejido',
              'titulo' => 'La glía en el tejido (4 niveles)',

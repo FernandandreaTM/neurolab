@@ -193,6 +193,10 @@ function iniciar(raiz) {
             const c = circDe(ver), e = ec(ver), p = pasoC(c), inh = inhibidas(c);
             const via = viaActual(c);
             if (etiquetas) {
+                // Máscara: zonas sombreadas mientras se ubican (p. ej. sustancia gris y blanca)
+                if (c.mascara && p === 'ubicar') svg += c.mascara.map(m => m.r
+                    ? `<rect x="${m.r[0]}" y="${m.r[1]}" width="${m.r[2]}" height="${m.r[3]}" fill="${m.c || 'rgba(139,92,246,.3)'}" class="nl-circ__mascara"/>`
+                    : `<polygon points="${(m.p || []).map(q => q.join(',')).join(' ')}" fill="${m.c || 'rgba(139,92,246,.3)'}" class="nl-circ__mascara"/>`).join('');
                 html += c.piezas.filter(pz => e.ok[pz.clave]).map(pz => {
                     const [x, y] = e.pos[pz.clave];
                     return `<span class="nl-circ__chip" style="left:${x}%;top:${y}%"><i></i>${esc(pz.nombre)}</span>`;
@@ -217,7 +221,7 @@ function iniciar(raiz) {
             ayuda = p === 'ubicar' ? (selPieza ? `Toca dónde va: <strong>${esc(pieza(c, selPieza).nombre)}</strong>` : 'Elige en el panel')
                 : p === 'conectar' ? `Toca las neuronas <strong>en el orden en que viaja la información</strong>${c.vias.length > 1 ? ` (vía ${via + 1}: ${esc(c.vias[via].titulo)})` : ''}`
                 : p === 'lupas' ? 'Toca cada 🔍 para ver la sinapsis de cerca'
-                : etiquetas ? 'Las partes de la médula' : `${esc(c.titulo)}: el impulso va del receptor al efector`;
+                : etiquetas ? esc(d.subtitulo || 'Las partes de la médula') : `${esc(c.titulo)}: el impulso va del receptor al efector`;
         }
         const vbAttr = `0 0 ${VB[0]} ${VB[1]}`;
         vista.innerHTML = `<div class="nl-lam__lienzo nl-circ__lienzo nl-circ__lienzo--fijo${clase}" id="nl-circ-lienzo">
@@ -376,7 +380,7 @@ function iniciar(raiz) {
             const ultimoMal = marca && malSel.length ? malSel[malSel.length - 1] : '';
             const porUbicar = c.piezas.filter(pz => !pz.dada);
             panel.innerHTML = `${av}${cab}
-                <p class="nl-lab__ayuda">${etiquetas ? 'Elige un nombre y toca su lugar en el esquema (vale cualquier punto de esa zona).'
+                <p class="nl-lab__ayuda">${etiquetas ? (c.ayuda ? esc(c.ayuda) : 'Elige un nombre y toca su lugar en el esquema (vale cualquier punto de esa zona).')
                     : 'Elige una neurona y toca dónde está su <strong>soma</strong>. Al acertar, aparece dibujada por su camino.'}
                     ${c.piezas.some(pz => pz.dada) ? ' Las motoneuronas ya están puestas.' : ''}</p>
                 <div class="nl-circ__piezas${etiquetas ? ' is-etiquetas' : ''}">${porUbicar.map(pz => {
@@ -688,7 +692,7 @@ function iniciar(raiz) {
         const rep = porRepasar();
         if (rep.length) bloques.push({ t: 'texto', txt: '↺ Por repasar: ' + rep.join(', ') + '.' });
         sumarAGuia(clave, {
-            titulo: d.titulo, subtitulo: etiquetas ? 'Las partes de la médula' : casos.length && !circuitos.length ? 'Casos clínicos y sitio de la lesión' : 'El circuito a nivel celular', slug: d.slug,
+            titulo: d.titulo, subtitulo: etiquetas ? (d.subtitulo || 'Las partes de la médula') : casos.length && !circuitos.length ? 'Casos clínicos y sitio de la lesión' : 'El circuito a nivel celular', slug: d.slug,
             nota: `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}`,
             bloques: bloques.concat(conexionGuia(tplCx)),
         });

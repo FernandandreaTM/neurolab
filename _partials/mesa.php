@@ -222,6 +222,7 @@ nl_barra([
                 'vias' => array_map(function ($v) { return ['titulo' => $v['titulo'] ?? '', 'n' => count($v['orden'] ?? [])]; },
                                     $c['vias'] ?? (!empty($c['orden']) ? [['titulo' => '', 'orden' => $c['orden']]] : [])),
                 'lupas' => $c['lupas'] ?? [],
+                'mascara' => $c['mascara'] ?? null, 'ayuda' => $c['ayuda'] ?? '',   // zonas sombreadas (públicas) mientras se ubican las piezas
                 'piezas' => array_map(function ($p) use (&$iconosCirc) {
                     if (!empty($p['icono'])) $iconosCirc[$p['clave']] = $p['icono'];
                     $q = ['clave' => $p['clave'], 'nombre' => $p['nombre'], 'detalle' => $p['detalle'] ?? '', 'color' => $p['color'] ?? ''];
@@ -249,6 +250,7 @@ nl_barra([
      data-fondo="<?= htmlspecialchars(!empty($nivelLam['fondo']) ? $nivelLam['fondo'] . '?v=' . (@filemtime(__DIR__ . '/../' . $nivelLam['fondo']) ?: 1) : '') ?>"
      data-vb="<?= htmlspecialchars(json_encode($nivelLam['vb'] ?? null)) ?>"
      data-etiquetas="<?= !empty($nivelLam['etiquetas']) ? '1' : '' ?>"
+     data-subtitulo="<?= htmlspecialchars($nivelLam['subtitulo'] ?? '') ?>"
      data-iconos="<?= htmlspecialchars(json_encode($iconosUrl, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-neuronas="<?= htmlspecialchars(json_encode($nivelLam['neuronas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-base="<?= htmlspecialchars(json_encode($baseCirc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
@@ -389,6 +391,7 @@ nl_barra([
      data-requiere="<?= htmlspecialchars($nivelPrac['requiere']) ?>"
      data-siguiente="<?= htmlspecialchars($siguientePrac) ?>"
      data-items="<?= htmlspecialchars(json_encode($itemsP, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-img="<?= htmlspecialchars($nivelPrac['img'] ?? '') ?>"
      data-opciones="<?= htmlspecialchars(json_encode(array_values($nivelPrac['opciones'] ?? []), JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
     <div class="nl-lab__candado" hidden>
         <strong>🔒 Nivel bloqueado</strong>
