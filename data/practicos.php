@@ -79,11 +79,12 @@ return [
                 'glia-conoce:3' => null,
              ]],
             ['slug' => 'glia-tejido',
-             'titulo' => 'La glía en el tejido (3 niveles)',
-             'tarea' => 'Encuentra la glía en cortes reales: el canal central y la sustancia blanca de la médula con H&E, la motoneurona y su glía con cresil violeta, y las células satélite y las envolturas en el ganglio y el nervio periférico. Cada nivel suma una sección a tu guía.',
+             'titulo' => 'La glía en el tejido (4 niveles)',
+             'tarea' => 'Encuentra la glía en cortes reales: el canal central y la sustancia blanca de la médula con H&E, la motoneurona y su glía con cresil violeta, las células satélite y las envolturas en el ganglio y el nervio periférico, y al final reconoce cada glía por el anticuerpo que la marca en imágenes de inmunofluorescencia. Cada nivel suma una sección a tu guía.',
              'guia' => ['glia-tejido:1' => 'Nivel I: canal central y sustancia blanca',
                         'glia-tejido:2' => 'Nivel II: motoneurona y su glía',
-                        'glia-tejido:3' => 'Nivel III: ganglio y nervio periférico'],
+                        'glia-tejido:3' => 'Nivel III: ganglio y nervio periférico',
+                        'glia-tejido:4' => 'Nivel IV: glía con anticuerpos'],
              'conexion' => [
                 'glia-tejido:1' => [
                     'terapia-ocupacional' => 'Si el LCR no circula bien (hidrocefalia), sube la presión dentro del cráneo y pueden aparecer alteraciones de la marcha, la atención y el control de esfínteres que afectan el desempeño diario.',
@@ -94,6 +95,9 @@ return [
                 'glia-tejido:3' => [
                     'terapia-ocupacional' => 'El dolor neuropático (tras un herpes zóster o en la neuropatía diabética) limita el uso de la mano y altera el sueño; y tras una lesión de nervio el axón vuelve a crecer guiado por las células de Schwann, cerca de 1 mm al día, mientras se protege la piel insensible y se reeduca la sensibilidad.',
                     'fonoaudiologia' => 'En la neuralgia del trigémino (ganglio de Gasser) el dolor aparece al hablar o masticar; y tras una lesión del nervio facial o del laríngeo recurrente, el axón puede volver a crecer guiado por las células de Schwann mientras la terapia mantiene la musculatura.'],
+                'glia-tejido:4' => [
+                    'terapia-ocupacional' => 'Los mismos marcadores se usan en investigación y diagnóstico: GFAP sube en la sangre tras un traumatismo encefálico y los astrocitos GFAP+ rodean las placas en el Alzheimer; entender qué marca cada uno te permite leer la evidencia detrás de la rehabilitación.',
+                    'fonoaudiologia' => 'Con estos marcadores se estudia la vía auditiva: S100 y MBP muestran la mielina de Schwann del nervio coclear y su paso a mielina de oligodendrocito cerca del tronco, la zona donde nacen los schwannomas vestibulares.'],
              ]],
             ['slug' => 'quiz-celulas-nerviosas-2',
              'titulo' => 'Quiz de cierre',
