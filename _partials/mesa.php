@@ -295,6 +295,7 @@ nl_barra([
      data-piezas="<?= htmlspecialchars(json_encode($piezasR, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-huecos="<?= !empty($nivelLam['huecos']) ? '1' : '' ?>"
      data-grupos="<?= htmlspecialchars(json_encode($nivelLam['grupos'] ?? null, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
+     data-textos="<?= htmlspecialchars(json_encode($nivelLam['textos'] ?? null, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-preguntas="<?= htmlspecialchars(json_encode($nivelLam['preguntas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
     <div class="nl-lab__candado" hidden>
         <strong>🔒 Nivel bloqueado</strong>

@@ -103,6 +103,27 @@ return [
                     'terapia-ocupacional' => 'Los mismos marcadores se usan en investigación y diagnóstico: GFAP sube en la sangre tras un traumatismo encefálico y los astrocitos GFAP+ rodean las placas en el Alzheimer; entender qué marca cada uno te permite leer la evidencia detrás de la rehabilitación.',
                     'fonoaudiologia' => 'Con estos marcadores se estudia la vía auditiva: S100 y MBP muestran la mielina de Schwann del nervio coclear y su paso a mielina de oligodendrocito cerca del tronco, la zona donde nacen los schwannomas vestibulares.'],
              ]],
+            ['slug' => 'glia-accion',
+             'titulo' => 'La glía en acción (4 niveles)',
+             'tarea' => 'Lo que la glía hace y cómo responde: identifica la unidad neurovascular y la sinapsis tripartita, la mielina y el nodo de Ranvier; ordena qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce la glía que cambia en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-accion:1' => 'Nivel I: unidad neurovascular y sinapsis tripartita',
+                        'glia-accion:2' => 'Nivel II: mielina y nodo de Ranvier',
+                        'glia-accion:3' => 'Nivel III: tras la lesión, SNP frente a SNC',
+                        'glia-accion:4' => 'Nivel IV: glía que cambia'],
+             'conexion' => [
+                'glia-accion:1' => [
+                    'terapia-ocupacional' => 'La unidad neurovascular explica por qué un ACV o un traumatismo dañan más allá del vaso: si se rompe la barrera entra líquido (edema) y los astrocitos dejan de controlar el glutamato. Ese daño secundario es parte de lo que verás en la evaluación funcional.',
+                    'fonoaudiologia' => 'En la sinapsis tripartita de la vía auditiva los astrocitos retiran el glutamato muy rápido: así la señal sigue el ritmo del habla. Si fallan (envejecimiento, ruido intenso), la transmisión se altera y cuesta discriminar sonidos.'],
+                'glia-accion:2' => [
+                    'terapia-ocupacional' => 'La conducción saltatoria explica la fatiga y la torpeza de la esclerosis múltiple o de Guillain-Barré: sin mielina el impulso se enlentece o se bloquea, y las tareas que exigen rapidez y coordinación se ven primero.',
+                    'fonoaudiologia' => 'La sincronía de las fibras del nervio auditivo depende de la mielina: si se desmieliniza, los potenciales evocados (PEAT) se alargan o desordenan aunque la cóclea funcione.'],
+                'glia-accion:3' => [
+                    'terapia-ocupacional' => 'Tras una lesión de nervio periférico esperas recuperación (Schwann guía el axón, ~1 mm/día): la intervención mantiene y reeduca. Tras una lesión medular el axón no vuelve: la intervención apunta a compensar y aprovechar la plasticidad.',
+                    'fonoaudiologia' => 'Una lesión del nervio facial o del laríngeo recurrente (SNP) puede recuperarse en meses; un daño en el tronco encefálico o en la corteza (SNC), no por regeneración sino por plasticidad: eso cambia los objetivos de la terapia.'],
+                'glia-accion:4' => [
+                    'terapia-ocupacional' => 'La glía participa en la plasticidad que buscas con la práctica repetida: astrocitos que forman sinapsis y microglía que poda las que no se usan. La inflamación crónica, en cambio, la entorpece.',
+                    'fonoaudiologia' => 'El aprendizaje del lenguaje y la terapia moldean sinapsis con ayuda de la glía (formación y poda). En las enfermedades neurodegenerativas, la glía reactiva contribuye al deterioro de la comunicación.'],
+             ]],
             ['slug' => 'quiz-celulas-nerviosas-2',
              'titulo' => 'Quiz de cierre',
              'tarea' => '15 preguntas, de lo general a los casos clínicos de tu carrera (elige TO o Fono arriba). Tu resultado y las explicaciones quedan en tu guía.',

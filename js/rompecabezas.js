@@ -46,6 +46,10 @@ function iniciar(raiz) {
     const huecos = !!d.huecos;
     let grupos = null;
     try { grupos = JSON.parse(d.grupos || 'null'); } catch { grupos = null; }
+    // Textos propios del nivel (data-textos); por defecto, los del arco reflejo
+    let T = { paso: 'Arma el arco reflejo', fijo: ' La médula ya está puesta.', armado: 'Tu arco reflejo armado',
+        img: 'Mi arco reflejo', pie: ' y médula espinal.', guia: 'El arco reflejo armado pieza por pieza' };
+    try { T = Object.assign(T, JSON.parse(d.textos || 'null') || {}); } catch { /* por defecto */ }
     const ordenGrupos = grupos ? Object.keys(grupos) : [];
     const ruta = new URLSearchParams(location.search).get('ruta') || '';
     const vista = raiz.querySelector('#nl-rompe-vista');
@@ -99,7 +103,7 @@ function iniciar(raiz) {
             <p class="nl-lam__ayuda-vista">${p === 'armar' ? (sel ? `Toca dónde va: <strong>${esc(nombre(sel))}</strong> (o arrástrala desde el panel)`
                     : pendiente ? 'Ahora elige en el panel <strong>qué pieza va en ese hueco</strong>'
                     : huecos ? 'Toca un hueco punteado o elige una pieza en el panel' : 'Elige una pieza en el panel')
-                : 'Tu arco reflejo armado'}</p>`;
+                : esc(T.armado)}</p>`;
         const tab = vista.querySelector('#nl-rompe-tablero');
         tab.addEventListener('click', ev => {
             if (paso() !== 'armar' || ocupado || (!sel && !huecos)) return;
@@ -183,9 +187,9 @@ function iniciar(raiz) {
             const malSel = sel && !est.ok[sel] ? (est.mal[sel] || []) : [];
             const g = grupoActual();
             panel.innerHTML = `${av}
-                <p class="nl-lab__paso"><span class="nl-lab__badge">1</span> ${grupos && g ? esc(grupos[g]) : 'Arma el arco reflejo'}</p>
+                <p class="nl-lab__paso"><span class="nl-lab__badge">1</span> ${grupos && g ? esc(grupos[g]) : esc(T.paso)}</p>
                 <p class="nl-lab__ayuda">${huecos ? (pendiente ? '<strong>¿Qué pieza va en el hueco que tocaste?</strong>' : 'Toca un hueco y luego su pieza, o toca la pieza y luego su hueco. También puedes arrastrarla.')
-                    : 'Toca una pieza y luego su lugar en el tablero, o arrástrala.'} La médula ya está puesta.</p>
+                    : 'Toca una pieza y luego su lugar en el tablero, o arrástrala.'}${esc(T.fijo)}</p>
                 <div class="nl-rompe__bandeja">${visibles().map(pz => {
                     const ok = !!est.ok[pz.clave];
                     return `<button type="button" class="nl-rompe__pieza${ok ? ' is-ok' : ''}${pz.clave === sel ? ' is-sel' : ''}" data-clave="${esc(pz.clave)}"${ok ? ' disabled' : ''}>
@@ -291,13 +295,13 @@ function iniciar(raiz) {
         guiaHecha = true;
         guiaPromesa = (async () => {
             const bloques = [];
-            try { bloques.push({ t: 'imagenes', items: [{ src: await imagenArmada(), titulo: 'Mi arco reflejo', pie: piezas.map(p => p.nombre).join(' · ') + ' y médula espinal.' }] }); }
+            try { bloques.push({ t: 'imagenes', items: [{ src: await imagenArmada(), titulo: T.img, pie: piezas.map(p => p.nombre).join(' · ') + T.pie }] }); }
             catch { /* sin imagen */ }
             bloques.push({ t: 'tabla', cab: ['Pieza', 'Qué hace'], filas: piezas.map(pz => [pz.nombre, (est.exp[pz.clave] || {}).exp || '']) });
             if (preguntas.length) bloques.push({ t: 'tabla', cab: ['Pregunta', 'Respuesta', 'Para recordar'], filas: preguntas.map(q => [q.p, q.ops[q.ok], q.exp || '']) });
             const rep = porRepasar();
             if (rep.length) bloques.push({ t: 'texto', txt: '↺ Por repasar: ' + rep.join(', ') + '.' });
-            sumarAGuia(clave, { titulo: d.titulo, subtitulo: 'El arco reflejo armado pieza por pieza', slug: d.slug,
+            sumarAGuia(clave, { titulo: d.titulo, subtitulo: T.guia, slug: d.slug,
                 nota: `${est.err} ${est.err === 1 ? 'intento fallido' : 'intentos fallidos'}`, bloques: bloques.concat(conexionGuia(tplCx)) });
         })();
         return guiaPromesa;
