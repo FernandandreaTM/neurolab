@@ -219,7 +219,7 @@ nl_barra([
     $circuitos = array_map(function ($c) use (&$iconosCirc) {
         return ['clave' => $c['clave'], 'titulo' => $c['titulo'], 'sub' => $c['sub'] ?? '', 'estimulo' => $c['estimulo'] ?? '',
                 'receptor' => $c['receptor'] ?? 'Receptor', 'efector' => $c['efector'] ?? 'Músculo', 'preguntas' => $c['preguntas'] ?? [],
-                'vias' => array_map(function ($v) { return ['titulo' => $v['titulo'] ?? '', 'n' => count($v['orden'] ?? [])]; },
+                'vias' => array_map(function ($v) { return ['titulo' => $v['titulo'] ?? '', 'ayuda' => $v['ayuda'] ?? '', 'n' => count($v['orden'] ?? [])]; },
                                     $c['vias'] ?? (!empty($c['orden']) ? [['titulo' => '', 'orden' => $c['orden']]] : [])),
                 'lupas' => $c['lupas'] ?? [],
                 'mascara' => $c['mascara'] ?? null, 'ayuda' => $c['ayuda'] ?? '',   // zonas sombreadas (públicas) mientras se ubican las piezas
@@ -296,6 +296,8 @@ nl_barra([
      data-tablero="<?= htmlspecialchars(($nivelLam['tablero'] ?? '') . '?v=' . (@filemtime($fotoR) ?: 1)) ?>"
      data-piezas="<?= htmlspecialchars(json_encode($piezasR, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-huecos="<?= !empty($nivelLam['huecos']) ? '1' : '' ?>"
+     data-barajar="<?= !empty($nivelLam['barajar']) ? '1' : '' ?>"
+     data-anonimas="<?= !empty($nivelLam['anonimas']) ? '1' : '' ?>"
      data-grupos="<?= htmlspecialchars(json_encode($nivelLam['grupos'] ?? null, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-textos="<?= htmlspecialchars(json_encode($nivelLam['textos'] ?? null, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>"
      data-preguntas="<?= htmlspecialchars(json_encode($nivelLam['preguntas'] ?? [], JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">

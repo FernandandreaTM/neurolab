@@ -248,3 +248,40 @@ REGLAS BIOLÓGICAS (obligatorias):
 
 El tablero `lesion-tablero.jpg` y las piezas `piezas/*.webp` se generan recortando las dos tiras (no son de ChatGPT).
 Se probó también Gemini (Nano Banana) con un prompt único para las 5 imágenes: pendiente de comparar.
+
+## 9. Práctico 2 · rediseño (20-10-2026) → `img/glia-snp-tejido.jpg`
+
+`glia-snp-tejido.jpg` (Conoce la glía · nivel II) sale del PNG que hizo Fer (`img/Dorsal Root Ganglion to Peripheral Nerve.png`, 1536 × 1024): ganglio con 4 somas y su cápsula de satélites → nervio con Schwann mielinizantes, nodos, una fibra de Remak y un capilar. Se pasó a JPG (≈200 KB) sin retoques; el PNG original va a `img/_fuentes/glia-snp-tejido-original.png`.
+
+## 10. Glía del SNP en su tejido con plantilla anatómica → `img/glia-snp-tejido.jpg`
+
+El PNG de la sección 9 tenía errores anatómicos. Ahora la anatomía la fija una plantilla dibujada en código
+(`img/_fuentes/plantilla-snp-tejido.svg/.png`, generada con `plantilla-snp-tejido.py`) y ChatGPT sólo pone las texturas.
+Adjuntar **dos imágenes**: 1) `plantilla-snp-tejido.png` (composición) y 2) `referencia-texturas-snp.png` (muestrario de texturas: recortes sueltos de la imagen SNP anterior y de `glia-snc-tejido.jpg`; al ir separados, ChatGPT no copia su composición errónea).
+
+Qué fija la plantilla: 6 neuronas pseudounipolares (3 grandes mielinizadas, 3 pequeñas amielínicas), cada soma con su cápsula de
+satélites en una sola capa que sigue sobre el inicio del tallo; cada tallo se bifurca en T **en un nodo de Ranvier**: rama central
+hacia la izquierda (raíz dorsal) y rama periférica hacia la derecha (nervio); mielinizadas con una Schwann por internodo; las
+delgadas van juntas dentro de células de Remak; capilar en el endoneuro; perineuro alrededor del fascículo; recuadro con corte transversal.
+
+```
+Usa la PRIMERA imagen como plano exacto: conserva la posición, el tamaño, la forma y el número de cada elemento
+(somas, células satélite, tallos, bifurcaciones en T, células de Schwann, nodos, células de Remak, capilar,
+perineuro, fibroblastos y el círculo con el corte transversal). No agregues, quites, muevas ni unas ningún elemento.
+Sólo cambia el ESTILO: usa la SEGUNDA imagen únicamente como muestrario de texturas y colores (no copies su
+composición ni la posición de nada); ilustración médica en acuarela digital, con volumen,
+luces suaves y texturas finas. Colores: neuronas violeta con núcleo y nucléolo; células satélite crema con núcleo
+violeta; células de Schwann celeste con su núcleo azul; capilar rojo con glóbulos rojos; tejido conectivo rosado
+fibroso con núcleos alargados de fibroblastos. Fondo blanco fuera del tejido. 1536 × 1024, sin texto, sin números,
+sin flechas, sin rótulos. Mantén las líneas del recuadro de aumento.
+
+REGLAS BIOLÓGICAS (obligatorias):
+- Cada soma tiene UNA sola prolongación (tallo); el tallo se divide en T en un tramo corto sin mielina (nodo).
+- Las ramas de la T salen por los bordes izquierdo y derecho de la imagen; ningún axón empieza ni termina en medio.
+- Una célula de Schwann cubre un solo tramo de un solo axón; entre dos Schwann queda un nodo corto, violeta.
+- Los axones delgados no tienen mielina: van hundidos de a varios dentro de la misma célula de Remak.
+- Las células satélite forman una sola capa continua pegada al soma; los somas vecinos no se tocan.
+- No agregues nada que no esté en la primera imagen.
+```
+
+Si algo sale mal, corregir **sólo con selección de zona** («deja esta zona igual a la primera imagen»), nunca rehacer completa.

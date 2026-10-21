@@ -1,5 +1,7 @@
 # Práctico II · Preguntas de láminas (tarea C)
 
+> **Rediseño 20-10-2026:** las preguntas vigentes están en `data/seed.sql` (actividad 11, «La glía en el tejido»). Se sacaron las de tinción (por qué no se ve el citoplasma, colores del Azan, por qué la blanca es blanca) y la del Nissl en el cono axónico; las de función (K+ de las satélites, contenido del canal) pasaron a «La glía en acción». Este documento queda como historial.
+
 > **Integradas en `data/seed.sql` (2026-10-18).** Se combinaron con las preguntas que ya estaban publicadas, sin repetir:
 >
 > | Nivel (actividad · nivel en el sitio) | De este documento | Se mantuvieron del sitio |

@@ -64,27 +64,23 @@ return [
         'intro'      => 'Avanza a tu ritmo, en orden. Cada actividad se corrige sola: cuando completes un nivel, se suma a tu guía de estudio. Al final descarga tu guía con todo lo que trabajaste.',
         'pasos' => [
             ['slug' => 'glia-conoce',
-             'titulo' => 'Conoce la glía (4 niveles)',
-             'tarea' => 'Primero ubica la sustancia gris y la blanca y nombra cada célula del SNC en su tejido; luego nombra la glía del SNP. Después lee qué hace cada célula, tócala en la imagen y arma el cuadro: dónde está, qué hace y qué pasa si falla. Cada nivel suma una sección a tu guía.',
+             'titulo' => 'Conoce la glía (3 niveles)',
+             'tarea' => 'Cómo es y dónde está cada glía. Etiqueta la glía del SNC en su tejido y la del SNP, del ganglio al nervio; luego reconoce cada célula por su forma y su lugar y arma el cuadro. Cada nivel suma una sección a tu guía.',
              'guia' => ['glia-conoce:1' => 'Nivel I: la glía del SNC en su tejido',
-                        'glia-conoce:2' => 'Nivel II: la glía del SNP',
-                        'glia-conoce:3' => 'Nivel III: qué hace cada una (SNC)',
-                        'glia-conoce:4' => 'Nivel IV: qué hace cada una (SNP)'],
+                        'glia-conoce:2' => 'Nivel II: la glía del SNP, del ganglio al nervio',
+                        'glia-conoce:3' => 'Nivel III: quién es quién (forma y lugar)'],
              'conexion' => [
                 'glia-conoce:1' => [
-                    'terapia-ocupacional' => 'Cada glía trabaja en un lugar: en la sustancia gris cuida las sinapsis donde ocurre el aprendizaje motor; en la blanca sostiene la conducción rápida entre regiones. Por eso una lesión de sustancia blanca (EM, ACV subcortical) enlentece el movimiento y la respuesta aunque las neuronas sigan vivas.',
-                    'fonoaudiologia' => 'Las vías del lenguaje (como el fascículo arqueado, entre las áreas de Broca y Wernicke) son sustancia blanca: si su mielina se daña, la persona puede comprender y producir palabras, pero repetir o procesar habla rápida se vuelve difícil.'],
-                'glia-conoce:2' => null,
-                'glia-conoce:3' => [
-                    'terapia-ocupacional' => 'La glía explica síntomas que verás en la práctica: la fatiga y la lentitud de la esclerosis múltiple (oligodendrocitos) o la cicatriz tras un ACV o un traumatismo (astrocitos), que hace que la recuperación dependa de la plasticidad y no de la regeneración.',
-                    'fonoaudiologia' => 'Cuando se pierde la mielina de la vía auditiva central o de las vías motoras del habla, la señal se enlentece: cuesta comprender el habla rápida y se altera la coordinación de la articulación.'],
-                'glia-conoce:4' => [
-                    'terapia-ocupacional' => 'Guillain-Barré (células de Schwann) y la esclerosis múltiple (oligodendrocitos) pueden dar una debilidad parecida, pero con pronóstico distinto: en el SNP la mielina y el axón pueden regenerar, y la rehabilitación apunta a recuperar funciones.',
-                    'fonoaudiologia' => 'En Guillain-Barré puede haber debilidad facial y bulbar (voz débil, disfagia). Como el SNP regenera, la intervención acompaña una recuperación que suele tomar semanas a meses.'],
+                    'terapia-ocupacional' => 'Cada glía trabaja en un lugar: en la sustancia gris rodea somas y sinapsis, donde ocurre el aprendizaje motor; en la blanca acompaña a los axones que conectan regiones. Saber dónde está cada una te ayuda a entender por qué una lesión de sustancia blanca enlentece el movimiento aunque las neuronas sigan vivas.',
+                    'fonoaudiologia' => 'Las vías del lenguaje (como el fascículo arqueado, entre las áreas de Broca y Wernicke) son sustancia blanca: ahí viven los oligodendrocitos que las mielinizan. Ubicar cada glía te permite relacionar el lugar de una lesión con lo que se altera.'],
+                'glia-conoce:2' => [
+                    'terapia-ocupacional' => 'La sensibilidad de la mano entra por neuronas cuyos somas están en el ganglio de la raíz dorsal, rodeados de células satélite, y viaja por nervios envueltos por células de Schwann: es la glía que verás comprometida en neuropatías y lesiones de nervio.',
+                    'fonoaudiologia' => 'Los nervios craneales que mueven labios, lengua y laringe (facial, hipogloso, vago) son SNP: sus axones van envueltos por células de Schwann, y los ganglios sensitivos (como el del trigémino) tienen células satélite.'],
+                'glia-conoce:3' => null,
              ]],
             ['slug' => 'glia-tejido',
              'titulo' => 'La glía en el tejido (4 niveles)',
-             'tarea' => 'Encuentra la glía en cortes reales: el canal central y la sustancia blanca de la médula con H&E, la motoneurona y su glía con cresil violeta, las células satélite y las envolturas en el ganglio y el nervio periférico, y al final reconoce cada glía por el anticuerpo que la marca en imágenes de inmunofluorescencia. Cada nivel suma una sección a tu guía.',
+             'tarea' => 'Encuentra la glía en cortes reales: el epéndimo y los oligodendrocitos de la médula, la glía alrededor de la motoneurona, las células satélite del ganglio y las envolturas del nervio; al final, reconoce cada glía en imágenes con anticuerpos. Cada nivel suma una sección a tu guía.',
              'guia' => ['glia-tejido:1' => 'Nivel I: canal central y sustancia blanca',
                         'glia-tejido:2' => 'Nivel II: motoneurona y su glía',
                         'glia-tejido:3' => 'Nivel III: ganglio y nervio periférico',
@@ -104,29 +100,33 @@ return [
                     'fonoaudiologia' => 'Con estos marcadores se estudia la vía auditiva: S100 y MBP muestran la mielina de Schwann del nervio coclear y su paso a mielina de oligodendrocito cerca del tronco, la zona donde nacen los schwannomas vestibulares.'],
              ]],
             ['slug' => 'glia-accion',
-             'titulo' => 'La glía en acción (4 niveles)',
-             'tarea' => 'Lo que la glía hace y cómo responde: identifica la unidad neurovascular y la sinapsis tripartita, la mielina y el nodo de Ranvier; ordena qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce la glía que cambia en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-accion:1' => 'Nivel I: unidad neurovascular y sinapsis tripartita',
-                        'glia-accion:2' => 'Nivel II: mielina y nodo de Ranvier',
-                        'glia-accion:3' => 'Nivel III: tras la lesión, SNP frente a SNC',
-                        'glia-accion:4' => 'Nivel IV: glía que cambia'],
+             'titulo' => 'La glía en acción (5 niveles)',
+             'tarea' => 'Qué hace la glía y cómo responde: traza el camino de la glucosa y del glutamato a través del astrocito, decide qué cruza la barrera hematoencefálica, relaciona la mielina con la velocidad, arma con piezas mezcladas qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce los estados de la glía en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-accion:1' => 'Nivel I: el astrocito entre el vaso y la sinapsis',
+                        'glia-accion:2' => 'Nivel II: ¿qué cruza la barrera?',
+                        'glia-accion:3' => 'Nivel III: mielina y conducción',
+                        'glia-accion:4' => 'Nivel IV: tras la lesión, SNP frente a SNC',
+                        'glia-accion:5' => 'Nivel V: glía que cambia'],
              'conexion' => [
                 'glia-accion:1' => [
-                    'terapia-ocupacional' => 'La unidad neurovascular explica por qué un ACV o un traumatismo dañan más allá del vaso: si se rompe la barrera entra líquido (edema) y los astrocitos dejan de controlar el glutamato. Ese daño secundario es parte de lo que verás en la evaluación funcional.',
+                    'terapia-ocupacional' => 'La unidad neurovascular explica por qué un ACV o un traumatismo dañan más allá del vaso: si se rompe la barrera entra líquido (edema) y si los astrocitos dejan de recaptar glutamato, la excitotoxicidad mata neuronas vecinas. Ese daño secundario es parte de lo que verás en la evaluación funcional.',
                     'fonoaudiologia' => 'En la sinapsis tripartita de la vía auditiva los astrocitos retiran el glutamato muy rápido: así la señal sigue el ritmo del habla. Si fallan (envejecimiento, ruido intenso), la transmisión se altera y cuesta discriminar sonidos.'],
                 'glia-accion:2' => [
+                    'terapia-ocupacional' => 'La barrera explica por qué muchos fármacos no llegan al encéfalo y por qué el Parkinson se trata con L-dopa: conocer el tratamiento y sus horarios (fluctuaciones «on-off») te ayuda a planificar las sesiones en los momentos de mejor desempeño.',
+                    'fonoaudiologia' => 'En el Parkinson, la voz y el habla responden en parte a la L-dopa, que cruza la barrera por un transportador: conviene evaluar y entrenar en el mismo momento del ciclo del fármaco para comparar el desempeño.'],
+                'glia-accion:3' => [
                     'terapia-ocupacional' => 'La conducción saltatoria explica la fatiga y la torpeza de la esclerosis múltiple o de Guillain-Barré: sin mielina el impulso se enlentece o se bloquea, y las tareas que exigen rapidez y coordinación se ven primero.',
                     'fonoaudiologia' => 'La sincronía de las fibras del nervio auditivo depende de la mielina: si se desmieliniza, los potenciales evocados (PEAT) se alargan o desordenan aunque la cóclea funcione.'],
-                'glia-accion:3' => [
+                'glia-accion:4' => [
                     'terapia-ocupacional' => 'Tras una lesión de nervio periférico esperas recuperación (Schwann guía el axón, ~1 mm/día): la intervención mantiene y reeduca. Tras una lesión medular el axón no vuelve: la intervención apunta a compensar y aprovechar la plasticidad.',
                     'fonoaudiologia' => 'Una lesión del nervio facial o del laríngeo recurrente (SNP) puede recuperarse en meses; un daño en el tronco encefálico o en la corteza (SNC), no por regeneración sino por plasticidad: eso cambia los objetivos de la terapia.'],
-                'glia-accion:4' => [
+                'glia-accion:5' => [
                     'terapia-ocupacional' => 'La glía participa en la plasticidad que buscas con la práctica repetida: astrocitos que forman sinapsis y microglía que poda las que no se usan. La inflamación crónica, en cambio, la entorpece.',
                     'fonoaudiologia' => 'El aprendizaje del lenguaje y la terapia moldean sinapsis con ayuda de la glía (formación y poda). En las enfermedades neurodegenerativas, la glía reactiva contribuye al deterioro de la comunicación.'],
              ]],
             ['slug' => 'quiz-celulas-nerviosas-2',
              'titulo' => 'Quiz de cierre',
-             'tarea' => '15 preguntas, de lo general a los casos clínicos de tu carrera (elige TO o Fono arriba). Tu resultado y las explicaciones quedan en tu guía.',
+             'tarea' => '16 preguntas para repasar todo el práctico, de lo general a los casos clínicos de tu carrera (elige TO o Fono arriba). Tu resultado y las explicaciones quedan en tu guía.',
              'guia' => ['quiz-celulas-nerviosas-2' => 'Quiz de cierre']],
         ],
     ],

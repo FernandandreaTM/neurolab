@@ -44,6 +44,8 @@ function iniciar(raiz) {
     try { preguntas = JSON.parse(d.preguntas || '[]'); } catch { preguntas = []; }
     const clave = d.clave, KEY = 'nl_rompe_' + clave;
     const huecos = !!d.huecos;
+    const barajadas = !!d.barajar;    // la bandeja sale en orden aleatorio (fijo para cada estudiante)
+    const anonimas = !!d.anonimas;    // el nombre de la pieza se ve sólo al ponerla bien
     let grupos = null;
     try { grupos = JSON.parse(d.grupos || 'null'); } catch { grupos = null; }
     // Textos propios del nivel (data-textos); por defecto, los del arco reflejo
@@ -70,6 +72,12 @@ function iniciar(raiz) {
     try { est = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { est = null; }
     if (!est || typeof est !== 'object') est = {};
     est.ok = est.ok || {}; est.mal = est.mal || {}; est.exp = est.exp || {}; est.preg = est.preg || {}; est.err = est.err || 0;
+    const nuevoOrden = () => barajar(piezas.length).map(i => piezas[i].clave);
+    if (barajadas && (!Array.isArray(est.orden) || est.orden.length !== piezas.length)) est.orden = nuevoOrden();
+    const enBandeja = lista => barajadas ? lista.slice().sort((a, b) => est.orden.indexOf(a.clave) - est.orden.indexOf(b.clave)) : lista;
+    const letraDe = k => String.fromCharCode(65 + Math.max(0, (barajadas ? est.orden : piezas.map(p => p.clave)).indexOf(k)));
+    /** Nombre visible: con «anonimas», «Pieza B» hasta que se ponga bien. */
+    const rotulo = pz => anonimas && !est.ok[pz.clave] ? 'Pieza ' + letraDe(pz.clave) : pz.nombre;
     const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(est)); } catch { /* sin espacio */ } };
     if (instr && !Object.keys(est.ok).length) instr.open = true;
 
@@ -82,7 +90,7 @@ function iniciar(raiz) {
         const iG = ordenGrupos.indexOf(grupoActual());
         return piezas.filter(p => iG < 0 || ordenGrupos.indexOf(p.grupo) <= iG);
     };
-    const primeraLibre = () => huecos ? null : (visibles().find(p => !est.ok[p.clave])?.clave || null);
+    const primeraLibre = () => huecos ? null : (enBandeja(visibles()).find(p => !est.ok[p.clave])?.clave || null);
     let sel = primeraLibre();
     let aviso = '', ocupado = false, enRespuesta = null, marca = null;   // marca: último punto mal puesto
     let pendiente = null;   // hueco tocado antes de elegir la pieza
@@ -117,7 +125,7 @@ function iniciar(raiz) {
             }
         });
     }
-    const nombre = k => (piezas.find(p => p.clave === k) || {}).nombre || k;
+    const nombre = k => { const pz = piezas.find(p => p.clave === k); return pz ? rotulo(pz) : k; };
 
     async function poner(k, xy) {
         if (instr) instr.open = false;
@@ -190,11 +198,11 @@ function iniciar(raiz) {
                 <p class="nl-lab__paso"><span class="nl-lab__badge">1</span> ${grupos && g ? esc(grupos[g]) : esc(T.paso)}</p>
                 <p class="nl-lab__ayuda">${huecos ? (pendiente ? '<strong>¿Qué pieza va en el hueco que tocaste?</strong>' : 'Toca un hueco y luego su pieza, o toca la pieza y luego su hueco. También puedes arrastrarla.')
                     : 'Toca una pieza y luego su lugar en el tablero, o arrástrala.'}${esc(T.fijo)}</p>
-                <div class="nl-rompe__bandeja">${visibles().map(pz => {
+                <div class="nl-rompe__bandeja${anonimas ? ' is-grande' : ''}">${enBandeja(visibles()).map(pz => {
                     const ok = !!est.ok[pz.clave];
                     return `<button type="button" class="nl-rompe__pieza${ok ? ' is-ok' : ''}${pz.clave === sel ? ' is-sel' : ''}" data-clave="${esc(pz.clave)}"${ok ? ' disabled' : ''}>
                         <span class="nl-rompe__mini"><img src="${esc(pz.img)}" alt="" draggable="false"></span>
-                        <strong>${ok ? '✓ ' : ''}${esc(pz.nombre)}</strong></button>`;
+                        <strong>${ok ? '✓ ' : ''}${esc(rotulo(pz))}</strong></button>`;
                 }).join('')}</div>
                 ${malSel.length ? `<p class="nl-lab__q-fb">✗ ${esc(malSel[malSel.length - 1])}</p>` : ''}
                 ${piezas.filter(pz => est.ok[pz.clave]).map(pz => bloque(pz.nombre, est.exp[pz.clave].exp)).join('')}`;
@@ -322,6 +330,7 @@ function iniciar(raiz) {
     raiz.querySelector('#nl-rompe-reset')?.addEventListener('click', () => {
         if (Object.keys(est.ok).length && !confirm('Esto desarma tu rompecabezas y borra tus respuestas de este nivel. ¿Seguro?')) return;
         est = { ok: {}, mal: {}, exp: {}, preg: {}, err: 0 };
+        if (barajadas) est.orden = nuevoOrden();
         guardar(); guiaHecha = false; enRespuesta = null; marca = null; pendiente = null;
         sel = primeraLibre();
         pintar();

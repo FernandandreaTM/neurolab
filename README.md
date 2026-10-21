@@ -24,7 +24,7 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 | Clave | Práctico | Estado |
 |---|---|---|
 | `celulas-1` | Células nerviosas I: la neurona | **En uso con estudiantes** |
-| `celulas-2` | Células nerviosas II: circuitos y glía | **Listo para revisión** (contenido completo; faltan íconos de glía) |
+| `celulas-2` | Células nerviosas II: la glía | **Rediseñado 20-10** (estructura → función; ver `docs/practico-2_tareas.md`) |
 | — | Potencial de acción · Sinapsis | Planificados |
 
 ### Ruta de `celulas-1`
@@ -40,10 +40,10 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 
 | # | Actividad | Niveles | Mecánica | Va a la guía |
 |---|---|---|---|---|
-| 1 | Circuito reflejo | 2 | I: capturar y etiquetar médula + ganglio (MH-047) · II: **sobre la propia captura**, ubicar neurona sensitiva, interneurona y motoneurona, conectarlas en orden (impulso animado) y responder | Captura etiquetada + circuito dibujado |
-| 2 | Glía del SNC | 4 | I: esquema (identificación) · II: escribir la célula que describe cada frase · III: canal central y sustancia blanca (MHS-240, H&E) · IV: motoneurona y su glía (UCSF-163, cresil) | Esquema rotulado + tabla + capturas + preguntas |
-| 3 | Glía del SNP | 4 | I: esquema (identificación) · II: frases → tarjetas → cuadro SNC/SNP · III: ganglio y células satélite (MH-051) · IV: nervio periférico (MH-052) | Esquema rotulado + cuadro + capturas + preguntas |
-| 4 | Quiz de cierre | 1 | 15 preguntas (7 conceptos + 4 casos + 4 de la carrera), algunas con tarjetas | Resultado + explicaciones |
+| 1 | Conoce la glía | 3 (SNC en su tejido · SNP del ganglio al nervio · quién es quién) | Etiquetar esquemas (nombre → clic) y tarjetas de forma y lugar | Esquemas rotulados + cuadro |
+| 2 | La glía en el tejido | 4 (médula H&E · motoneurona cresil · ganglio y nervio · anticuerpos) | Capturas en láminas reales; tarjetas con inmunofluorescencias | Capturas + preguntas |
+| 3 | La glía en acción | 5 (unidad neurovascular · barrera · mielina · lesión · glía que cambia) | Etiquetar + recorridos animados, tarjetas, rompecabezas mezclado | Esquemas, cuadros y secuencias |
+| 4 | Quiz de cierre | 1 | 16 preguntas (12 comunes + 4 de la carrera) | Resultado + explicaciones |
 
 Cada nivel puede tener un recuadro **«¿Para qué te sirve?»** propio de TO o Fono.
 
