@@ -19,23 +19,27 @@ Ruta `celulas-2` (desde la sesión 08 el práctico 2 es **solo glía**; el circu
 | MHS-285/286 | Ganglio espinal · toluidina / Weigert | https://histologyguide.com/slideview/MHS-285-286-spinal-ganglion/06-slide-1.html |
 | MH-052 | Nervio periférico · H&E | https://histologyguide.com/slideview/MH-052-peripheral-nerve/06-slide-1.html |
 
-## Ruta
+## Ruta (rediseño 20-10-2026)
 
-| # | Actividad (slug) | Nivel | Qué hacen | Imagen |
-|---|---|---|---|---|
-| 1 | Conoce la glía (`glia-conoce`) | I · Glía del SNC | Identifican astrocito, oligodendrocito, microglía, ependimaria y eligen su función | Esquema de Kaira |
-| | | II · La glía en su tejido | 11 estructuras: astrocito protoplasmático y fibroso, oligodendrocito, mielina, nodo, microglía, capilar, ependimaria, ventrículo, sustancia gris y blanca | `glia-snc-tejido.jpg` |
-| | | III · Glía del SNP | Satélite, Schwann mielinizante y no mielinizante, oligodendrocito para comparar | Esquema de Kaira |
-| | | IV · Cada célula en su lugar | 18 frases → cuadro de las 6 células (dónde está, qué hace, si falla) | Tarjetas |
-| 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Ependimarias y núcleos de oligodendrocitos con H&E | MHS-240 |
-| | | II · Motoneurona y su glía | Glía perineuronal, axón frente a dendrita por el Nissl, neuropilo | UCSF-163 |
-| | | III · Ganglio y nervio periférico | Células satélite; epi-, peri- y endoneuro, Schwann | MH-051 y MH-052 |
-| | | IV · Glía con anticuerpos | 10 imágenes reales (GFAP, Iba1, coronina, Rip, NG2, S100/MBP, laminina): qué célula marca cada color | `img/glia-if/` (Wikimedia) |
-| 3 | La glía en acción (`glia-accion`) | I · Unidad neurovascular y sinapsis tripartita | 10 estructuras (endotelio, unión estrecha, pericito, pie astrocitario, sinapsis envuelta) | `glia-accion/neurovascular.jpg` |
-| | | II · Mielina y nodo de Ranvier | 8 estructuras (internodo, nodo, asas paranodales, canales de Na+) | `glia-accion/mielina.jpg` |
-| | | III · Tras la lesión | Rompecabezas: ordenar 4 etapas en el SNP y 4 en el SNC + 3 preguntas | `glia-accion/lesion-tablero.jpg` |
-| | | IV · Glía que cambia | 9 casos: glutamato, M1/M2, gliosis, poda, glía radial, bandas de Büngner, fibras C, remielinización, epéndimo | Tarjetas |
-| 4 | Quiz de cierre | — | 15 preguntas, solo de glía | — |
+Criterio: **actividades 1 y 2 = estructura** (qué es, cómo es, dónde está), **actividad 3 = función** (qué hace, cómo responde, qué pasa si falla). El quiz repasa todo.
+
+| # | Actividad (slug) | Nivel | Qué hacen | Mecánica | Imagen |
+|---|---|---|---|---|---|
+| 1 | Conoce la glía (`glia-conoce`) | I · Glía del SNC en su tejido | Ubican sustancia gris/blanca y etiquetan 7 estructuras; 4 preguntas de forma y lugar | Etiquetar (nombre → clic) | `glia-snc-tejido.jpg` |
+| | | II · Glía del SNP en su tejido | Ganglio/nervio y 8 estructuras (soma, satélite, axón, Schwann mielinizante y no mielinizante, nodo, capilar, conectivo); 3 preguntas | Etiquetar | `glia-snp-tejido.jpg` (nuevo, de Fer) |
+| | | III · ¿Quién es quién? | 12 descripciones de forma y lugar → tarjeta → cuadro Forma / Dónde está | Tarjetas con ícono (barajadas) | Íconos `img/glia/` |
+| 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Epéndimo y oligodendrocitos en hileras | Capturas MHS-240 | histologyguide |
+| | | II · Motoneurona y su glía | Glía perineuronal, comparación con la sustancia blanca, neuropilo | Capturas UCSF-163 | histologyguide |
+| | | III · Ganglio y nervio | Satélites frente a glía del SNC; somas redondos; Schwann/fibroblasto; envolturas | Capturas MH-051 y MH-052 | histologyguide |
+| | | IV · Glía con anticuerpos | 7 imágenes: reconocer por **forma y lugar** (el marcador va en el pie) | Tarjetas | `img/glia-if/` |
+| 3 | La glía en acción (`glia-accion`) | I · El astrocito entre el vaso y la sinapsis | 10 etiquetas + **2 recorridos animados** (glucosa → lactato; ciclo del glutamato) + 4 preguntas (BHE, sincicio, lactato, excitotoxicidad) | Etiquetar + conectar en orden | `glia-accion/neurovascular.jpg` |
+| | | II · ¿Qué cruza la barrera? | 11 sustancias → pasa libre / con transportador / no pasa (incluye L-dopa, dopamina, órganos circunventriculares) | Tarjetas → cuadro | — |
+| | | III · Mielina y conducción | 9 etiquetas (incluye neurilema) + 4 preguntas (saltatoria, P0/PLP/MBP, neurilema, fibras Aα–C) | Etiquetar | `glia-accion/mielina.jpg` |
+| | | IV · Tras la lesión | 8 piezas **mezcladas y sin nombre**: decidir SNP o SNC y etapa; 4 preguntas (por qué regenera, aplastamiento vs corte, Aguayo, cicatriz) | Rompecabezas | `glia-accion/lesion-tablero.jpg` |
+| | | V · Glía que cambia | 9 casos → estado (M0, M1, M2, A1, A2, cicatriz, glía radial, NG2) | Tarjetas | 3 imágenes de `img/glia-if/` |
+| 4 | Quiz de cierre | — | 12 comunes + 4 de la carrera = 16 | Quiz | — |
+
+Respaldo de la versión anterior (18/19-10): carpeta `_respaldo_p2_2026-10-20/` en la raíz del repo (fuera de git) y commit base en `COMMIT_BASE.txt`.
 
 ## Actividades adicionales del atlas (fuera de la ruta)
 
@@ -54,7 +58,7 @@ Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. 
 | K. Revisar láminas de glía | Recorrer La glía en el tejido I–III en histologyguide: que los links abran en el campo correcto y las preguntas se respondan con lo que se ve | `feat/p2-revision-glia` |
 | L. Mielina en el ganglio | Actividad adicional con MHS-286 (Weigert): mielinizadas frente a no mielinizadas y velocidad de conducción | `feat/p2-mielina-ganglio` |
 | M. Probar el práctico 2 en celular | Recorrer las 3 actividades en el teléfono (sobre todo el rompecabezas de la lesión y los anticuerpos) y anotar en el PR qué se ve mal o cuesta tocar | `fix/p2-celular` |
-| N. Revisar «La glía en acción» | Leer las estructuras de los niveles I–II y los 9 casos del nivel IV con la clase de Células II y Neuroplasticidad III; proponer cambios si algo no calza con la imagen o con la clase | `feat/p2-glia-accion` |
+| N. Revisar «La glía en acción» | Recorrer los 5 niveles con la clase de Células II y Neuroplasticidad III: etiquetas, recorridos, sustancias de la barrera y los 9 casos del nivel V; proponer cambios si algo no calza con la imagen o con la clase | `feat/p2-glia-accion` |
 | I y J (práctico 4) | Casos del arco y revisión de lupas: quedan para cuando el circuito vuelva en el práctico 4 | — |
 
 **¿Quién tiene qué tarea?** La que tenga un Pull Request abierto en GitHub (pestaña *Pull requests*). Antes de elegir, revisa ahí que nadie la haya tomado. Una tarea a la vez.

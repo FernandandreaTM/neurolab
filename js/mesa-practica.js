@@ -77,6 +77,10 @@ function iniciar(raiz) {
 
     let est = leer(d.nivel);
     if (instr && !Object.keys(est.items).length) instr.open = true;
+    // Tarjetas en orden aleatorio (fijo para cada estudiante): así la primera tarjeta no delata la primera respuesta
+    const barajarOps = () => { const a = opciones.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    if (!Array.isArray(est.oc) || est.oc.length !== opciones.length || est.oc.some(o => !opciones.includes(o))) est.oc = barajarOps();
+    const cartas = () => est.oc;
     const guardar = () => escribir(d.nivel, est);
     const porId = Object.fromEntries(items.map(it => [String(it.id), it]));
     const num = it => items.indexOf(it) + 1;
@@ -296,12 +300,12 @@ function iniciar(raiz) {
                     return;
                 }
                 const s = hecho(sel), m = mal(sel);
-                vista.innerHTML = `<div class="nl-tip__frase-caja">
+                vista.innerHTML = `<div class="nl-tip__frase-caja${cartas().length === 6 ? ' is-compacta' : ''}">
                     <p class="nl-tip__fila-etq">${sel.fila ? esc(sel.fila) + ' · ' : ''}ejercicio ${num(sel)} de ${items.length}</p>
                     ${imagen(sel)}
                     <p class="nl-tip__frase">${frase(sel)}</p>
-                    <div class="nl-tip__cartas nl-cartas" role="group" aria-label="Elige una tarjeta">
-                    ${opciones.map(o => {
+                    <div class="nl-tip__cartas nl-cartas" data-n="${cartas().length}" role="group" aria-label="Elige una tarjeta">
+                    ${cartas().map(o => {
                         const esMal = m.find(x => x.t === o);
                         const esOk = s && s.r === o;
                         const cls = esOk ? ' is-ok is-vuelta' : esMal ? ' is-mal is-vuelta' : (s ? ' is-apagada' : '');
@@ -337,7 +341,7 @@ function iniciar(raiz) {
                 }
                 panel.innerHTML = `
                     <p class="nl-lab__paso"><span class="nl-lab__badge">${num(sel)}</span> Elige la tarjeta correcta</p>
-                    <p class="nl-lab__ayuda">Toca la tarjeta en la imagen.${sel.fila ? ` Fila del cuadro: <strong>${esc(sel.fila)}</strong>.` : ''}</p>
+                    <p class="nl-lab__ayuda">Toca la tarjeta que corresponde.${sel.fila ? ` Fila del cuadro: <strong>${esc(sel.fila)}</strong>.` : ''}</p>
                     ${m.length ? `<p class="nl-lab__q-fb">✗ Esa tarjeta no era: lee la pista y prueba con otra.</p>` : ''}`;
             },
             progreso: () => (conCuadro && !verCierre ? cuadro(false) : ''),
@@ -355,7 +359,7 @@ function iniciar(raiz) {
 
     raiz.querySelector('#nl-mprac-reset')?.addEventListener('click', () => {
         if (Object.keys(est.items).length && !confirm('Esto borra todas tus respuestas de este nivel. ¿Seguro?')) return;
-        est = { items: {}, mal: {}, err: 0 };
+        est = { items: {}, mal: {}, err: 0, oc: barajarOps() };
         guardar();
         sel = items[0]; verCierre = false; nueva = null;
         pintar();

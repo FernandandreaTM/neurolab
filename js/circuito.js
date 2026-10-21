@@ -174,7 +174,7 @@ function iniciar(raiz) {
     function svgRuta(dd, inhibe, idx) {
         const col = inhibe ? '#A78BFA' : '#F59E0B';
         return `<path d="${dd}" class="nl-circ__ruta is-animada" style="stroke:${col}"/>
-            <circle r="10" class="nl-circ__impulso${inhibe ? ' is-inh' : ''}"><animateMotion dur="${4 + idx * 0.7}s" repeatCount="indefinite" path="${dd}"/></circle>`;
+            <circle r="${Math.max(3, VB[0] / 150)}" class="nl-circ__impulso${inhibe ? ' is-inh' : ''}"><animateMotion dur="${4 + idx * 0.7}s" repeatCount="indefinite" path="${dd}"/></circle>`;
     }
 
     /* ---------------- Vista ---------------- */
@@ -197,10 +197,15 @@ function iniciar(raiz) {
                 if (c.mascara && p === 'ubicar') svg += c.mascara.map(m => m.r
                     ? `<rect x="${m.r[0]}" y="${m.r[1]}" width="${m.r[2]}" height="${m.r[3]}" fill="${m.c || 'rgba(139,92,246,.3)'}" class="nl-circ__mascara"/>`
                     : `<polygon points="${(m.p || []).map(q => q.join(',')).join(' ')}" fill="${m.c || 'rgba(139,92,246,.3)'}" class="nl-circ__mascara"/>`).join('');
+                // Con «vias», las etiquetas puestas se tocan en orden (p. ej. el camino de la glucosa)
+                const seqE = p === 'conectar' && e.via[via] ? (e.via[via].seq || []) : [];
                 html += c.piezas.filter(pz => e.ok[pz.clave]).map(pz => {
-                    const [x, y] = e.pos[pz.clave];
-                    return `<span class="nl-circ__chip" style="left:${x}%;top:${y}%"><i></i>${esc(pz.nombre)}</span>`;
+                    const [x, y] = e.pos[pz.clave], iS = seqE.indexOf(pz.clave);
+                    return p === 'conectar'
+                        ? `<button type="button" class="nl-circ__chip is-tocable${iS >= 0 ? ' is-elegida' : ''}" data-neu="${esc(pz.clave)}" style="left:${x}%;top:${y}%"><i>${iS >= 0 ? iS + 1 : ''}</i>${esc(pz.nombre)}</button>`
+                        : `<span class="nl-circ__chip" style="left:${x}%;top:${y}%"><i></i>${esc(pz.nombre)}</span>`;
                 }).join('');
+                c.vias.forEach((v, i) => { const s = e.via[i]; if (s && s.ok && s.ruta) svg += svgRuta(s.ruta, !!s.inhibe, i); });
             } else {
                 svg += c.piezas.filter(pz => e.ok[pz.clave] && e.trz[pz.clave]).map(pz => {
                     const iSeq = p === 'conectar' && e.via[via] ? (e.via[via].seq || []).indexOf(pz.clave) : -1;
@@ -219,7 +224,7 @@ function iniciar(raiz) {
             if (marca) html += `<span class="nl-rompe__marca" style="left:${marca[0]}%;top:${marca[1]}%">✗</span>`;
             clase = (p === 'ubicar' && selPieza ? ' is-poner' : '') + (p !== 'ubicar' ? ' is-armado' : '');
             ayuda = p === 'ubicar' ? (selPieza ? `Toca dónde va: <strong>${esc(pieza(c, selPieza).nombre)}</strong>` : 'Elige en el panel')
-                : p === 'conectar' ? `Toca las neuronas <strong>en el orden en que viaja la información</strong>${c.vias.length > 1 ? ` (vía ${via + 1}: ${esc(c.vias[via].titulo)})` : ''}`
+                : p === 'conectar' ? `${etiquetas ? 'Toca las etiquetas' : 'Toca las neuronas'} <strong>en el orden ${etiquetas ? 'del recorrido' : 'en que viaja la información'}</strong>${c.vias.length > 1 ? ` (vía ${via + 1}: ${esc(c.vias[via].titulo)})` : ''}`
                 : p === 'lupas' ? 'Toca cada 🔍 para ver la sinapsis de cerca'
                 : etiquetas ? esc(d.subtitulo || 'Las partes de la médula') : `${esc(c.titulo)}: el impulso va del receptor al efector`;
         }
@@ -403,12 +408,12 @@ function iniciar(raiz) {
             const hechas = c.vias.map((vv, j) => (e.via[j] || {}).ok ? bloque('✓ ' + (vv.titulo || 'Tu reflejo'), e.via[j].exp) : '').join('');
             panel.innerHTML = `${av}${cab}${hechas}
                 <p class="nl-lab__paso nl-circ__via">${c.vias.length > 1 ? `Vía ${i + 1} de ${c.vias.length}: ` : ''}<strong>${esc(c.vias[i].titulo || 'Conecta el reflejo')}</strong></p>
-                <p class="nl-lab__ayuda">Toca en el esquema las <strong>${c.vias[i].n} neuronas</strong> de esta vía, en el orden en que viaja la información, empezando por la que recibe del <strong>${esc(c.receptor.toLowerCase())}</strong>.</p>
+                <p class="nl-lab__ayuda">${c.vias[i].ayuda ? c.vias[i].ayuda : `Toca en el esquema las <strong>${c.vias[i].n} neuronas</strong> de esta vía, en el orden en que viaja la información, empezando por la que recibe del <strong>${esc(c.receptor.toLowerCase())}</strong>.`}</p>
                 <p class="nl-circ__seq">${v.seq.length ? v.seq.map((k, j) => `<span style="--c:${pieza(c, k).color || '#FCD34D'}">${j + 1}. ${esc(pieza(c, k).nombre)}</span>`).join(' → ') : '<em>Aún no tocas ninguna</em>'}</p>
                 ${v.seq.length ? '<button type="button" class="nl-lab__nose nl-circ__borrar">Borrar y empezar el orden de nuevo</button>' : ''}
                 <p class="nl-lab__ayuda nl-circ__o">También puedes tocarlas aquí:</p>
                 <div class="nl-circ__piezas nl-circ__toque">${c.piezas.map(pz => `<button type="button" class="nl-circ__pieza${v.seq.includes(pz.clave) ? ' is-sel' : ''}" data-neu="${esc(pz.clave)}" style="--c:${pz.color || '#FCD34D'}"${v.seq.includes(pz.clave) ? ' disabled' : ''}>
-                    <span class="nl-circ__ico">${iconos[pz.clave] || ''}</span><span><strong>${v.seq.includes(pz.clave) ? (v.seq.indexOf(pz.clave) + 1) + '. ' : ''}${esc(pz.nombre)}</strong></span></button>`).join('')}</div>`;
+                    ${etiquetas ? '' : `<span class="nl-circ__ico">${iconos[pz.clave] || ''}</span>`}<span><strong>${v.seq.includes(pz.clave) ? (v.seq.indexOf(pz.clave) + 1) + '. ' : ''}${esc(pz.nombre)}</strong></span></button>`).join('')}</div>`;
             panel.querySelector('.nl-circ__borrar')?.addEventListener('click', () => { v.seq = []; guardar(); pintar(); });
             panel.querySelectorAll('.nl-circ__toque [data-neu]:not([disabled])').forEach(b => b.addEventListener('click', () => { if (!ocupado) tocarNeurona(c, b.dataset.neu); }));
             return;
@@ -504,7 +509,7 @@ function iniciar(raiz) {
         const e = ec(c.clave);
         panel.className = 'nl-lab__trabajo ' + (repasarCirc(c).length ? 'is-repasar' : 'is-ok');
         panel.innerHTML = `${cab}
-            ${etiquetas ? bloque('✓ Partes ubicadas', c.piezas.map(pz => pz.nombre).join(' · ')) : c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Tu reflejo'), (e.via[j] || {}).exp || '')).join('')}
+            ${etiquetas ? bloque('✓ Partes ubicadas', c.piezas.map(pz => pz.nombre).join(' · ')) + c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Recorrido'), (e.via[j] || {}).exp || '')).join('') : c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Tu reflejo'), (e.via[j] || {}).exp || '')).join('')}
             ${c.preguntas.length ? bloque('Respuestas', c.preguntas.map(q => '• ' + q.ops[q.ok]).join('  '), true) : ''}
             ${(c.lupas || []).length ? '<p class="nl-lab__ayuda">Puedes volver a abrir las 🔍 del esquema para repasar.</p>' : ''}
             <div class="nl-ficha__acciones">${siguienteBoton()}</div>`;
@@ -630,6 +635,12 @@ function iniciar(raiz) {
     async function imagenCircuito(cc) {
         const e = ec(cc.clave), L = await lienzoBase();
         if (etiquetas) {
+            cc.vias.map((_, i) => e.via[i] || {}).filter(v => v.ok && v.ruta).forEach(v => {
+                const g = L.g; g.save(); g.scale(L.W / VB[0], L.H / VB[1]);
+                g.strokeStyle = v.inhibe ? 'rgba(167,139,250,.85)' : 'rgba(245,158,11,.85)'; g.lineWidth = 5 * VB[0] / L.W;
+                g.lineCap = 'round'; g.lineJoin = 'round'; g.setLineDash([12 * VB[0] / L.W, 8 * VB[0] / L.W]);
+                g.stroke(new Path2D(v.ruta)); g.restore();
+            });
             cc.piezas.forEach(pz => {
                 if (!e.pos[pz.clave]) return;
                 const p = L.px(e.pos[pz.clave]);
