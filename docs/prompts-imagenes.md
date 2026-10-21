@@ -313,6 +313,8 @@ unión estrecha y quedan abajo, en la sangre; un pequeño símbolo de «alto» r
 
 ### 11b. Glía que cambia (nivel V) → 8 tarjetas
 
+Versión usada (sesión 11): `img/_fuentes/Biomedical Neuroscience Cell Montage.png` (corrige 3, 6, 7 y 8 de la primera versión), cortada en 8 PNG de 320 px.
+
 ```
 Adjunto un set de íconos de referencia. Crea UNA sola imagen de 2048 × 1024 px dividida en una
 cuadrícula de 4 columnas × 2 filas (8 cuadros de 512 × 512), separados por espacio blanco, con

@@ -3,8 +3,10 @@
  * Nivel «escenas» de una lámina: casos en orden sobre una imagen fija (`fondo`, coordenadas en `vb`).
  *   · modo «poe» (predice → observa → explica): cada caso trae una predicción de una sola oportunidad;
  *     al responder se ve la animación del caso (partículas por rutas, efectos y rótulos) y la explicación.
- *   · modo «casos»: pasos «tocar» (una zona del fondo), «tarjeta» (célula con ícono) y «elegir»
- *     (alternativas con pista); al terminar, la lesión se marca en el fondo y el caso suma una fila al cuadro.
+ *   · modo «casos»: pasos «tocar» (una zona del fondo), «sistema» (SNC o SNP), «tarjeta» (célula con ícono)
+ *     y «elegir» (alternativas con pista); al terminar, la lesión se marca en el fondo y el caso suma una fila al cuadro.
+ *     Si el caso trae «foto», la vista muestra la ficha del caso (enfermedad, paciente, «contexto») junto a la imagen
+ *     real; «dx» en el nivel muestra el nombre de la enfermedad desde el inicio.
  * Son preguntas formativas: las respuestas vienen en data-nivel. Avance: localStorage nl_esc_<clave>.
  * Al completar: markDone(clave) y la sección va a la guía (imagen + cuadro + explicaciones).
  */
@@ -97,7 +99,7 @@ function iniciar(raiz) {
         const e = est.c[cs.clave] || (est.c[cs.clave] = { paso: 0, r: {} });
         cs.pasos.forEach((p, i) => {
             const r = e.r[i] || (e.r[i] = { mal: [] });
-            if (p.ops && !Array.isArray(r.orden)) r.orden = barajar(p.ops.length);
+            if (p.ops && !Array.isArray(r.orden)) r.orden = p.tipo === 'sistema' ? p.ops.map((_, k) => k) : barajar(p.ops.length);
         });
         return e;
     };
@@ -109,11 +111,12 @@ function iniciar(raiz) {
     let recien = false;      // el caso se acaba de resolver: se anima desde el principio
     if (instr && !Object.keys(est.c).length) instr.open = true;
 
-    const NOMBRES_PASO = { predice: 'Predice', tocar: 'Dónde', tarjeta: 'Célula', elegir: 'Por qué' };
+    const NOMBRES_PASO = { predice: 'Predice', tocar: 'Dónde', sistema: 'SNC o SNP', tarjeta: 'Célula', elegir: 'Por qué' };
+    const SISTEMAS = { SNC: 'Sistema nervioso central: encéfalo y médula espinal', SNP: 'Sistema nervioso periférico: nervios y ganglios' };
     const nomPaso = p => p.nombre || NOMBRES_PASO[p.tipo] || 'Pregunta';
     const pct = (x, y) => [x / VB[0] * 100, y / VB[1] * 100];
-    /** En «casos» el diagnóstico (corto) se ve sólo al resolverlo; antes, el paciente. */
-    const nombreCaso = cs => (poe || listo(cs) ? cs.corto : '') || cs.titulo;
+    /** En «casos» el diagnóstico (corto) se ve sólo al resolverlo (salvo «dx»); antes, el paciente. */
+    const nombreCaso = cs => (poe || N.dx || listo(cs) ? cs.corto : '') || cs.titulo;
     const malCaso = cs => Object.values(ec(cs).r).some(r => r.mal.length || r.fallo);
 
     /* ---------------- Animación de un caso ---------------- */
@@ -153,6 +156,7 @@ function iniciar(raiz) {
         const cs = ver, e = ec(cs);
         if (verCierre && N.cuadro) { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>`; return; }
         if (cs.vista === 'cuadro') { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">${esc(cs.titulo)}</p>${cuadro(true)}</div>`; return; }
+        if (cs.foto) { pintarFicha(cs); return; }
         const hecho = listo(cs);
         const animar = hecho && cs.anim;
         const p = !hecho ? cs.pasos[e.paso] : null;
@@ -197,6 +201,25 @@ function iniciar(raiz) {
         }
     }
 
+    /** Caso con imagen real: ficha (enfermedad, paciente, contexto) + imagen que se amplía en el visor. */
+    function pintarFicha(cs) {
+        const hecho = listo(cs);
+        vista.innerHTML = `
+            <div class="nl-esc__caso">
+              <div class="nl-esc__ficha">
+                <p class="nl-esc__enf">${esc(cs.corto)}${hecho ? ' <span class="nl-esc__ok">✓ Resuelto</span>' : ''}</p>
+                <p class="nl-esc__pac"><strong>${esc(cs.titulo)}.</strong> ${esc(cs.situacion || '')}</p>
+                ${cs.contexto ? `<div class="nl-esc__sobre"><span class="nl-esc__sobre-etq">Sobre la enfermedad</span><p>${esc(cs.contexto)}</p></div>` : ''}
+              </div>
+              <figure class="nl-esc__foto">
+                <button type="button" class="nl-esc__foto-btn" aria-label="Ver la imagen grande"><img src="${esc(cs.foto)}" alt="${esc(cs.foto_t || cs.corto)}"><span>🔍 Ampliar</span></button>
+                ${cs.foto_t ? `<figcaption>${esc(cs.foto_t)}${cs.foto_pie ? `<small>${esc(cs.foto_pie)}</small>` : ''}</figcaption>` : ''}
+              </figure>
+            </div>`;
+        vista.querySelector('.nl-esc__foto-btn').addEventListener('click', () => abrirVisor(cs.foto, cs.foto_t, cs.foto_pie));
+        recien = false;
+    }
+
     /* ---------------- Respuestas ---------------- */
     function avanzar(cs) {
         const e = ec(cs);
@@ -225,7 +248,7 @@ function iniciar(raiz) {
         }
         if (io !== p.ok) {
             r.mal.push(io); est.err++; guardar(); pintarPanel(); actualizar();
-            panel.querySelector('.nl-lab__alts, .nl-esc__cartas')?.classList.add('is-sacude');
+            panel.querySelector('.nl-lab__alts, .nl-esc__cartas, .nl-esc__sis')?.classList.add('is-sacude');
             return;
         }
         r.ok = true; r.elegida = io; avanzar(cs);
@@ -255,6 +278,12 @@ function iniciar(raiz) {
 
     function htmlPaso(cs, p, r) {
         const ops = r.orden.map(io => ({ io, txt: p.ops[io] }));
+        if (p.tipo === 'sistema') {
+            return `<p class="nl-lab__q">${esc(p.p)}</p>
+                <div class="nl-esc__sis">${ops.map(o => `<button type="button" class="nl-esc__sis-btn is-${esc(String(o.txt).toLowerCase())}${r.mal.includes(o.io) ? ' is-mal' : ''}" data-i="${o.io}"${r.mal.includes(o.io) ? ' disabled' : ''}>
+                    <strong>${esc(o.txt)}</strong><small>${esc(SISTEMAS[o.txt] || '')}</small></button>`).join('')}</div>
+                ${r.mal.length ? `<p class="nl-lab__q-fb">✗ Pista: ${esc(p.pista || 'intenta de nuevo.')}</p>` : ''}`;
+        }
         if (p.tipo === 'tarjeta') {
             return `<p class="nl-lab__q">${esc(p.p)}</p>
                 <div class="nl-esc__cartas">${ops.map(o => `<button type="button" class="nl-esc__carta${r.mal.includes(o.io) ? ' is-mal' : ''}" data-i="${o.io}"${r.mal.includes(o.io) ? ' disabled' : ''}>
@@ -272,8 +301,10 @@ function iniciar(raiz) {
         if (verCierre) { mostrarCierre(); return; }
         const cs = ver, e = ec(cs), iC = casos.indexOf(cs);
         const mini = `<ol class="nl-lam__pasos nl-circ__mini">${cs.pasos.map((p, i) => `<li class="${i < e.paso ? ((e.r[i] || {}).fallo || (e.r[i] || {}).mal?.length ? 'is-repasar' : 'is-ok') : i === e.paso ? 'is-actual' : ''}">${esc(nomPaso(p))}</li>`).join('')}${poe ? `<li class="${listo(cs) ? 'is-ok' : ''}">Mira</li>` : ''}</ol>`;
-        const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${iC + 1}</span> ${esc(cs.titulo)}</p>${mini}
-            ${cs.situacion ? `<p class="nl-esc__situacion">${esc(cs.situacion)}</p>` : ''}`;
+        // Con imagen real, el caso se lee en la vista; aquí sólo las preguntas
+        const leer = cs.foto && !listo(cs) ? `<p class="nl-esc__leer">📋 Lee el caso y «Sobre la enfermedad» ${angosta() ? 'arriba' : 'a la izquierda'}.</p>` : '';
+        const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${iC + 1}</span> ${esc(N.dx && cs.foto ? cs.corto : cs.titulo)}</p>${mini}
+            ${cs.foto ? leer : cs.situacion ? `<p class="nl-esc__situacion">${esc(cs.situacion)}</p>` : ''}`;
         if (!listo(cs)) {
             const i = e.paso, p = cs.pasos[i], r = e.r[i];
             panel.className = 'nl-lab__trabajo is-pregunta';
@@ -304,7 +335,7 @@ function iniciar(raiz) {
                 ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-sig">${poe ? 'Siguiente escena' : 'Siguiente caso'} →</button>`
                       : '<button type="button" class="btn btn-primary btn-sm nl-fin">Terminar el nivel →</button>'}
             </div>`;
-        panel.querySelector('.nl-esc__mini')?.addEventListener('click', () => abrirVisor(cs));
+        panel.querySelector('.nl-esc__mini')?.addEventListener('click', () => abrirVisor(cs.img, cs.ctx, cs.pie));
         panel.querySelector('.nl-sig')?.addEventListener('click', () => {
             ver = actual(); recien = true; pintar();
             if (angosta()) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -312,15 +343,15 @@ function iniciar(raiz) {
         panel.querySelector('.nl-fin')?.addEventListener('click', () => { verCierre = true; pintar(); });
     }
 
-    function abrirVisor(cs) {
+    function abrirVisor(img, ctx, pie) {
         const v = document.createElement('div');
         v.className = 'nl-mprac__visor';
         v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true');
         v.innerHTML = `<div class="nl-mprac__visor-caja">
             <button type="button" class="nl-mprac__visor-x" aria-label="Cerrar">✕</button>
-            <img src="${esc(cs.img)}" alt="">
-            ${cs.ctx ? `<p class="nl-mprac__visor-ctx">${esc(cs.ctx)}</p>` : ''}
-            ${cs.pie ? `<p class="nl-mprac__visor-pie">${esc(cs.pie)}</p>` : ''}</div>`;
+            <img src="${esc(img)}" alt="">
+            ${ctx ? `<p class="nl-mprac__visor-ctx">${esc(ctx)}</p>` : ''}
+            ${pie ? `<p class="nl-mprac__visor-pie">${esc(pie)}</p>` : ''}</div>`;
         const cerrar = () => { v.remove(); document.removeEventListener('keydown', tecla); };
         const tecla = ev => { if (ev.key === 'Escape') cerrar(); };
         v.addEventListener('click', ev => { if (ev.target === v || ev.target.closest('.nl-mprac__visor-x')) cerrar(); });
@@ -353,7 +384,31 @@ function iniciar(raiz) {
     }
 
     /* ---------------- Guía ---------------- */
+    /** Casos con imagen real: cuadrícula de 2 columnas con cada imagen y su enfermedad. */
+    async function imagenFotos(fotos) {
+        const W = MAX_GUIA, col = 2, gap = 12, cw = (W - gap * (col + 1)) / col, ch = 300, eh = 36;
+        const H = gap + Math.ceil(fotos.length / col) * (ch + eh + gap);
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const g = c.getContext('2d');
+        g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+        const imgs = await Promise.all(fotos.map(cs => cargar(cs.foto).catch(() => null)));
+        imgs.forEach((im, i) => {
+            const x = gap + (i % col) * (cw + gap), y = gap + Math.floor(i / col) * (ch + eh + gap);
+            g.fillStyle = '#0F0820'; g.fillRect(x, y, cw, ch);
+            if (im) {
+                const k = Math.min(cw / im.width, ch / im.height), w = im.width * k, h = im.height * k;
+                g.drawImage(im, x + (cw - w) / 2, y + (ch - h) / 2, w, h);
+            }
+            g.fillStyle = '#1A0E2E'; g.fillRect(x, y + ch, cw, eh);
+            g.fillStyle = '#fff'; g.font = 'bold 17px Arial, sans-serif'; g.textBaseline = 'middle';
+            g.fillText(`${casos.indexOf(fotos[i]) + 1} · ${fotos[i].corto}`, x + 12, y + ch + eh / 2);
+        });
+        return c.toDataURL('image/jpeg', 0.82);
+    }
     async function imagenGuia() {
+        const fotos = casos.filter(cs => cs.foto);
+        if (fotos.length) return imagenFotos(fotos);
         const img = await cargar(d.fondo);
         const W = MAX_GUIA, H = Math.round(W * VB[1] / VB[0]);
         const c = document.createElement('canvas');
