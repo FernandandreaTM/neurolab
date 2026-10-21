@@ -45,21 +45,35 @@ Ya no se usan: `img/glia-accion/mielina.jpg` y las «funciones» de `circuito.js
 | `mesa-practica` · caja compacta | Ahora siempre; estilos por número de tarjetas `data-n` 3, 6 y 8 |
 | `img/cartas/<nombre>.png` | Ícono de tarjeta por nombre (además de `img/tipos/` e `img/glia/`) |
 
+## Commits de la sesión
+
+| Commit | Qué |
+|---|---|
+| `6a520d5` | Glía en acción: funciones, lesión en cuadro, visor de imágenes, moléculas con paréntesis, sin hileras en la lámina |
+| `290c5a4` | Anticuerpos al pool, quiz sin GFAP, cajas de tarjetas parejas, máscaras en la guía |
+| `57ca5cf` | Tarjetas dibujadas de la barrera |
+| `bb093af` | Glía en acción I y III: escenas animadas y casos de mielina dañada (motor `js/escenas.js`) |
+
 ## Estado al cierre
 
 | Qué | Estado |
 |---|---|
-| Producción | Subir los archivos del commit de la sesión 10 (sin docs) y correr `admin/seed.php` |
-| Tarjetas dibujadas | Barrera: listas (`img/cartas/`, cortadas de `img/_fuentes/Blood–Brain Barrier Transport Triptych.png`, 320 px; en el celular van una bajo otra con el dibujo a la izquierda). Glía que cambia: pendiente (§11b) |
-| Piezas del rompecabezas (`img/glia-accion/piezas/`, `lesion-tablero.jpg`) | Ya no se usan; quedan en el repo |
+| Producción | Subir lo de `git diff --name-status 47c09dc HEAD` sin `docs/` (16 archivos) y correr `admin/seed.php` |
 | Push | Pendiente (Fer, GitHub Desktop) |
+| Tarjetas de «Glía que cambia» (nivel V) | Pendiente. La primera versión (`img/_fuentes/Pastel Neuroscience Glia Icon Grid.png`) se revisó: sirven 1, 2, 4 y 5; había que corregir 3 (M2 igual a la vigilante), 6 (bulbo de retracción dibujado como terminal sináptico), 7 (soma de la glía radial lejos del ventrículo) y 8 (el precursor NG2 ya formaba mielina). Fer está generando la versión corregida con un prompt único. Al recibirla: revisar, cortar en 8 PNG de 320 px en `img/cartas/` con los nombres de §11 de `prompts-imagenes.md` |
+| Glía con anticuerpos (`glia-anticuerpos`) | Fuera de la ruta, en el pool como «en desarrollo»; Fer la arregla después (íconos chicos en las tarjetas) |
+| Guías ya guardadas | Quien hizo antes Conoce la glía I–II o La glía en acción I y III debe rehacer esos niveles para tener la versión nueva en su guía |
+| Sin uso (quedan en el repo) | `img/glia-accion/mielina.jpg`, `lesion-tablero.jpg`, `piezas/`; «funciones» de `circuito.js` |
 
 ## Prompt para la sesión siguiente
 
 ```
 Retomo NeuroLab (C:\repo\neurolab). Lee docs/sesiones/sesion-10_correcciones-practico-2.md y docs/practico-2_tareas.md.
-Te paso las imágenes de las tarjetas (barrera y glía que cambia, §11 de prompts-imagenes.md): córtalas en img/cartas/
-y sigamos corrigiendo detalles del práctico 2 de a uno. Pruébalo (PHP 8.3 + Playwright, 1366×660 y celular),
-edita data/seed.sql directamente, trabaja sobre main y al final un commit con mi autoría y la lista para FileZilla.
+Seguimos con detalles del práctico 2 (glía), que te iré reportando de a uno. Primero: en img/_fuentes te dejo la
+imagen corregida de las 8 tarjetas de «Glía que cambia»; revísala (validez científica de cada cuadro) y, si sirve,
+córtala en img/cartas/ con los nombres de §11 de docs/prompts-imagenes.md.
+Para cada corrección: dime qué archivo tocas, edítalo, pruébalo (PHP 8.3 + Playwright, 1366×660 y celular)
+y dime qué subir. Edita data/seed.sql directamente (bloque de la actividad afectada).
+Trabaja sobre main; al final un commit con mi autoría y la lista de archivos para FileZilla.
 Al cerrar, escribe docs/sesiones/sesion-11_*.md.
 ```
