@@ -101,7 +101,7 @@ return [
              ]],
             ['slug' => 'glia-accion',
              'titulo' => 'La glía en acción (5 niveles)',
-             'tarea' => 'Qué hace la glía y cómo responde: traza el camino de la glucosa y del glutamato a través del astrocito, decide qué cruza la barrera hematoencefálica, relaciona la mielina con la velocidad, arma con piezas mezcladas qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce los estados de la glía en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
+             'tarea' => 'Qué hace la glía y cómo responde: une cada función con la estructura que la cumple entre el vaso y la sinapsis, decide qué cruza la barrera hematoencefálica, relaciona la mielina con la velocidad, compara qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce los estados de la glía en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
              'guia' => ['glia-accion:1' => 'Nivel I: el astrocito entre el vaso y la sinapsis',
                         'glia-accion:2' => 'Nivel II: ¿qué cruza la barrera?',
                         'glia-accion:3' => 'Nivel III: mielina y conducción',

@@ -9,7 +9,8 @@
  * Verde = correcto al primer intento · rojo suave = por repasar · naranjo = activo.
  * Respuestas en api/practica_check.php. Avance: localStorage nl_mprac_<nivelId>.
  * Al completar: markDone('<slug>:<número>') y la sección se guarda sola en la guía con esa clave.
- * Datos públicos de cada ítem (practica_items.datos, JSON): { img, pie }
+ * Datos públicos de cada ítem (practica_items.datos, JSON): { img, pie, mini, ctx }
+ *   mini: la imagen va chica junto a la frase y se amplía al tocarla (visor con `ctx`: la imagen explicada)
  */
 import { markDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
@@ -192,6 +193,26 @@ function iniciar(raiz) {
     const imagen = it => it.d && it.d.img
         ? `<figure class="nl-mprac__fig"><img src="${esc(it.d.img)}" alt="">${it.d.pie ? `<figcaption>${esc(it.d.pie)}</figcaption>` : ''}</figure>` : '';
 
+    /** Miniatura que abre el visor (datos.mini): la imagen es complementaria y no agranda la caja. */
+    const miniatura = it => `<button type="button" class="nl-mprac__mini" aria-label="Ver la imagen grande">
+        <img src="${esc(it.d.img)}" alt=""><span>🔍 Ver imagen</span></button>`;
+    function abrirVisor(it) {
+        const v = document.createElement('div');
+        v.className = 'nl-mprac__visor';
+        v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true');
+        v.innerHTML = `<div class="nl-mprac__visor-caja">
+            <button type="button" class="nl-mprac__visor-x" aria-label="Cerrar">✕</button>
+            <img src="${esc(it.d.img)}" alt="">
+            ${it.d.ctx ? `<p class="nl-mprac__visor-ctx">${esc(it.d.ctx)}</p>` : ''}
+            ${it.d.pie ? `<p class="nl-mprac__visor-pie">${esc(it.d.pie)}</p>` : ''}</div>`;
+        const cerrar = () => { v.remove(); document.removeEventListener('keydown', tecla); };
+        const tecla = ev => { if (ev.key === 'Escape') cerrar(); };
+        v.addEventListener('click', ev => { if (ev.target === v || ev.target.closest('.nl-mprac__visor-x')) cerrar(); });
+        document.addEventListener('keydown', tecla);
+        document.body.appendChild(v);
+        v.querySelector('.nl-mprac__visor-x').focus();
+    }
+
     /** Tabla resumen (vista de cierre y guía). */
     function resumen() {
         return `<div class="nl-tip__frase-caja is-cierre"><p class="nl-tip__fila-etq">Resumen del nivel</p>
@@ -300,10 +321,11 @@ function iniciar(raiz) {
                     return;
                 }
                 const s = hecho(sel), m = mal(sel);
-                vista.innerHTML = `<div class="nl-tip__frase-caja${cartas().length === 6 ? ' is-compacta' : ''}">
+                const mini = sel.d && sel.d.mini && sel.d.img;
+                vista.innerHTML = `<div class="nl-tip__frase-caja is-compacta">
                     <p class="nl-tip__fila-etq">${sel.fila ? esc(sel.fila) + ' · ' : ''}ejercicio ${num(sel)} de ${items.length}</p>
-                    ${imagen(sel)}
-                    <p class="nl-tip__frase">${frase(sel)}</p>
+                    ${mini ? `<div class="nl-mprac__con-mini"><p class="nl-tip__frase">${frase(sel)}</p>${miniatura(sel)}</div>`
+                           : `${imagen(sel)}<p class="nl-tip__frase">${frase(sel)}</p>`}
                     <div class="nl-tip__cartas nl-cartas" data-n="${cartas().length}" role="group" aria-label="Elige una tarjeta">
                     ${cartas().map(o => {
                         const esMal = m.find(x => x.t === o);
@@ -314,6 +336,7 @@ function iniciar(raiz) {
                             <span class="nl-tip__carta-in"><span class="nl-tip__cara">${iconos[o] || ''}<span class="nl-tip__carta-nom">${partir(o)}</span></span>
                             <span class="nl-tip__dorso">${dorso}</span></span></button>`;
                     }).join('')}</div></div>`;
+                vista.querySelector('.nl-mprac__mini')?.addEventListener('click', () => abrirVisor(sel));
                 vista.querySelectorAll('.nl-tip__carta:not([disabled])').forEach(b => b.addEventListener('click', async () => {
                     if (hecho(sel) || panel.classList.contains('is-esperando')) return;
                     cerrarInstr();

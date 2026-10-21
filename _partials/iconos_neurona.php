@@ -2,7 +2,7 @@
 /**
  * NeuroLab — iconos_neurona.php
  * Ícono de cada tipo de neurona para los botones del nivel "elegir".
- * Si existe img/tipos/<clave>.png o img/glia/<clave>.png (asset ilustrado) se usa esa imagen;
+ * Si existe img/tipos/, img/glia/ o img/cartas/<clave>.png (asset ilustrado) se usa esa imagen;
  * si no, un dibujo SVG simple de respaldo.
  */
 
@@ -16,7 +16,7 @@ function nl_clave_icono($nombre) {
 
 function nl_icono_neurona($nombre) {
     $clave = nl_clave_icono($nombre);
-    foreach (['img/tipos/', 'img/glia/'] as $dir) {   // neuronas y células gliales
+    foreach (['img/tipos/', 'img/glia/', 'img/cartas/'] as $dir) {   // neuronas, células gliales y otras tarjetas (barrera, estados)
         $png = $dir . $clave . '.png';
         if (is_file(__DIR__ . '/../' . $png)) {
             return '<img class="nl-ico" src="' . $png . '?v=' . filemtime(__DIR__ . '/../' . $png) . '" alt="" loading="lazy">';

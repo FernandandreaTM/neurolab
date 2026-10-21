@@ -132,6 +132,10 @@ function iniciar(raiz) {
     const lupaLista = (c, lp) => !!(ec(c.clave).lupa[lp.clave] || {}).listo;
     const pasosDe = c => ['ubicar'].concat(c.vias.length ? ['conectar'] : [], (c.lupas || []).length ? ['lupas'] : [], c.preguntas.length ? ['preguntas'] : []);
     const NOMBRE_PASO = { ubicar: 'Ubicar', conectar: 'Conectar', lupas: 'Lupas', preguntas: 'Preguntas' };
+    const nomPaso = (c, t) => (t === 'conectar' && c.paso) || NOMBRE_PASO[t];
+    // «funciones»: cada vía es una sola etiqueta (lee la función y toca la estructura que la cumple)
+    const nomVia = (c, e, j) => { const k = ((e.via[j] || {}).seq || [])[0]; return k ? pieza(c, k).nombre : ''; };
+    const viaHecha = (c, e, j) => c.funciones ? bloque('✓ ' + nomVia(c, e, j), e.via[j].exp) : bloque('✓ ' + (c.vias[j].titulo || 'Tu reflejo'), e.via[j].exp);
     const pasoC = c => {
         const e = ec(c.clave);
         if (!c.piezas.every(p => e.ok[p.clave])) return 'ubicar';
@@ -224,6 +228,7 @@ function iniciar(raiz) {
             if (marca) html += `<span class="nl-rompe__marca" style="left:${marca[0]}%;top:${marca[1]}%">✗</span>`;
             clase = (p === 'ubicar' && selPieza ? ' is-poner' : '') + (p !== 'ubicar' ? ' is-armado' : '');
             ayuda = p === 'ubicar' ? (selPieza ? `Toca dónde va: <strong>${esc(pieza(c, selPieza).nombre)}</strong>` : 'Elige en el panel')
+                : p === 'conectar' && c.funciones ? `Toca la etiqueta de la estructura que cumple la función ${via + 1} de ${c.vias.length}`
                 : p === 'conectar' ? `${etiquetas ? 'Toca las etiquetas' : 'Toca las neuronas'} <strong>en el orden ${etiquetas ? 'del recorrido' : 'en que viaja la información'}</strong>${c.vias.length > 1 ? ` (vía ${via + 1}: ${esc(c.vias[via].titulo)})` : ''}`
                 : p === 'lupas' ? 'Toca cada 🔍 para ver la sinapsis de cerca'
                 : etiquetas ? esc(d.subtitulo || 'Las partes de la médula') : `${esc(c.titulo)}: el impulso va del receptor al efector`;
@@ -294,7 +299,7 @@ function iniciar(raiz) {
             Object.assign(v, { ok: true, exp: r.feedback || '', ruta: r.ruta || null, inhibe: r.inhibe || '' });
         } else {
             v.mal++; est.err++;
-            aviso = '✗ Ese orden no es. ' + (r.feedback || '');
+            aviso = (c.funciones ? '✗ No es esa estructura. ' : '✗ Ese orden no es. ') + (r.feedback || '');
             v.seq = [];
         }
         guardar();
@@ -328,7 +333,7 @@ function iniciar(raiz) {
             const s = secciones[0];
             if (s === 'cortes') { pasosEl.innerHTML = casos.map((_, i) => `<li class="${ek(i).ok ? 'is-ok' : i === casoSel ? 'is-actual' : ''}">Caso ${i + 1}</li>`).join(''); return; }
             const c = circDe(s), lista = pasosDe(c), iP = lista.indexOf(pasoC(c));
-            pasosEl.innerHTML = lista.map((t, i) => `<li class="${iP < 0 || i < iP ? 'is-ok' : i === iP ? 'is-actual' : ''}">${NOMBRE_PASO[t]}</li>`).join('');
+            pasosEl.innerHTML = lista.map((t, i) => `<li class="${iP < 0 || i < iP ? 'is-ok' : i === iP ? 'is-actual' : ''}">${nomPaso(c, t)}</li>`).join('');
             return;
         }
         const act = actual();
@@ -376,7 +381,7 @@ function iniciar(raiz) {
         const lista = pasosDe(c), iP = lista.indexOf(p);
         const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${secciones.length > 1 ? letra : iP < 0 ? '✓' : iP + 1}</span> ${esc(c.titulo)} <small class="nl-circ__sub">${esc(c.sub)}</small></p>
             ${c.estimulo ? `<p class="nl-circ__estimulo">⚡ ${esc(c.estimulo)}</p>` : ''}
-            ${secciones.length > 1 ? `<ol class="nl-lam__pasos nl-circ__mini">${lista.map((t, i) => `<li class="${iP < 0 || i < iP ? 'is-ok' : i === iP ? 'is-actual' : ''}">${NOMBRE_PASO[t]}</li>`).join('')}</ol>` : ''}`;
+            ${secciones.length > 1 ? `<ol class="nl-lam__pasos nl-circ__mini">${lista.map((t, i) => `<li class="${iP < 0 || i < iP ? 'is-ok' : i === iP ? 'is-actual' : ''}">${nomPaso(c, t)}</li>`).join('')}</ol>` : ''}`;
 
         if (p === 'ubicar') {
             if (!selPieza) selPieza = primeraSinUbicar(c);
@@ -405,7 +410,18 @@ function iniciar(raiz) {
 
         if (p === 'conectar') {
             const i = viaActual(c), v = e.via[i] || { seq: [] };
-            const hechas = c.vias.map((vv, j) => (e.via[j] || {}).ok ? bloque('✓ ' + (vv.titulo || 'Tu reflejo'), e.via[j].exp) : '').join('');
+            const hechas = c.vias.map((vv, j) => (e.via[j] || {}).ok ? viaHecha(c, e, j) : '').join('');
+            if (c.funciones) {
+                const ult = i > 0 && (e.via[i - 1] || {}).ok ? viaHecha(c, e, i - 1) : '';
+                panel.innerHTML = `${av}${cab}${ult}
+                <p class="nl-lab__paso nl-circ__via">Función ${i + 1} de ${c.vias.length}</p>
+                <p class="nl-circ__funcion">${esc(c.vias[i].titulo)}</p>
+                <p class="nl-lab__ayuda">${c.vias[i].ayuda || 'Toca en el esquema la etiqueta de la estructura que lo hace (o elígela aquí).'}</p>
+                <div class="nl-circ__piezas nl-circ__toque">${c.piezas.map(pz => `<button type="button" class="nl-circ__pieza" data-neu="${esc(pz.clave)}" style="--c:${pz.color || '#FCD34D'}"><span><strong>${esc(pz.nombre)}</strong></span></button>`).join('')}</div>
+                ${hechas ? `<details class="nl-circ__hechas"><summary>Funciones resueltas (${c.vias.filter((_, j) => (e.via[j] || {}).ok).length})</summary>${hechas}</details>` : ''}`;
+                panel.querySelectorAll('.nl-circ__toque [data-neu]').forEach(b => b.addEventListener('click', () => { if (!ocupado) tocarNeurona(c, b.dataset.neu); }));
+                return;
+            }
             panel.innerHTML = `${av}${cab}${hechas}
                 <p class="nl-lab__paso nl-circ__via">${c.vias.length > 1 ? `Vía ${i + 1} de ${c.vias.length}: ` : ''}<strong>${esc(c.vias[i].titulo || 'Conecta el reflejo')}</strong></p>
                 <p class="nl-lab__ayuda">${c.vias[i].ayuda ? c.vias[i].ayuda : `Toca en el esquema las <strong>${c.vias[i].n} neuronas</strong> de esta vía, en el orden en que viaja la información, empezando por la que recibe del <strong>${esc(c.receptor.toLowerCase())}</strong>.`}</p>
@@ -509,7 +525,7 @@ function iniciar(raiz) {
         const e = ec(c.clave);
         panel.className = 'nl-lab__trabajo ' + (repasarCirc(c).length ? 'is-repasar' : 'is-ok');
         panel.innerHTML = `${cab}
-            ${etiquetas ? bloque('✓ Partes ubicadas', c.piezas.map(pz => pz.nombre).join(' · ')) + c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Recorrido'), (e.via[j] || {}).exp || '')).join('') : c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Tu reflejo'), (e.via[j] || {}).exp || '')).join('')}
+            ${etiquetas ? bloque('✓ Partes ubicadas', c.piezas.map(pz => pz.nombre).join(' · ')) + c.vias.map((vv, j) => c.funciones ? bloque('✓ ' + nomVia(c, e, j), vv.titulo) : bloque('✓ ' + (vv.titulo || 'Recorrido'), (e.via[j] || {}).exp || '')).join('') : c.vias.map((vv, j) => bloque('✓ ' + (vv.titulo || 'Tu reflejo'), (e.via[j] || {}).exp || '')).join('')}
             ${c.preguntas.length ? bloque('Respuestas', c.preguntas.map(q => '• ' + q.ops[q.ok]).join('  '), true) : ''}
             ${(c.lupas || []).length ? '<p class="nl-lab__ayuda">Puedes volver a abrir las 🔍 del esquema para repasar.</p>' : ''}
             <div class="nl-ficha__acciones">${siguienteBoton()}</div>`;
@@ -693,7 +709,9 @@ function iniciar(raiz) {
             bloques.push(etiquetas
                 ? { t: 'tabla', cab: ['Parte', 'Qué es'], filas: cc.piezas.map(pz => [pz.nombre, (e.exp[pz.clave] || {}).exp || '']) }
                 : { t: 'tabla', cab: ['Neurona', 'Su soma está en', 'Qué hace'], filas: cc.piezas.map(pz => [pz.nombre, (e.exp[pz.clave] || {}).zona || '', (e.exp[pz.clave] || {}).exp || '']) });
-            if (cc.vias.length) bloques.push({ t: 'tabla', cab: ['Vía', 'Recorrido'], filas: cc.vias.map((vv, i) => [vv.titulo || cc.titulo, (e.via[i] || {}).exp || '']) });
+            if (cc.vias.length) bloques.push(cc.funciones
+                ? { t: 'tabla', cab: ['Función', 'Quién lo hace', 'Para recordar'], filas: cc.vias.map((vv, i) => [vv.titulo, nomVia(cc, e, i), (e.via[i] || {}).exp || '']) }
+                : { t: 'tabla', cab: ['Vía', 'Recorrido'], filas: cc.vias.map((vv, i) => [vv.titulo || cc.titulo, (e.via[i] || {}).exp || '']) });
             if ((cc.lupas || []).length) bloques.push({ t: 'tabla', cab: ['Lupa', 'Pregunta', 'Respuesta'],
                 filas: cc.lupas.flatMap(lp => lp.preguntas.map((q, i) => [i === 0 ? lp.titulo : '', q.p, q.ops[q.ok]])) });
             if (cc.preguntas.length) bloques.push({ t: 'tabla', cab: ['Pregunta', 'Respuesta', 'Para recordar'], filas: cc.preguntas.map(q => [q.p, q.ops[q.ok], q.exp || '']) });

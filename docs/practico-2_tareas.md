@@ -28,15 +28,15 @@ Criterio: **actividades 1 y 2 = estructura** (qué es, cómo es, dónde está), 
 | 1 | Conoce la glía (`glia-conoce`) | I · Glía del SNC en su tejido | Ubican sustancia gris/blanca y etiquetan 7 estructuras; 4 preguntas de forma y lugar | Etiquetar (nombre → clic) | `glia-snc-tejido.jpg` |
 | | | II · Glía del SNP en su tejido | Ganglio/nervio y 8 estructuras (soma, satélite, axón, Schwann mielinizante y no mielinizante, nodo, capilar, conectivo); 3 preguntas | Etiquetar | `glia-snp-tejido.jpg` (nuevo, de Fer) |
 | | | III · ¿Quién es quién? | 12 descripciones de forma y lugar → tarjeta → cuadro Forma / Dónde está | Tarjetas con ícono (barajadas) | Íconos `img/glia/` |
-| 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Epéndimo y oligodendrocitos en hileras | Capturas MHS-240 | histologyguide |
+| 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Epéndimo; fibras cortadas de través (axón + anillo de mielina disuelta) y núcleos de glía | Capturas MHS-240 | histologyguide |
 | | | II · Motoneurona y su glía | Glía perineuronal, comparación con la sustancia blanca, neuropilo | Capturas UCSF-163 | histologyguide |
 | | | III · Ganglio y nervio | Satélites frente a glía del SNC; somas redondos; Schwann/fibroblasto; envolturas | Capturas MH-051 y MH-052 | histologyguide |
 | | | IV · Glía con anticuerpos | 7 imágenes: reconocer por **forma y lugar** (el marcador va en el pie) | Tarjetas | `img/glia-if/` |
-| 3 | La glía en acción (`glia-accion`) | I · El astrocito entre el vaso y la sinapsis | 10 etiquetas + **2 recorridos animados** (glucosa → lactato; ciclo del glutamato) + 4 preguntas (BHE, sincicio, lactato, excitotoxicidad) | Etiquetar + conectar en orden | `glia-accion/neurovascular.jpg` |
-| | | II · ¿Qué cruza la barrera? | 11 sustancias → pasa libre / con transportador / no pasa (incluye L-dopa, dopamina, órganos circunventriculares) | Tarjetas → cuadro | — |
-| | | III · Mielina y conducción | 9 etiquetas (incluye neurilema) + 4 preguntas (saltatoria, P0/PLP/MBP, neurilema, fibras Aα–C) | Etiquetar | `glia-accion/mielina.jpg` |
-| | | IV · Tras la lesión | 8 piezas **mezcladas y sin nombre**: decidir SNP o SNC y etapa; 4 preguntas (por qué regenera, aplastamiento vs corte, Aguayo, cicatriz) | Rompecabezas | `glia-accion/lesion-tablero.jpg` |
-| | | V · Glía que cambia | 9 casos → estado (M0, M1, M2, A1, A2, cicatriz, glía radial, NG2) | Tarjetas | 3 imágenes de `img/glia-if/` |
+| 3 | La glía en acción (`glia-accion`) | I · El astrocito entre el vaso y la sinapsis | 10 etiquetas + **¿Quién lo hace?** (7 funciones → tocar la etiqueta) + 4 preguntas (BHE, sincicio, lactato, excitotoxicidad) | Etiquetar + funciones | `glia-accion/neurovascular.jpg` |
+| | | II · ¿Qué cruza la barrera? | 11 sustancias → pasa libre / con transportador / no pasa (incluye L-dopa, dopamina, órganos circunventriculares) | Tarjetas → cuadro | Tarjetas `img/cartas/` (pendientes) |
+| | | III · Mielina y conducción | 8 etiquetas (incluye neurilema; sin asas paranodales) + 4 preguntas (saltatoria, P0/PLP/MBP, neurilema, fibras Aα–C) | Etiquetar | `glia-accion/mielina.jpg` |
+| | | IV · Tras la lesión | 10 hechos → **solo SNP / solo SNC / en ambos**; cuadro por etapa (tras el corte, días a semanas, resultado). Incluye Aguayo y aplastamiento vs corte | Tarjetas → cuadro + imagen en miniatura | `glia-accion/lesion-comparacion.jpg` |
+| | | V · Glía que cambia | 9 casos → estado (M0, M1, M2, A1, A2, cicatriz, glía radial, NG2); moléculas con paréntesis aclaratorio | Tarjetas (4 + 4) | 3 imágenes de `img/glia-if/` en miniatura con visor; tarjetas `img/cartas/` (pendientes) |
 | 4 | Quiz de cierre | — | 12 comunes + 4 de la carrera = 16 | Quiz | — |
 
 Respaldo de la versión anterior (18/19-10): carpeta `_respaldo_p2_2026-10-20/` en la raíz del repo (fuera de git) y commit base en `COMMIT_BASE.txt`.

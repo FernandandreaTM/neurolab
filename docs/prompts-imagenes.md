@@ -285,3 +285,66 @@ REGLAS BIOLÓGICAS (obligatorias):
 ```
 
 Si algo sale mal, corregir **sólo con selección de zona** («deja esta zona igual a la primera imagen»), nunca rehacer completa.
+
+## 11. Tarjetas dibujadas de «La glía en acción» (sesión 10) → `img/cartas/<nombre>.png`
+
+Una sola imagen por set; Claude la corta en tarjetas de 256 px y las deja en `img/cartas/` con el nombre de la tarjeta
+(`_partials/iconos_neurona.php` también busca ahí). Adjunta `img/_fuentes/referencia-set-glia.png` (los 6 íconos de glía) como referencia de estilo.
+
+### 11a. ¿Qué cruza la barrera? (nivel II) → `pasa-libremente.png`, `pasa-con-transportador.png`, `no-pasa.png`
+
+```
+Adjunto un set de íconos de referencia. Crea UNA sola imagen horizontal de 1536 × 512 px dividida en
+3 cuadros iguales (512 × 512), separados por espacio blanco, con exactamente el mismo estilo de la
+referencia: ilustración médico-educativa semi-realista y limpia, colores suaves, volumen y luces suaves,
+fondo blanco puro, SIN texto, SIN letras, SIN números, SIN flechas con rótulos. Cada cuadro se verá
+como tarjeta a 60-120 px: silueta simple y muy legible, el elemento central ocupa ~80 % del cuadro.
+En los 3 cuadros aparece el mismo trozo de pared de un capilar del cerebro, visto de lado y horizontal:
+abajo la sangre (rojo claro, con un glóbulo rojo), en medio dos células endoteliales rosadas unidas
+por una unión estrecha (pequeño broche oscuro) y arriba, el tejido nervioso con un pie de astrocito
+rosado como el de la referencia.
+Cuadro 1 (pasa libremente): pequeñas esferas celestes (gas) y gotitas amarillas (grasa) atraviesan
+la membrana de la célula endotelial directamente, en línea recta de abajo hacia arriba.
+Cuadro 2 (pasa con transportador): moléculas hexagonales anaranjadas (glucosa) cruzan solo a través
+de una proteína-canal verde incrustada en la membrana endotelial; las demás esperan en fila abajo.
+Cuadro 3 (no pasa): una proteína grande morada y una bacteria verde chocan contra la pared y la
+unión estrecha y quedan abajo, en la sangre; un pequeño símbolo de «alto» rojo sin letras sobre ellas.
+```
+
+### 11b. Glía que cambia (nivel V) → 8 tarjetas
+
+```
+Adjunto un set de íconos de referencia. Crea UNA sola imagen de 2048 × 1024 px dividida en una
+cuadrícula de 4 columnas × 2 filas (8 cuadros de 512 × 512), separados por espacio blanco, con
+exactamente el mismo estilo y los mismos colores de la referencia: ilustración médico-educativa
+semi-realista y limpia, fondo blanco puro, SIN texto, SIN letras, SIN números, SIN rótulos. Cada
+cuadro se verá como tarjeta a 50-100 px: una escena simple, la célula protagonista centrada y
+ocupando ~75 % del cuadro. Microglía en gris azulado, astrocitos en rosado, linaje oligodendrocito
+en celeste/azul, neuronas y axones en lila, mielina celeste translúcida (como en la referencia).
+Fila 1:
+1) Microglía vigilante: microglía con soma pequeño y muchas ramas finas, largas y muy ramificadas
+   extendidas en todas direcciones (como la de referencia), tranquila.
+2) Microglía M1 inflamatoria: microglía redondeada, con ramas cortas y gruesas, que engulle una
+   bacteria verde y libera a su alrededor puntitos rojo-anaranjados (señales de inflamación).
+3) Microglía M2 reparadora: microglía con ramas medianas que libera puntitos verde menta hacia
+   una neurona lila sana a su lado.
+4) Astrocito A1 tóxico: astrocito rosado-magenta hinchado, de ramas gruesas, que rodea una
+   dendrita lila fragmentada y opaca.
+Fila 2:
+5) Astrocito A2 protector: astrocito rosado de ramas suaves que abrazan el soma de una neurona
+   lila sana, con puntitos dorados que van hacia ella.
+6) Astrocito de la cicatriz: tres o cuatro astrocitos rosados alargados y entrelazados formando
+   una pared vertical densa; a la izquierda, un axón lila que termina en un bulbo redondo frente
+   a la pared, sin cruzarla.
+7) Glía radial: célula delgada y vertical cuya fibra larga va desde una superficie celeste abajo
+   (ventrículo) hasta arriba; una neurona lila pequeña y alargada trepa por la fibra.
+8) Precursor NG2: célula celeste pequeña con pocas ramas cortas, junto a un axón lila que tiene
+   un segmento nuevo de mielina celeste, delgado.
+```
+
+| Tarjeta | Archivo |
+|---|---|
+| Pasa libremente · Pasa con transportador · No pasa | `pasa-libremente.png` · `pasa-con-transportador.png` · `no-pasa.png` |
+| Microglía vigilante · M1 · M2 | `microglia-vigilante.png` · `microglia-m1-inflamatoria.png` · `microglia-m2-reparadora.png` |
+| Astrocito A1 · A2 · de la cicatriz | `astrocito-a1-toxico.png` · `astrocito-a2-protector.png` · `astrocito-de-la-cicatriz.png` |
+| Glía radial · Precursor NG2 | `glia-radial.png` · `precursor-ng2.png` |

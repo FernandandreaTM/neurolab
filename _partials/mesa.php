@@ -222,6 +222,7 @@ nl_barra([
                 'vias' => array_map(function ($v) { return ['titulo' => $v['titulo'] ?? '', 'ayuda' => $v['ayuda'] ?? '', 'n' => count($v['orden'] ?? [])]; },
                                     $c['vias'] ?? (!empty($c['orden']) ? [['titulo' => '', 'orden' => $c['orden']]] : [])),
                 'lupas' => $c['lupas'] ?? [],
+                'funciones' => !empty($c['funciones']), 'paso' => $c['paso_vias'] ?? '',   // vías de 1 etiqueta: «lee la función y toca quién la cumple»
                 'mascara' => $c['mascara'] ?? null, 'ayuda' => $c['ayuda'] ?? '',   // zonas sombreadas (públicas) mientras se ubican las piezas
                 'piezas' => array_map(function ($p) use (&$iconosCirc) {
                     if (!empty($p['icono'])) $iconosCirc[$p['clave']] = $p['icono'];

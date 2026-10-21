@@ -615,11 +615,46 @@
 .nl-cartas[data-n="6"] .nl-tip__cara .nl-ico { width: 62%; max-width: 104px; }
 .nl-tip__frase-caja.is-compacta { min-height: 0; justify-content: flex-start; gap: .8rem; padding: 1.1rem 1.4rem; }
 .nl-tip__frase-caja.is-compacta .nl-tip__frase { min-height: 2.8em; }
+/* 3 tarjetas (p. ej. la barrera): una fila baja; 8 tarjetas (estados de la glía): 4 + 4 */
+.nl-cartas[data-n="3"] { grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+.nl-cartas[data-n="3"] .nl-tip__carta { aspect-ratio: 3 / 2.5; }
+.nl-cartas[data-n="3"] .nl-tip__cara .nl-ico { width: 60%; max-width: 120px; }
+.nl-cartas[data-n="8"] { grid-template-columns: repeat(4, 1fr); gap: .6rem; }
+.nl-cartas[data-n="8"] .nl-tip__carta { aspect-ratio: 3 / 2.9; }
+.nl-cartas[data-n="8"] .nl-tip__cara { gap: .2rem; padding: .4rem; }
+.nl-cartas[data-n="8"] .nl-tip__cara .nl-ico { width: 58%; max-width: 90px; }
+.nl-cartas[data-n="8"] .nl-tip__carta-nom { font-size: clamp(.72rem, 1vw, .86rem); line-height: 1.2; }
+.nl-cartas[data-n="8"] .nl-tip__dorso { font-size: .78rem; line-height: 1.3; }
+.nl-cartas[data-n="8"] .nl-tip__dorso small { font-size: .72rem; }
+/* Imagen complementaria en miniatura junto a la frase; se amplía en el visor */
+.nl-mprac__con-mini { display: flex; align-items: flex-start; gap: 1rem; }
+.nl-mprac__con-mini .nl-tip__frase { flex: 1; }
+.nl-mprac__mini { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: .25rem; width: 132px; padding: .3rem; border: 2px solid #DDD6FE; border-radius: 12px; background: #F5F3FF; cursor: zoom-in; font: inherit; }
+.nl-mprac__mini:hover { border-color: #F59E0B; }
+.nl-mprac__mini img { width: 100%; height: 84px; object-fit: cover; border-radius: 8px; background: #fff; }
+.nl-mprac__mini span { font-size: .72rem; font-weight: 800; color: #5B21B6; }
+.nl-mprac__visor { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; background: rgba(10,4,24,.82); animation: nlFade .25s ease; }
+.nl-mprac__visor-caja { position: relative; max-width: min(960px, 100%); max-height: 100%; overflow: auto; padding: 1rem 1rem .8rem; border-radius: 16px; background: #fff; color: #1A0E2E; }
+.nl-mprac__visor-caja img { display: block; max-width: 100%; max-height: 68vh; margin: 0 auto; border-radius: 10px; }
+.nl-mprac__visor-ctx { margin: .7rem 0 0; font-size: .95rem; line-height: 1.5; color: #1A0E2E; }
+.nl-mprac__visor-pie { margin: .4rem 0 0; font-size: .78rem; color: #6B5B86; }
+.nl-mprac__visor-x { position: absolute; top: .4rem; right: .4rem; width: 34px; height: 34px; border: 0; border-radius: 99px; background: #EDE9FE; color: #2E1065; font-size: 1rem; cursor: pointer; }
 @media (max-width: 900px) {
     .nl-cartas[data-n="6"] { gap: .4rem; }
     .nl-cartas[data-n="6"] .nl-tip__carta { aspect-ratio: 3 / 3.7; }
     .nl-cartas[data-n="6"] .nl-tip__cara .nl-ico { width: 70%; }
     .nl-cartas[data-n="6"] .nl-tip__carta-nom { font-size: .72rem; line-height: 1.15; }
+    .nl-cartas[data-n="3"] .nl-tip__carta { aspect-ratio: 3 / 3.2; }
+    /* en el celular, 2 columnas de tarjetas horizontales (dibujo a la izquierda) */
+    .nl-cartas[data-n="8"] { grid-template-columns: repeat(2, 1fr); gap: .4rem; }
+    .nl-cartas[data-n="8"] .nl-tip__carta { aspect-ratio: auto; height: 64px; }
+    .nl-cartas[data-n="8"] .nl-tip__cara { flex-direction: row; justify-content: flex-start; gap: .4rem; padding: .3rem .45rem; text-align: left; }
+    .nl-cartas[data-n="8"] .nl-tip__cara .nl-ico { width: 48px; max-width: 48px; flex: 0 0 48px; }
+    .nl-cartas[data-n="8"] .nl-tip__carta-nom { font-size: .74rem; line-height: 1.15; }
+    .nl-cartas[data-n="8"] .nl-tip__dorso { font-size: .66rem; }
+    .nl-cartas[data-n="8"] .nl-tip__dorso small { display: none; }
+    .nl-mprac__mini { width: 96px; }
+    .nl-mprac__mini img { height: 64px; }
 }
 .nl-tip__hueco.is-lleno { color: #4ADE80; letter-spacing: 0; border-bottom: 2px solid rgba(74,222,128,.5); }
 .nl-mprac__fig { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
@@ -833,6 +868,10 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
 .nl-circ__chip.is-elegida { border-color: #22C55E; background: #14532D; animation: none; }
 .nl-circ__chip.is-tocable i { width: auto; min-width: 8px; height: auto; min-height: 8px; padding: 0 .2rem; font-style: normal; font-size: .7rem; line-height: 1.1; color: #1A0E2E; border-radius: 99px; }
 .nl-circ__chip.is-elegida i { background: #86EFAC; }
+/* Funciones (vías de una etiqueta): la función se lee grande y se toca quién la cumple */
+.nl-circ__funcion { margin: .2rem 0 .5rem; padding: .7rem .85rem; border-radius: 12px; background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.45); color: #FEF3C7; font-weight: 700; font-size: 1rem; line-height: 1.4; }
+.nl-circ__hechas { margin-top: .7rem; }
+.nl-circ__hechas summary { cursor: pointer; font-size: .8rem; color: var(--gray-300); }
 @media (max-width: 900px) {
     .nl-circ__lupa { width: 26px; height: 26px; font-size: .75rem; border-width: 2px; }
 }

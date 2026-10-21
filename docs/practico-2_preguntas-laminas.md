@@ -77,7 +77,7 @@ respuesta) y explicación. Links al campo y pistas de «Dónde buscar» en `docs
 - Se tiñen rosados con la eosina, y los de neurona se tiñen morados
 
 *Pista:* Compáralos con el núcleo de una neurona de la sustancia gris, en la misma captura.
-*Explicación:* El núcleo de una neurona es grande, claro y con nucléolo visible, rodeado de citoplasma con Nissl. Los de la sustancia blanca son pequeños y oscuros: son sobre todo oligodendrocitos, ordenados en hileras entre las fibras que mielinizan.
+*Explicación:* El núcleo de una neurona es grande, claro y con nucléolo visible, rodeado de citoplasma con Nissl. Los de la sustancia blanca son pequeños y oscuros: son sobre todo oligodendrocitos, repartidos entre las fibras que mielinizan (en un corte transversal no se ven en hileras: eso se ve en cortes longitudinales).
 
 **3.** Alrededor del canal central ves una sola capa de células cúbicas, bien juntas. ¿Qué te dice esa forma de ordenarse?
 - ✅ Forman un epitelio que reviste una cavidad con líquido cefalorraquídeo
