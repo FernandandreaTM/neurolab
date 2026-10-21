@@ -7,7 +7,7 @@
 | 1 | La glía en acción V · Glía que cambia | Revisión científica de la imagen corregida (`img/_fuentes/Biomedical Neuroscience Cell Montage.png`): sirven los 8 cuadros. Cortada en 8 PNG de 320 px con los nombres de §11b | `img/cartas/` (8 PNG), `docs/prompts-imagenes.md` |
 | 2 | La glía en acción III · Cuando se ataca la mielina | El nombre de la enfermedad se ve desde el inicio (pestañas y título) y cada caso trae **«Sobre la enfermedad»** con el contexto para razonar sin saberla de memoria. El caso (ficha + imagen real) va en la **vista**, en lugar del mapa del cuerpo. El paso «tocar el cuerpo» pasa a **SNC o SNP** en el panel, como las otras preguntas. Pacientes ajustados a las imágenes | `data/seed.sql` (act. 13, nivel 3), `js/escenas.js`, `css/mesa.css`, `img/glia-accion/casos/` (4 JPG) |
 | 3 | La glía en acción IV · Tras la lesión | La secuencia se presenta **antes**, animada por etapas, y las preguntas se responden **en el panel** (sin tarjetas en la vista). Pasa de práctica «elegir» (nivel 9 de `practica_niveles`, que sale del seed) a escenas en modo «etapas» | `data/seed.sql` (act. 13, nivel 4), `js/escenas.js`, `css/mesa.css` |
-| 4 | La glía en acción III · célula real de la neuromielitis óptica | La inmunohistoquímica de GFAP (café) no dejaba ver el vaso. Se cambia por astrocitos con GFAP (verde) cuyos pies forran vasos sanguíneos (magenta): Jeffery J. Iliff, dominio público, Wikimedia Commons (`Astrocytes.jpg`) | `data/seed.sql` (act. 13, nivel 3, caso nmo), `img/glia-if/astrocitos-vasos-gfap.jpg` |
+| 4 | La glía en acción III · célula real de la neuromielitis óptica (y Glía con anticuerpos, hecho 2) | La inmunohistoquímica de GFAP (café) no dejaba ver el vaso. Se cambia por astrocitos con GFAP (verde) cuyos pies forran vasos sanguíneos (magenta): Jeffery J. Iliff, dominio público, Wikimedia Commons (`Astrocytes.jpg`) | `data/seed.sql` (act. 13, nivel 3, caso nmo; act. 14, hecho 2), `img/glia-if/astrocitos-vasos-gfap.jpg` |
 
 ## Revisión de las 8 tarjetas (nivel V)
 
@@ -93,7 +93,7 @@ Quien ya había empezado el nivel III conserva su avance; quien lo terminó con 
 |---|---|
 | Push | Pendiente (Fer, GitHub Desktop) |
 | Sin uso (quedan en el repo) | `img/glia-accion/mapa-mielina.svg` (además de los de la sesión 10) |
-| Glía con anticuerpos | Sigue en el pool, en desarrollo; su pregunta de pies perivasculares aún usa `astrocito-capilar-ihq.jpg` (la imagen poco clara) |
+| Glía con anticuerpos | Sigue en el pool, en desarrollo; la pregunta de pies perivasculares ya usa la imagen nueva (`astrocito-capilar-ihq.jpg` queda sin uso) |
 
 ## Prompt para la sesión siguiente
 
