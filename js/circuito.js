@@ -265,7 +265,7 @@ function iniciar(raiz) {
         if (r.red) { aviso = r.feedback; pintar(); return; }
         if (r.correcto) {
             e.ok[k] = true;
-            e.pos[k] = r.punto || xy;
+            e.pos[k] = etiquetas ? xy : (r.punto || xy);   // con etiquetas, el rótulo queda donde se tocó
             if (r.trazo) { e.trz[k] = r.trazo; nueva = k; }
             e.exp[k] = { exp: r.exp || '', zona: r.zona || '', e: (e.mal[k] || []).length };
             marca = null;
