@@ -6,7 +6,7 @@
  */
 import { carrera } from './carrera.js';
 import { arMolde } from './molde.js';
-const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ, #nl-rompe');
+const raiz = document.querySelector('#nl-lab, #nl-tip, #nl-lam, #nl-quiz, #nl-mprac, #nl-circ, #nl-rompe, #nl-esc');
 const url = new URL(location.href);
 
 function leer(k, def) { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? def; } catch { return def; } }
@@ -86,6 +86,20 @@ async function completarNivel() {
         piezas.forEach(p => { est.ok[p.clave] = p.caja; est.exp[p.clave] = { exp: p.exp, e: 0 }; });
         JSON.parse(d.preguntas || '[]').forEach((q, i) => { est.preg[i] = { mal: [], orden: q.ops.map((_, k) => k), ok: true }; });
         poner('nl_rompe_' + d.clave, est);
+    } else if (raiz.id === 'nl-esc') {
+        // Escenas: las respuestas vienen en data-nivel (preguntas formativas)
+        const N = JSON.parse(d.nivel || '{}'), zonas = N.zonas || {};
+        const est = { c: {}, err: 0, nombres: true };
+        (N.casos || []).forEach(cs => {
+            const r = {};
+            cs.pasos.forEach((p, i) => {
+                const z = p.tipo === 'tocar' ? zonas[p.ok[0]] : null;
+                const xy = z ? (z.e ? [z.e[0], z.e[1]] : z.r ? [z.r[0] + z.r[2] / 2, z.r[1] + z.r[3] / 2] : z.l[0][1]) : null;
+                r[i] = { mal: [], ok: true, elegida: p.ok, orden: p.ops ? p.ops.map((_, k) => k) : undefined, xy };
+            });
+            est.c[cs.clave] = { paso: cs.pasos.length, r };
+        });
+        poner('nl_esc_' + d.clave, est);
     } else if (raiz.id === 'nl-lam') {
         const caps = JSON.parse(d.capturas || '[]');
         const est = { caps: {}, err: 0 };

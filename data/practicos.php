@@ -97,10 +97,10 @@ return [
              ]],
             ['slug' => 'glia-accion',
              'titulo' => 'La glía en acción (5 niveles)',
-             'tarea' => 'Qué hace la glía y cómo responde: une cada función con la estructura que la cumple entre el vaso y la sinapsis, decide qué cruza la barrera hematoencefálica, relaciona la mielina con la velocidad, compara qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce los estados de la glía en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
-             'guia' => ['glia-accion:1' => 'Nivel I: el astrocito entre el vaso y la sinapsis',
+             'tarea' => 'Qué hace la glía y cómo responde: predice qué pasa en la unidad neurovascular en cuatro situaciones (reposo, actividad, ACV y barrera abierta), decide qué cruza la barrera hematoencefálica, resuelve cuatro casos de mielina dañada, compara qué pasa tras cortar un axón en el SNP y en el SNC, y reconoce los estados de la glía en casos e imágenes reales. Cada nivel suma una sección a tu guía.',
+             'guia' => ['glia-accion:1' => 'Nivel I: la unidad neurovascular en acción',
                         'glia-accion:2' => 'Nivel II: ¿qué cruza la barrera?',
-                        'glia-accion:3' => 'Nivel III: mielina y conducción',
+                        'glia-accion:3' => 'Nivel III: cuando se ataca la mielina',
                         'glia-accion:4' => 'Nivel IV: tras la lesión, SNP frente a SNC',
                         'glia-accion:5' => 'Nivel V: glía que cambia'],
              'conexion' => [
@@ -111,8 +111,8 @@ return [
                     'terapia-ocupacional' => 'La barrera explica por qué muchos fármacos no llegan al encéfalo y por qué el Parkinson se trata con L-dopa: conocer el tratamiento y sus horarios (fluctuaciones «on-off») te ayuda a planificar las sesiones en los momentos de mejor desempeño.',
                     'fonoaudiologia' => 'En el Parkinson, la voz y el habla responden en parte a la L-dopa, que cruza la barrera por un transportador: conviene evaluar y entrenar en el mismo momento del ciclo del fármaco para comparar el desempeño.'],
                 'glia-accion:3' => [
-                    'terapia-ocupacional' => 'La conducción saltatoria explica la fatiga y la torpeza de la esclerosis múltiple o de Guillain-Barré: sin mielina el impulso se enlentece o se bloquea, y las tareas que exigen rapidez y coordinación se ven primero.',
-                    'fonoaudiologia' => 'La sincronía de las fibras del nervio auditivo depende de la mielina: si se desmieliniza, los potenciales evocados (PEAT) se alargan o desordenan aunque la cóclea funcione.'],
+                    'terapia-ocupacional' => 'Esclerosis múltiple, Guillain-Barré y Charcot-Marie-Tooth son diagnósticos frecuentes en rehabilitación. Saber si el daño está en el SNC o en el SNP, y si es autoinmune o genético, te dice si esperar recuperación, brotes o un avance lento, y orienta la intervención: conservar energía, órtesis, prevención de caídas.',
+                    'fonoaudiologia' => 'En Guillain-Barré pueden afectarse los nervios craneales (debilidad facial, disfagia, voz débil) y en la esclerosis múltiple y la neuromielitis óptica aparecen disartria y alteraciones de la deglución: ubicar el daño y su causa orienta qué esperar y cómo intervenir.'],
                 'glia-accion:4' => [
                     'terapia-ocupacional' => 'Tras una lesión de nervio periférico esperas recuperación (Schwann guía el axón, ~1 mm/día): la intervención mantiene y reeduca. Tras una lesión medular el axón no vuelve: la intervención apunta a compensar y aprovechar la plasticidad.',
                     'fonoaudiologia' => 'Una lesión del nervio facial o del laríngeo recurrente (SNP) puede recuperarse en meses; un daño en el tronco encefálico o en la corteza (SNC), no por regeneración sino por plasticidad: eso cambia los objetivos de la terapia.'],

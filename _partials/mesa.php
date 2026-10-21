@@ -322,6 +322,46 @@ nl_barra([
     </aside>
 </div>
 
+<?php elseif (!empty($esEscenas)):
+    // Escenas (js/escenas.js): casos sobre una imagen fija; los datos del nivel van completos (preguntas formativas)
+    $nivelEsc = $nivelLam;
+    unset($nivelEsc['instrucciones']);
+    $opsCartas = [];
+    foreach (($nivelEsc['casos'] ?? []) as $cs) foreach (($cs['pasos'] ?? []) as $ps) if (($ps['tipo'] ?? '') === 'tarjeta') foreach ($ps['ops'] as $o) $opsCartas[$o] = true;
+    $fondoE = $nivelLam['fondo'] ?? '';
+?>
+<div class="nl-mesa nl-mesa--lamina nl-mesa--esc container" id="nl-esc"
+     data-slug="<?= htmlspecialchars($act['slug']) ?>"
+     data-n="<?= (int)$nivelLam['n'] ?>"
+     data-clave="<?= htmlspecialchars($nivelLam['clave']) ?>"
+     data-titulo="<?= htmlspecialchars($act['titulo'] . ' — Nivel ' . $nivelLam['romano'] . ': ' . $nivelLam['titulo']) ?>"
+     data-requiere="<?= htmlspecialchars($nivelLam['requiere']) ?>"
+     data-siguiente="<?= htmlspecialchars($nivelLam['siguiente']) ?>"
+     data-fondo="<?= htmlspecialchars($fondoE . '?v=' . (@filemtime(__DIR__ . '/../' . $fondoE) ?: 1)) ?>"
+     data-nivel="<?= htmlspecialchars(json_encode($nivelEsc, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+    <div class="nl-lab__candado" hidden>
+        <strong>🔒 Nivel bloqueado</strong>
+        <p>Completa primero el nivel anterior para desbloquear este.</p>
+    </div>
+    <div class="nl-mesa__vista nl-lam__vista">
+        <div class="nl-lam__editor nl-esc__vista" id="nl-esc-vista"></div>
+    </div>
+    <aside class="nl-mesa__panel">
+        <?= $instrucciones($nivelLam['instrucciones'] ?? '') ?>
+        <div class="nl-lab__estado">
+            <span class="nl-lab__contador" id="nl-esc-contador"></span>
+            <span class="nl-lab__errores" id="nl-esc-errores"></span>
+            <button type="button" class="nl-lab__reset" id="nl-esc-reset">Empezar de nuevo</button>
+        </div>
+        <ol class="nl-lam__pasos nl-esc__casos" id="nl-esc-pasos"></ol>
+        <?= $conexion() ?>
+        <div class="nl-lab__trabajo" id="nl-esc-trabajo" role="status" aria-live="polite"></div>
+    </aside>
+    <template id="nl-esc-iconos">
+        <?php foreach (array_keys($opsCartas) as $o): ?><span data-op="<?= htmlspecialchars($o) ?>"><?= nl_icono_neurona($o) ?></span><?php endforeach; ?>
+    </template>
+</div>
+
 <?php elseif ($esLamina):
     // Lámina por niveles: la lámina (iframe, con selector de tinción) o la captura del estudiante a la
     // izquierda; en el panel los pasos de cada captura (buscar → recortar → etiquetar → preguntas)

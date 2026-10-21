@@ -17,6 +17,25 @@
 | Guía: SNC y SNP en su tejido | Sustancia gris/blanca y ganglio/nervio quedan en la guía como **zona coloreada** con su nombre al centro (no con punto). Quien ya completó esos niveles debe rehacerlos para regenerar la imagen | `js/circuito.js` |
 | Prompts | §11 de `prompts-imagenes.md`: un prompt por set (barrera: 3 cuadros; estados: 4 × 2). Referencia de estilo `img/_fuentes/referencia-set-glia.png` | `docs/prompts-imagenes.md` |
 
+## Rediseño de «La glía en acción» I y III (motor nuevo `js/escenas.js`)
+
+| Nivel | Antes | Ahora |
+|---|---|---|
+| I · La unidad neurovascular en acción | Etiquetar + «¿Quién lo hace?» | 4 escenas sobre el mismo esquema: reposo, «mañana hay prueba» (acoplamiento neurovascular), ACV (excitotoxicidad) y meningitis (edema). **Predice** con una sola oportunidad → **mira** la animación (partículas por rutas, efectos y rótulos que aparecen en orden; leyenda de partículas) → explicación. «Nombres» muestra las estructuras |
+| III · Cuando se ataca la mielina | Etiquetar mielina + 4 preguntas | 4 pacientes sobre un **mapa del cuerpo** (SVG propio, SNC lila / SNP amarillo): **dónde** (tocar; pista si se equivoca y dice qué tocó) → **célula** (tarjetas con íconos de glía) → **por qué**. Al resolver, la lesión se marca en el cuerpo, la célula real se abre en el visor y el caso suma una fila al cuadro (Dónde · Célula · Causa · Evolución). Cierre: comparar los cuatro (¿quién se recupera mejor?) |
+
+Casos del nivel III: esclerosis múltiple (nervio óptico = SNC, MBP/PLP/MOG), Guillain-Barré (mimetismo molecular), neuromielitis óptica (acuaporina-4 del astrocito: daño de mielina secundario; conecta con el nivel I) y Charcot-Marie-Tooth 1A (genético, PMP22: contraste no autoinmune). No toca la conducción saltatoria (queda para potencial de acción).
+
+| Motor `escenas` | Uso |
+|---|---|
+| `modo: "poe"` | Pasos `predice` (una oportunidad); al responder se ve `anim` |
+| `modo: "casos"` | Pasos `tocar` (claves de `zonas`: e / r / l), `tarjeta` (íconos por nombre), `elegir` (con pista); `fila` + `cuadro`; `vista: "cuadro"` para el cierre |
+| `anim` | `flujos` (partículas glu, lac, glut, gln, prot, agua, ca por una ruta SVG; `fin` para que se acumulen), `efectos` (zonas que aparecen, `pulso` o `crece`), `rotulos` (con retraso `s`) |
+| Guía | Imagen (esquema rotulado o mapa con lesiones) + tabla de escenas o cuadro + explicaciones |
+| Docente | «⚡ Autocompletar» incluido |
+
+Ya no se usan: `img/glia-accion/mielina.jpg` y las «funciones» de `circuito.js` (quedan en el motor por si sirven en otra actividad).
+
 ## Motor (para reutilizar)
 
 | Pieza | Uso |
