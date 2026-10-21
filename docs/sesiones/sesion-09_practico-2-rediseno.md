@@ -1,43 +1,35 @@
-# Sesión 09 · Rediseño del práctico 2 (glía) · 20-10-2026
+# Sesión 09 · Rediseño del práctico 2 (glía) · 20/21-10-2026
 
 (La sesión 08 —práctico 2 solo glía, esquemas §8 de `prompts-imagenes.md`— no dejó reporte; su trabajo está en los commits `7a5fb9c` a `8a0eb63`.)
 
-## Pedido
+## Qué se hizo
 
-El práctico 2 era repetitivo (las mismas preguntas de función en las tres actividades), con preguntas centradas en la tinción, una sobre el Nissl que no se ve en la lámina, niveles de «escribir de memoria» y un rompecabezas que salía ya ordenado.
-
-## Criterio
-
-| Actividad | Pregunta que responde | Herramientas |
-|---|---|---|
-| 1 · Conoce la glía | ¿Cómo es y dónde está? | Etiquetar esquemas (nombre → clic) · tarjetas de forma y lugar |
-| 2 · La glía en el tejido | ¿La reconozco en un corte real? | Capturas · inmunofluorescencias por forma |
-| 3 · La glía en acción | ¿Qué hace y cómo responde? | Etiquetar + recorridos animados · clasificar · rompecabezas mezclado · estados |
-| Quiz | Repaso de todo | 12 comunes + 4 por carrera |
-
-Contenido nuevo tomado de la clase (nunca preguntado antes): proporción glía:neurona ≈ 1:1, origen de la microglía, sincicio de astrocitos, lactato y glucógeno, qué cruza la BHE (L-dopa, órganos circunventriculares), composición de la mielina (MBP, PLP, P0), neurilema, fibras Aα–C, aplastamiento frente a corte, experimento de Aguayo, estados M0/M1/M2 y A1/A2/cicatriz, precursores NG2.
-
-## Cambios de motor (compatibles con lo anterior)
-
-| Archivo | Cambio |
+| Tema | Resultado |
 |---|---|
-| `js/circuito.js`, `_partials/mesa.php`, `css/mesa.css` | En niveles «circuito» con `etiquetas`, las `vias` se responden tocando las etiquetas puestas en orden; se anima el recorrido (`ruta` en px de `vb`) y se dibuja en la guía. Cada vía acepta `ayuda` (texto del panel). |
-| `js/rompecabezas.js`, `_partials/mesa.php`, `css/mesa.css` | Opciones `barajar` (bandeja en orden aleatorio, fijo por estudiante) y `anonimas` («Pieza A…» hasta ponerla bien; miniaturas más grandes). |
-| `js/mesa-practica.js` | Las tarjetas de «elegir» salen barajadas (antes la primera tarjeta era siempre la respuesta del primer ejercicio). |
+| Criterio | Act. 1 y 2 = estructura (qué es, cómo es, dónde está); act. 3 = función; quiz = repaso (12 comunes + 4 por carrera) |
+| Conoce la glía (3 niveles) | I SNC en su tejido · II SNP del ganglio al nervio (esquema nuevo con plantilla anatómica) · III ¿Quién es quién? (6 tarjetas 3 + 3, forma y lugar) |
+| La glía en el tejido (4) | Sin preguntas de tinción ni del Nissl; inmunofluorescencias por forma (marcador en el pie) |
+| La glía en acción (5) | I etiquetas + 2 recorridos animados (glucosa → lactato, ciclo del glutamato) · II ¿qué cruza la BHE? · III mielina (P0/PLP/MBP, neurilema, fibras Aα–C) · IV rompecabezas mezclado y sin nombres · V estados (M0/M1/M2, A1/A2/cicatriz, glía radial, NG2) |
+| Motor | `circuito.js`: vías tocando etiquetas, rótulo donde se toca · `rompecabezas.js`: `barajar`, `anonimas` · `mesa-practica.js`: tarjetas barajadas, caja compacta con 6 tarjetas |
+| Esquema SNP | `img/glia-snp-tejido.jpg` hecho con ChatGPT desde `img/_fuentes/plantilla-snp-tejido.png` (anatomía en SVG, `plantilla-snp-tejido.py`) + `referencia-texturas-snp.png`; prompt en `prompts-imagenes.md` §10. Zonas calibradas sobre la imagen final |
+| Ícono | `img/glia/oligodendrocito.png` nuevo (axones completos), 256 px |
+| Git | `main` limpio: merge del PR #15 + commit `591f53f` (zonas del SNP). Sin ramas locales extra ni carpetas de respaldo |
 
-## Pendiente
+## Estado al cierre
 
-| Qué | Quién |
+| Qué | Estado |
 |---|---|
-| Probar en producción (escritorio y celular), sobre todo los recorridos de «La glía en acción» I y el rompecabezas IV | Fer |
-| Revisar textos con la clase (tareas K y N de ayudantes siguen vigentes) | Ayudantes |
-| Estudiantes que ya avanzaron con la versión anterior: niveles renumerados (Conoce la glía IV y La glía en acción V cambiaron); conviene «Reiniciar avance» | — |
+| Push de los commits locales | Pendiente (Fer, GitHub Desktop) |
+| Producción | Subir los 9 archivos de `git diff --name-status 8a0eb63 HEAD` (sin docs) + `admin/seed.php` |
+| Rama remota `feat/p2-rediseno` | Se puede borrar en GitHub |
 
 ## Prompt para la sesión siguiente
 
 ```
-Retomo NeuroLab (C:\\repo\\neurolab). Lee docs/sesiones/sesion-09_practico-2-rediseno.md y docs/practico-2_tareas.md.
-Revisa conmigo cómo funcionó el práctico 2 rediseñado y corrige lo que te reporte. Luego proponer el práctico 3
-(potencial de acción y canales iónicos) en tabla antes de programar, reutilizando los recorridos animados y las
-tarjetas barajadas. Pruebas con PHP 8.3 + Playwright (1366×660 y celular). Al cerrar, docs/sesiones/sesion-10_*.md.
+Retomo NeuroLab (C:\repo\neurolab). Lee docs/sesiones/sesion-09_practico-2-rediseno.md y docs/practico-2_tareas.md.
+El práctico 2 (glía) ya está en producción. Vamos a corregir detalles que te iré reportando de a uno.
+Para cada corrección: dime qué archivo tocas, edítalo, pruébalo (PHP 8.3 + Playwright, 1366×660 y celular)
+y dime qué subir. Edita data/seed.sql directamente (bloque de la actividad afectada).
+Trabaja sobre main; al final un commit con mi autoría y la lista de archivos para FileZilla.
+Al cerrar, escribe docs/sesiones/sesion-10_*.md.
 ```
