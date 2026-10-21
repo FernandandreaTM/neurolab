@@ -31,7 +31,7 @@
 | Qué | Estado |
 |---|---|
 | Producción | Subir los archivos del commit de la sesión 10 (sin docs) y correr `admin/seed.php` |
-| Tarjetas dibujadas (barrera y estados) | Pendientes: Fer genera las 2 imágenes con ChatGPT (§11) y Claude las corta en `img/cartas/` |
+| Tarjetas dibujadas | Barrera: listas (`img/cartas/`, cortadas de `img/_fuentes/Blood–Brain Barrier Transport Triptych.png`, 320 px; en el celular van una bajo otra con el dibujo a la izquierda). Glía que cambia: pendiente (§11b) |
 | Piezas del rompecabezas (`img/glia-accion/piezas/`, `lesion-tablero.jpg`) | Ya no se usan; quedan en el repo |
 | Push | Pendiente (Fer, GitHub Desktop) |
 
