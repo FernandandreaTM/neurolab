@@ -31,13 +31,12 @@ Criterio: **actividades 1 y 2 = estructura** (qué es, cómo es, dónde está), 
 | 2 | La glía en el tejido (`glia-tejido`) | I · Canal central y sustancia blanca | Epéndimo; fibras cortadas de través (axón + anillo de mielina disuelta) y núcleos de glía | Capturas MHS-240 | histologyguide |
 | | | II · Motoneurona y su glía | Glía perineuronal, comparación con la sustancia blanca, neuropilo | Capturas UCSF-163 | histologyguide |
 | | | III · Ganglio y nervio | Satélites frente a glía del SNC; somas redondos; Schwann/fibroblasto; envolturas | Capturas MH-051 y MH-052 | histologyguide |
-| | | IV · Glía con anticuerpos | 7 imágenes: reconocer por **forma y lugar** (el marcador va en el pie) | Tarjetas | `img/glia-if/` |
 | 3 | La glía en acción (`glia-accion`) | I · El astrocito entre el vaso y la sinapsis | 10 etiquetas + **¿Quién lo hace?** (7 funciones → tocar la etiqueta) + 4 preguntas (BHE, sincicio, lactato, excitotoxicidad) | Etiquetar + funciones | `glia-accion/neurovascular.jpg` |
 | | | II · ¿Qué cruza la barrera? | 11 sustancias → pasa libre / con transportador / no pasa (incluye L-dopa, dopamina, órganos circunventriculares) | Tarjetas → cuadro | Tarjetas `img/cartas/` (pendientes) |
 | | | III · Mielina y conducción | 8 etiquetas (incluye neurilema; sin asas paranodales) + 4 preguntas (saltatoria, P0/PLP/MBP, neurilema, fibras Aα–C) | Etiquetar | `glia-accion/mielina.jpg` |
 | | | IV · Tras la lesión | 10 hechos → **solo SNP / solo SNC / en ambos**; cuadro por etapa (tras el corte, días a semanas, resultado). Incluye Aguayo y aplastamiento vs corte | Tarjetas → cuadro + imagen en miniatura | `glia-accion/lesion-comparacion.jpg` |
 | | | V · Glía que cambia | 9 casos → estado (M0, M1, M2, A1, A2, cicatriz, glía radial, NG2); moléculas con paréntesis aclaratorio | Tarjetas (4 + 4) | 3 imágenes de `img/glia-if/` en miniatura con visor; tarjetas `img/cartas/` (pendientes) |
-| 4 | Quiz de cierre | — | 12 comunes + 4 de la carrera = 16 | Quiz | — |
+| 4 | Quiz de cierre | — | 11 comunes + 4 de la carrera = 15 (sin la pregunta de marcadores/GFAP) | Quiz | — |
 
 Respaldo de la versión anterior (18/19-10): carpeta `_respaldo_p2_2026-10-20/` en la raíz del repo (fuera de git) y commit base en `COMMIT_BASE.txt`.
 
@@ -46,6 +45,7 @@ Respaldo de la versión anterior (18/19-10): carpeta `_respaldo_p2_2026-10-20/` 
 | Actividad | Lámina | Idea |
 |---|---|---|
 | Circuito reflejo (5 niveles) | Esquema | Queda en el atlas; vuelve como integración del práctico 4 |
+| Glía con anticuerpos (`glia-anticuerpos`) | `img/glia-if/` | Ex nivel IV de «La glía en el tejido»: 7 imágenes, reconocer por forma y lugar. En el pool, en desarrollo (sesión 10) |
 | Mielina en el ganglio | MHS-286 | Weigert: mielinizadas vs no mielinizadas y velocidad de conducción |
 | Una tinción, dos miradas | MH-051 vs MHS-285 | Misma estructura con Azan y toluidina: qué tiñe cada una |
 
@@ -57,7 +57,7 @@ Cada tarea se trabaja **directo en los archivos del sitio**, en tu propia rama. 
 |---|---|---|
 | K. Revisar láminas de glía | Recorrer La glía en el tejido I–III en histologyguide: que los links abran en el campo correcto y las preguntas se respondan con lo que se ve | `feat/p2-revision-glia` |
 | L. Mielina en el ganglio | Actividad adicional con MHS-286 (Weigert): mielinizadas frente a no mielinizadas y velocidad de conducción | `feat/p2-mielina-ganglio` |
-| M. Probar el práctico 2 en celular | Recorrer las 3 actividades en el teléfono (sobre todo el rompecabezas de la lesión y los anticuerpos) y anotar en el PR qué se ve mal o cuesta tocar | `fix/p2-celular` |
+| M. Probar el práctico 2 en celular | Recorrer las 3 actividades en el teléfono (sobre todo las tarjetas y el cuadro de la lesión) y anotar en el PR qué se ve mal o cuesta tocar | `fix/p2-celular` |
 | N. Revisar «La glía en acción» | Recorrer los 5 niveles con la clase de Células II y Neuroplasticidad III: etiquetas, recorridos, sustancias de la barrera y los 9 casos del nivel V; proponer cambios si algo no calza con la imagen o con la clase | `feat/p2-glia-accion` |
 | I y J (práctico 4) | Casos del arco y revisión de lupas: quedan para cuando el circuito vuelva en el práctico 4 | — |
 

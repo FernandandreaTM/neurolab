@@ -887,3 +887,19 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
 .nl-circ__mascara { stroke: #fff; stroke-width: .3; stroke-dasharray: 1 .8; }
 .nl-mprac__marca.is-izq em { left: auto; right: 30px; }
 @media (max-width: 900px) { .nl-tip__cuadro thead th { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; } }
+
+/* Caja blanca de las tarjetas (mesa-practica): misma proporción que «¿Quién es quién?» (682 × 506; celular 342 × 392).
+   Es una altura mínima: las tarjetas ocupan lo que deja la frase y, si el contenido no cabe (p. ej. una imagen), la caja crece */
+#nl-mprac .nl-tip__vista { container-type: inline-size; }
+#nl-mprac .nl-tip__frase-caja.is-compacta { min-height: calc(100cqw * 506 / 682); }
+#nl-mprac .nl-tip__frase-caja.is-compacta > * { flex-shrink: 0; }
+#nl-mprac .nl-tip__frase-caja.is-compacta .nl-cartas { flex: 1 0 auto; grid-auto-rows: minmax(104px, 1fr); }
+#nl-mprac .nl-tip__frase-caja.is-compacta .nl-cartas .nl-tip__carta { aspect-ratio: auto; height: 100%; }
+#nl-mprac .nl-tip__frase-caja.is-compacta .nl-tip__cara .nl-ico { width: auto; max-width: 62%; max-height: calc(100% - 2.8em); min-height: 0; }
+#nl-mprac .nl-tip__frase-caja.is-compacta .nl-mprac__fig img { max-height: 210px; }
+@media (max-width: 900px) {
+    #nl-mprac .nl-tip__frase-caja.is-compacta { min-height: calc(100cqw * 392 / 342); }
+    #nl-mprac .nl-tip__frase-caja.is-compacta .nl-cartas { grid-auto-rows: minmax(96px, 1fr); }
+    #nl-mprac .nl-tip__frase-caja.is-compacta .nl-cartas[data-n="8"] { grid-auto-rows: minmax(60px, 1fr); }
+    #nl-mprac .nl-tip__frase-caja.is-compacta .nl-cartas[data-n="8"] .nl-tip__cara .nl-ico { max-width: 48px; max-height: 48px; }
+}

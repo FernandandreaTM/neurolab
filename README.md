@@ -41,9 +41,9 @@ Los estudiantes avanzan **a su ritmo** (solos o en grupo) por una ruta de activi
 | # | Actividad | Niveles | Mecánica | Va a la guía |
 |---|---|---|---|---|
 | 1 | Conoce la glía | 3 (SNC en su tejido · SNP del ganglio al nervio · quién es quién) | Etiquetar esquemas (nombre → clic) y tarjetas de forma y lugar | Esquemas rotulados + cuadro |
-| 2 | La glía en el tejido | 4 (médula H&E · motoneurona cresil · ganglio y nervio · anticuerpos) | Capturas en láminas reales; tarjetas con inmunofluorescencias | Capturas + preguntas |
+| 2 | La glía en el tejido | 3 (médula H&E · motoneurona cresil · ganglio y nervio) | Capturas en láminas reales | Capturas + preguntas |
 | 3 | La glía en acción | 5 (unidad neurovascular · barrera · mielina · lesión · glía que cambia) | Etiquetar + recorridos animados, tarjetas, rompecabezas mezclado | Esquemas, cuadros y secuencias |
-| 4 | Quiz de cierre | 1 | 16 preguntas (12 comunes + 4 de la carrera) | Resultado + explicaciones |
+| 4 | Quiz de cierre | 1 | 15 preguntas (11 comunes + 4 de la carrera) | Resultado + explicaciones |
 
 Cada nivel puede tener un recuadro **«¿Para qué te sirve?»** propio de TO o Fono.
 

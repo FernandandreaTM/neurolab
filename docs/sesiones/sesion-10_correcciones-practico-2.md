@@ -11,6 +11,10 @@
 | La glía en acción V | Tarjetas 4 + 4 (celular: 2 columnas horizontales), nombres cortos (M1 (inflamatoria), A1 (tóxico)…), imágenes reales en **miniatura** que abren un visor con la imagen explicada (`mini`, `ctx` en `datos`) | `seed.sql`, `js/mesa-practica.js`, `css/mesa.css` |
 | Moléculas | Paréntesis aclaratorio para 2.º año: TNF-α/IL-1β, IL-4/IL-10, BDNF, C3, C1q, GFAP, CSPG, NG2, GLUT1, Nogo/MAG, P0/PLP/MBP, ATP | `seed.sql` |
 | La glía en el tejido I | Fuera los oligodendrocitos «en hilera» (en un corte transversal no se ven: las fibras vienen hacia ti). Nueva pregunta: punto = axón, anillo claro = mielina disuelta; etiquetas «Fibra cortada de través» y «Núcleo de glía». Ajustada la pregunta del nivel II que comparaba con las hileras | `seed.sql` (act. 11), `docs/practico-2_preguntas-laminas.md` |
+| Glía con anticuerpos | Sale de la ruta: el nivel IV de «La glía en el tejido» pasa a la actividad propia `glia-anticuerpos` (id 14, nivel id 5), estado «en desarrollo», visible en el pool. La glía en el tejido queda con 3 niveles | `seed.sql`, `data/practicos.php` |
+| Quiz de cierre | Fuera la pregunta c03 (marcador GFAP): 11 comunes + 4 de la carrera = 15 | `seed.sql`, `data/practicos.php` |
+| Cajas de tarjetas | Toda caja blanca con tarjetas usa la proporción de «¿Quién es quién?» (682 × 506; celular 342 × 392) como alto mínimo; las tarjetas llenan el espacio y la caja crece solo si el contenido no cabe | `css/mesa.css` |
+| Guía: SNC y SNP en su tejido | Sustancia gris/blanca y ganglio/nervio quedan en la guía como **zona coloreada** con su nombre al centro (no con punto). Quien ya completó esos niveles debe rehacerlos para regenerar la imagen | `js/circuito.js` |
 | Prompts | §11 de `prompts-imagenes.md`: un prompt por set (barrera: 3 cuadros; estados: 4 × 2). Referencia de estilo `img/_fuentes/referencia-set-glia.png` | `docs/prompts-imagenes.md` |
 
 ## Motor (para reutilizar)

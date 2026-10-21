@@ -657,8 +657,23 @@ function iniciar(raiz) {
                 g.lineCap = 'round'; g.lineJoin = 'round'; g.setLineDash([12 * VB[0] / L.W, 8 * VB[0] / L.W]);
                 g.stroke(new Path2D(v.ruta)); g.restore();
             });
+            // Zonas con máscara (p. ej. sustancia gris y blanca, ganglio y nervio): la zona coloreada con su nombre al centro, sin punto
+            const masc = cc.mascara || [], conMasc = new Set();
+            masc.forEach((m, i) => {
+                const pz = cc.piezas[i];
+                if (!pz || !e.ok[pz.clave]) return;
+                conMasc.add(pz.clave);
+                const g = L.g, sx = L.W / VB[0], sy = L.H / VB[1];
+                const pts = m.r ? [[m.r[0], m.r[1]], [m.r[0] + m.r[2], m.r[1]], [m.r[0] + m.r[2], m.r[1] + m.r[3]], [m.r[0], m.r[1] + m.r[3]]] : (m.p || []);
+                if (!pts.length) return;
+                g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x * sx, y * sy) : g.moveTo(x * sx, y * sy))); g.closePath();
+                g.fillStyle = m.c || 'rgba(139,92,246,.3)'; g.fill();
+                g.strokeStyle = (m.c || 'rgba(139,92,246,.3)').replace(/[\d.]+\)$/, '.95)'); g.lineWidth = Math.max(2, L.fs * 0.2); g.stroke();
+                const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]);
+                rotulo(L, pz.nombre, (Math.min(...xs) + Math.max(...xs)) / 2 * sx, (Math.min(...ys) + Math.max(...ys)) / 2 * sy, '#F59E0B');
+            });
             cc.piezas.forEach(pz => {
-                if (!e.pos[pz.clave]) return;
+                if (!e.pos[pz.clave] || conMasc.has(pz.clave)) return;
                 const p = L.px(e.pos[pz.clave]);
                 L.g.fillStyle = '#F59E0B'; L.g.beginPath(); L.g.arc(p[0], p[1], L.fs * 0.35, 0, Math.PI * 2); L.g.fill();
                 rotulo(L, pz.nombre, p[0] + L.fs * 0.5, p[1], '#F59E0B', 'izq');
