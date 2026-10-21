@@ -7,6 +7,9 @@
  *     y «elegir» (alternativas con pista); al terminar, la lesión se marca en el fondo y el caso suma una fila al cuadro.
  *     Si el caso trae «foto», la vista muestra la ficha del caso (enfermedad, paciente, «contexto») junto a la imagen
  *     real; «dx» en el nivel muestra el nombre de la enfermedad desde el inicio.
+ *   · modo «etapas»: una secuencia en columnas (`cols`, filas `filas_y`). Cada etapa es un caso con `col` y un paso
+ *     «mira» (la columna se destapa y se anima; texto SNP/SNC en el panel); después un caso con pasos «sistema»
+ *     que marcan su columna (`col`) y llenan el cuadro por etapa (`cuadro_etapas`, con `fila` y `celda`).
  * Son preguntas formativas: las respuestas vienen en data-nivel. Avance: localStorage nl_esc_<clave>.
  * Al completar: markDone(clave) y la sección va a la guía (imagen + cuadro + explicaciones).
  */
@@ -35,6 +38,7 @@ const FORMAS = {
     prot: ['Proteínas de la sangre', '<circle r="11" fill="#A78BFA" stroke="#6D28D9" stroke-width="2"/><circle r="4" cx="-3" cy="-3" fill="#EDE9FE"/>'],
     agua: ['Agua', '<path d="M0,-9 C4,-3 6,0 6,3.5 A6,6 0 0 1 -6,3.5 C-6,0 -4,-3 0,-9Z" fill="#7DD3FC" stroke="#0369A1" stroke-width="1.6"/>'],
     ca:   ['Ca²⁺', '<circle r="5.5" fill="#F87171" stroke="#B91C1C" stroke-width="2"/><text y="2.5" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">+</text>'],
+    cono: ['Punta del axón que crece', '<circle r="8" fill="#A855F7" stroke="#6B21A8" stroke-width="2.5"/><circle r="3" cx="2.5" cy="-2" fill="#F3E8FF"/>'],
 };
 
 /** Zonas: e = elipse [cx, cy, rx, ry] · r = rectángulo [x, y, w, h] · l = líneas [[[x, y], …], …] con tolerancia w. */
@@ -72,6 +76,7 @@ function iniciar(raiz) {
     const VB = N.vb || [100, 100];
     const S = N.escala || VB[0] / 640;          // tamaño de las partículas
     const poe = N.modo === 'poe';
+    const etapas = N.modo === 'etapas';
     const zonas = N.zonas || {};
     const clave = d.clave, KEY = 'nl_esc_' + clave;
     const ruta = new URLSearchParams(location.search).get('ruta') || '';
@@ -111,7 +116,7 @@ function iniciar(raiz) {
     let recien = false;      // el caso se acaba de resolver: se anima desde el principio
     if (instr && !Object.keys(est.c).length) instr.open = true;
 
-    const NOMBRES_PASO = { predice: 'Predice', tocar: 'Dónde', sistema: 'SNC o SNP', tarjeta: 'Célula', elegir: 'Por qué' };
+    const NOMBRES_PASO = { predice: 'Predice', mira: 'Mira', tocar: 'Dónde', sistema: 'SNC o SNP', tarjeta: 'Célula', elegir: 'Por qué' };
     const SISTEMAS = { SNC: 'Sistema nervioso central: encéfalo y médula espinal', SNP: 'Sistema nervioso periférico: nervios y ganglios' };
     const nomPaso = p => p.nombre || NOMBRES_PASO[p.tipo] || 'Pregunta';
     const pct = (x, y) => [x / VB[0] * 100, y / VB[1] * 100];
@@ -145,22 +150,106 @@ function iniciar(raiz) {
         });
         return svg;
     }
-    const rotulos = (lista, base) => (lista || []).map(r => {
-        const [x, y] = pct(r.x, r.y);
+    const rotulos = (lista, base, pos = r => pct(r.x, r.y)) => (lista || []).map(r => {
+        const [x, y] = pos(r);
         return `<span class="nl-esc__rot${base ? ' is-base' : ''}${r.i ? ' is-izq' : ''}${r.c ? ' is-' + r.c : ''}" style="left:${x}%;top:${y}%;animation-delay:${base ? 0 : r.s || 0}s"><i></i>${esc(r.t)}</span>`;
     }).join('');
     const formasDe = a => [...new Set((a.flujos || []).map(f => f.f))];
 
+    /* ---------------- Modo «etapas»: columnas, velos y cuadro por etapa ---------------- */
+    const conFilas = cs => cs.pasos.some(p => p.fila);
+    /** Velos sobre las etapas que vienen, la etapa actual se destapa; en las preguntas, marco en la etapa del hecho. */
+    function velos(cs, p) {
+        if (!N.cols || !N.filas_y) return '';
+        const rect = (j, attrs, cls) => N.filas_y.map(([y0, y1]) =>
+            `<rect x="${N.cols[j][0]}" y="${y0}" width="${N.cols[j][1] - N.cols[j][0]}" height="${y1 - y0}" ${attrs}${cls ? ` class="${cls}"` : ''}/>`).join('');
+        const VELO = 'fill="rgba(15,8,32,.9)"', MARCO = 'fill="none" stroke="#F59E0B" stroke-width="7" rx="14"';
+        let s = '';
+        if (cs.col != null) {
+            N.cols.forEach((_, j) => {
+                if (j > cs.col) s += rect(j, VELO);
+                if (j === cs.col) s += rect(j, VELO, 'nl-esc__destapa') + `<g class="nl-esc__ef" style="animation-delay:.6s"><g class="nl-esc__pulso">${rect(j, MARCO)}</g></g>`;
+            });
+        } else if (p && p.col != null) {
+            N.cols.forEach((_, j) => { s += j === p.col ? rect(j, MARCO) : rect(j, 'fill="rgba(15,8,32,.5)"'); });
+        }
+        return s;
+    }
+    function cuadroEtapas() {
+        const CE = N.cuadro_etapas, cel = {};
+        casos.forEach(cs => cs.pasos.forEach((p, i) => {
+            if (!p.fila || !(ec(cs).r[i] || {}).ok) return;
+            ((cel[p.fila] = cel[p.fila] || {})[p.ok] = cel[p.fila][p.ok] || []).push(p.celda || p.p);
+        }));
+        return `<table class="nl-tip__cuadro is-grande nl-esc__cuadro">
+            <thead><tr><th>Etapa</th>${CE.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+            <tbody>${CE.filas.map(f => `<tr><th>${esc(f)}</th>${CE.cols.map((_, k) => {
+                const v = (cel[f] || {})[k];
+                return `<td>${v ? v.map(esc).join('<br>') : '<span class="nl-tip__vacia">·</span>'}</td>`;
+            }).join('')}</tr>`).join('')}</tbody></table>`;
+    }
+    function pintarCuadroEtapas(conVolver) {
+        vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">Tu cuadro por etapa</p>${cuadroEtapas()}</div>
+            ${conVolver ? '<div class="nl-esc__barra"><span class="nl-esc__botones"><button type="button" class="nl-esc__btn" data-acc="imagen">🖼 Ver la imagen</button></span></div>' : ''}`;
+        vista.querySelector('[data-acc="imagen"]')?.addEventListener('click', () => { est.vc = false; guardar(); pintarVista(); });
+    }
+
+    /**
+     * Etapa en grande: la columna `col`, recortada por fila (SNP | SNC), con sus rótulos y partículas.
+     * Al mirar una etapa (cs.col) se anima; al clasificar un hecho (p.col) se muestra quieta, con su etapa marcada en la miniatura.
+     */
+    function pintarEtapa(cs, p) {
+        const mirando = cs.col != null, col = mirando ? cs.col : p.col;
+        const [x0, x1] = N.cols[col], w = x1 - x0;
+        const a = (casos.find(c => c.col === col) || {}).anim || {};
+        const hMax = Math.max(...N.recortes.map(f => f.y[1] - f.y[0]));
+        const figs = N.recortes.map(f => {
+            const [y0, y1] = f.y, h = y1 - y0;
+            const rots = (a.rotulos || []).filter(r => r.x >= x0 && r.x <= x1 && r.y >= y0 && r.y <= y1);
+            return `<figure class="nl-esc__rec is-${esc(f.c)}" style="--rw:${(w / hMax).toFixed(3)}">
+                <figcaption>${esc(f.t)}</figcaption>
+                <div class="nl-esc__rec-lienzo" style="aspect-ratio:${w} / ${h}">
+                  <svg viewBox="${x0} ${y0} ${w} ${h}" aria-hidden="true"><image href="${esc(d.fondo)}" width="${VB[0]}" height="${VB[1]}"/>${animSvg(mirando ? a : { flujos: a.flujos })}</svg>
+                  ${rotulos(rots, !mirando, r => [(r.x - x0) / w * 100, (r.y - y0) / h * 100])}
+                </div></figure>`;
+        }).join('');
+        const ley = formasDe(a);
+        vista.innerHTML = `
+            <div class="nl-esc__etapa${mirando ? '' : ' is-quieta'}">${figs}</div>
+            <div class="nl-esc__barra">
+              <button type="button" class="nl-esc__mapa" data-acc="ampliar" aria-label="Ver la secuencia completa">
+                <svg viewBox="0 0 ${VB[0]} ${VB[1]}" aria-hidden="true"><image href="${esc(d.fondo)}" width="${VB[0]}" height="${VB[1]}"/>${velos(cs, p)}</svg></button>
+              <p class="nl-lam__ayuda-vista">${mirando ? `<strong>${esc(cs.titulo)}</strong>: mira lo que pasa` : `<strong>${esc(N.cols_t ? N.cols_t[col] : '')}</strong>: la etapa de este hecho`}<br>
+                <span class="nl-esc__mapa-txt">Etapa ${col + 1} de ${N.cols.length} · toca la miniatura para ver la secuencia completa</span></p>
+              ${ley.length ? `<span class="nl-esc__ley">${ley.map(f => `<span><svg viewBox="-12 -12 24 24" aria-hidden="true">${FORMAS[f][1]}</svg>${FORMAS[f][0]}</span>`).join('')}</span>` : ''}
+              <span class="nl-esc__botones">
+                ${mirando ? '<button type="button" class="nl-esc__btn" data-acc="repetir">▶ Ver de nuevo</button>' : ''}
+                ${N.cuadro_etapas && conFilas(cs) ? '<button type="button" class="nl-esc__btn" data-acc="cuadro">▦ Ver cuadro</button>' : ''}
+              </span>
+            </div>`;
+        vista.querySelectorAll('svg').forEach(s => { try { s.setCurrentTime(0); } catch { /* sin SMIL */ } });
+        recien = false;
+        vista.querySelector('[data-acc="repetir"]')?.addEventListener('click', () => { recien = true; pintarVista(); });
+        vista.querySelector('[data-acc="cuadro"]')?.addEventListener('click', () => { est.vc = true; guardar(); pintarVista(); });
+        vista.querySelector('[data-acc="ampliar"]').addEventListener('click', () => abrirVisor(d.fondo, N.ampliar_t || '', N.ampliar_pie || ''));
+    }
+
     /* ---------------- Vista ---------------- */
     function pintarVista() {
         const cs = ver, e = ec(cs);
+        if (verCierre && N.cuadro_etapas) { pintarCuadroEtapas(false); return; }
         if (verCierre && N.cuadro) { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>`; return; }
         if (cs.vista === 'cuadro') { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">${esc(cs.titulo)}</p>${cuadro(true)}</div>`; return; }
         if (cs.foto) { pintarFicha(cs); return; }
+        if (N.cuadro_etapas && est.vc && conFilas(cs)) { pintarCuadroEtapas(true); return; }
+        if (etapas && N.recortes) {
+            const pe = !listo(cs) ? cs.pasos[e.paso] : null;
+            if (cs.col != null || (pe && pe.col != null)) { pintarEtapa(cs, pe); return; }
+        }
         const hecho = listo(cs);
-        const animar = hecho && cs.anim;
         const p = !hecho ? cs.pasos[e.paso] : null;
-        let svg = '', html = '';
+        const animar = cs.anim && (hecho || (p && p.tipo === 'mira'));
+        let svg = velos(cs, p), html = '';
         // Zonas ya halladas en este caso (modo casos)
         cs.pasos.forEach((ps, i) => {
             if (ps.tipo !== 'tocar' || !(e.r[i] || {}).ok || animar) return;
@@ -178,13 +267,17 @@ function iniciar(raiz) {
               ${html}
             </div>
             <div class="nl-esc__barra">
-              <p class="nl-lam__ayuda-vista">${tocable ? `<strong>Toca en ${esc(N.donde || 'la imagen')}</strong>` : hecho ? (cs.anim ? `<strong>${esc(cs.titulo)}</strong>: mira lo que pasa` : esc(cs.titulo)) : `<strong>${esc(cs.titulo)}</strong>`}</p>
+              <p class="nl-lam__ayuda-vista">${tocable ? `<strong>Toca en ${esc(N.donde || 'la imagen')}</strong>` : animar ? `<strong>${esc(cs.titulo)}</strong>: mira lo que pasa` : p && p.col != null ? `<strong>${esc(N.cols_t ? N.cols_t[p.col] : '')}</strong> marcada en la imagen` : hecho ? esc(cs.titulo) : `<strong>${esc(cs.titulo)}</strong>`}</p>
               ${ley.length ? `<span class="nl-esc__ley">${ley.map(f => `<span><svg viewBox="-12 -12 24 24" aria-hidden="true">${FORMAS[f][1]}</svg>${FORMAS[f][0]}</span>`).join('')}</span>` : ''}
               <span class="nl-esc__botones">
                 ${N.nombres && !animar ? `<button type="button" class="nl-esc__btn" data-acc="nombres" aria-pressed="${est.nombres ? 'true' : 'false'}">${est.nombres ? '✓ ' : ''}Nombres</button>` : ''}
                 ${animar ? '<button type="button" class="nl-esc__btn" data-acc="repetir">▶ Ver de nuevo</button>' : ''}
+                ${etapas ? '<button type="button" class="nl-esc__btn" data-acc="ampliar">🔍 Ampliar</button>' : ''}
+                ${N.cuadro_etapas && conFilas(cs) ? '<button type="button" class="nl-esc__btn" data-acc="cuadro">▦ Ver cuadro</button>' : ''}
               </span>
             </div>`;
+        vista.querySelector('[data-acc="ampliar"]')?.addEventListener('click', () => abrirVisor(d.fondo, N.ampliar_t || '', N.ampliar_pie || ''));
+        vista.querySelector('[data-acc="cuadro"]')?.addEventListener('click', () => { est.vc = true; guardar(); pintarVista(); });
         const s = vista.querySelector('svg.nl-esc__capa');
         try { s.setCurrentTime(0); } catch { /* sin SMIL */ }
         recien = false;
@@ -226,9 +319,11 @@ function iniciar(raiz) {
         e.paso++;
         marca = null;
         if (e.paso >= cs.pasos.length) recien = true;
+        if (listo(cs) && cs.pasos.every(q => q.tipo === 'mira') && actual()) ver = actual();   // etapa vista: sigue la próxima
+        if (listo(cs) && conFilas(cs)) est.vc = true;                                          // terminó de clasificar: cuadro
         guardar();
         pintar();
-        if (angosta() && listo(cs) && cs.anim) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (angosta() && ((listo(cs) && cs.anim) || ver !== cs)) vista.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     function tocar(cs, xy) {
         if (instr) instr.open = false;
@@ -256,6 +351,13 @@ function iniciar(raiz) {
 
     /* ---------------- Panel ---------------- */
     const bloque = (etq, txt, extra) => `<div class="nl-ficha__bloque${extra ? ' nl-ficha__bloque--extra' : ''}"><span class="nl-ficha__etq">${esc(etq)}</span><p>${esc(txt)}</p></div>`;
+    /** Lo que pasa en el SNP y en el SNC en una etapa (modo «etapas»). */
+    const narr = cs => (cs.snp || cs.snc) ? `<div class="nl-esc__narr">
+        ${cs.snp ? `<p class="is-snp"><b>SNP · nervio (arriba)</b>${esc(cs.snp)}</p>` : ''}
+        ${cs.snc ? `<p class="is-snc"><b>SNC · médula (abajo)</b>${esc(cs.snc)}</p>` : ''}</div>` : '';
+    /** Respuesta ya dada: los hechos con explicación muestran sólo el último. */
+    const hecha = (p, k, ultimo) => p.tipo === 'predice' || p.tipo === 'tocar' || p.tipo === 'mira' || (p.exp && k !== ultimo) ? ''
+        : p.exp ? bloque(`✓ ${p.celda ? p.celda + ': ' : ''}${p.ops[p.ok]}`, p.exp) : bloque('✓ ' + nomPaso(p), p.ops[p.ok]);
 
     function pintarPasos() {
         const act = actual();
@@ -279,9 +381,10 @@ function iniciar(raiz) {
     function htmlPaso(cs, p, r) {
         const ops = r.orden.map(io => ({ io, txt: p.ops[io] }));
         if (p.tipo === 'sistema') {
+            const clase = t => /ambos/i.test(t) ? 'ambos' : /SNC/.test(t) ? 'snc' : 'snp';
             return `<p class="nl-lab__q">${esc(p.p)}</p>
-                <div class="nl-esc__sis">${ops.map(o => `<button type="button" class="nl-esc__sis-btn is-${esc(String(o.txt).toLowerCase())}${r.mal.includes(o.io) ? ' is-mal' : ''}" data-i="${o.io}"${r.mal.includes(o.io) ? ' disabled' : ''}>
-                    <strong>${esc(o.txt)}</strong><small>${esc(SISTEMAS[o.txt] || '')}</small></button>`).join('')}</div>
+                <div class="nl-esc__sis" data-n="${ops.length}">${ops.map(o => `<button type="button" class="nl-esc__sis-btn is-${clase(String(o.txt))}${r.mal.includes(o.io) ? ' is-mal' : ''}" data-i="${o.io}"${r.mal.includes(o.io) ? ' disabled' : ''}>
+                    <strong>${esc(o.txt)}</strong>${SISTEMAS[o.txt] ? `<small>${esc(SISTEMAS[o.txt])}</small>` : ''}</button>`).join('')}</div>
                 ${r.mal.length ? `<p class="nl-lab__q-fb">✗ Pista: ${esc(p.pista || 'intenta de nuevo.')}</p>` : ''}`;
         }
         if (p.tipo === 'tarjeta') {
@@ -300,15 +403,27 @@ function iniciar(raiz) {
     function pintarPanel() {
         if (verCierre) { mostrarCierre(); return; }
         const cs = ver, e = ec(cs), iC = casos.indexOf(cs);
-        const mini = `<ol class="nl-lam__pasos nl-circ__mini">${cs.pasos.map((p, i) => `<li class="${i < e.paso ? ((e.r[i] || {}).fallo || (e.r[i] || {}).mal?.length ? 'is-repasar' : 'is-ok') : i === e.paso ? 'is-actual' : ''}">${esc(nomPaso(p))}</li>`).join('')}${poe ? `<li class="${listo(cs) ? 'is-ok' : ''}">Mira</li>` : ''}</ol>`;
+        const soloMira = cs.pasos.every(p => p.tipo === 'mira');
+        const estado = i => i < e.paso ? ((e.r[i] || {}).fallo || (e.r[i] || {}).mal?.length ? 'is-repasar' : 'is-ok') : i === e.paso ? 'is-actual' : '';
+        const n = cs.pasos.length;
+        const mini = soloMira ? ''
+            : n > 6 ? `<ol class="nl-esc__puntos" aria-hidden="true">${cs.pasos.map((p, i) => `<li class="${estado(i)}"></li>`).join('')}</ol>
+                <p class="nl-esc__prog">${listo(cs) ? `${n} de ${n} listos` : `Hecho ${e.paso + 1} de ${n}`}</p>`
+            : `<ol class="nl-lam__pasos nl-circ__mini">${cs.pasos.map((p, i) => `<li class="${estado(i)}">${esc(nomPaso(p))}</li>`).join('')}${poe ? `<li class="${listo(cs) ? 'is-ok' : ''}">Mira</li>` : ''}</ol>`;
         // Con imagen real, el caso se lee en la vista; aquí sólo las preguntas
         const leer = cs.foto && !listo(cs) ? `<p class="nl-esc__leer">📋 Lee el caso y «Sobre la enfermedad» ${angosta() ? 'arriba' : 'a la izquierda'}.</p>` : '';
+        const sit = cs.situacion && !(conFilas(cs) && (e.paso > 0 || listo(cs)));   // al clasificar, la consigna sólo al inicio
         const cab = `<p class="nl-lab__paso"><span class="nl-lab__badge">${iC + 1}</span> ${esc(N.dx && cs.foto ? cs.corto : cs.titulo)}</p>${mini}
-            ${cs.foto ? leer : cs.situacion ? `<p class="nl-esc__situacion">${esc(cs.situacion)}</p>` : ''}`;
+            ${cs.foto ? leer : sit ? `<p class="nl-esc__situacion">${esc(cs.situacion)}</p>` : ''}`;
         if (!listo(cs)) {
             const i = e.paso, p = cs.pasos[i], r = e.r[i];
             panel.className = 'nl-lab__trabajo is-pregunta';
-            const hechas = cs.pasos.slice(0, i).map((pp, k) => pp.tipo === 'tocar' ? '' : bloque('✓ ' + nomPaso(pp), pp.ops[pp.ok])).join('');
+            if (p.tipo === 'mira') {
+                panel.innerHTML = `${cab}${narr(cs)}<div class="nl-ficha__acciones"><button type="button" class="btn btn-primary btn-sm nl-mira">${esc(p.boton || 'Siguiente →')}</button></div>`;
+                panel.querySelector('.nl-mira').addEventListener('click', () => { if (instr) instr.open = false; r.ok = true; avanzar(cs); });
+                return;
+            }
+            const hechas = cs.pasos.slice(0, i).map((pp, k) => hecha(pp, k, i - 1)).join('');
             if (p.tipo === 'tocar') {
                 panel.innerHTML = `${cab}${hechas}<p class="nl-lab__q">${esc(p.p)}</p>
                     <p class="nl-lab__ayuda">Toca el lugar en ${esc(N.donde || 'la imagen')}.</p>
@@ -327,12 +442,13 @@ function iniciar(raiz) {
         panel.innerHTML = `${cab}
             ${rp ? `<p class="nl-esc__pred ${rp.ok ? 'is-ok' : 'is-mal'}">${rp.ok ? '🎯 Predijiste bien' : '↺ Tu predicción no era'}: «${esc(cs.pasos[pr].ops[rp.elegida])}»</p>
                     ${rp.ok ? '' : bloque('Lo que pasa en realidad', cs.pasos[pr].ops[cs.pasos[pr].ok])}` : ''}
-            ${cs.pasos.filter(p => p.tipo !== 'predice' && p.tipo !== 'tocar').map(p => bloque('✓ ' + nomPaso(p), p.ops[p.ok])).join('')}
+            ${narr(cs)}
+            ${cs.pasos.map((p, k) => hecha(p, k, cs.pasos.length - 1)).join('')}
             ${cs.fila && N.cuadro ? bloque('Tu fila del cuadro', N.cuadro.slice(1).map((c, k) => c + ': ' + cs.fila[k]).join(' · ')) : ''}
             ${cs.exp ? bloque('Para recordar', cs.exp, true) : ''}
             ${cs.img ? `<button type="button" class="nl-mprac__mini nl-esc__mini" aria-label="Ver la imagen grande"><img src="${esc(cs.img)}" alt=""><span>🔍 ${esc(cs.img_t || 'Ver imagen real')}</span></button>` : ''}
             <div class="nl-ficha__acciones">
-                ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-sig">${poe ? 'Siguiente escena' : 'Siguiente caso'} →</button>`
+                ${sig ? `<button type="button" class="btn btn-primary btn-sm nl-sig">${poe ? 'Siguiente escena' : etapas ? 'Continuar' : 'Siguiente caso'} →</button>`
                       : '<button type="button" class="btn btn-primary btn-sm nl-fin">Terminar el nivel →</button>'}
             </div>`;
         panel.querySelector('.nl-esc__mini')?.addEventListener('click', () => abrirVisor(cs.img, cs.ctx, cs.pie));
@@ -360,7 +476,9 @@ function iniciar(raiz) {
         v.querySelector('.nl-mprac__visor-x').focus();
     }
 
-    const porRepasar = () => casos.filter(malCaso).map(cs => cs.corto || cs.titulo);
+    const porRepasar = () => etapas
+        ? casos.flatMap(cs => cs.pasos.filter((p, i) => p.fila && ((ec(cs).r[i] || {}).mal || []).length).map(p => p.celda || p.p))
+        : casos.filter(malCaso).map(cs => cs.corto || cs.titulo);
     function mostrarCierre() {
         const rep = porRepasar();
         const hrefRuta = ruta ? 'practico.php?p=' + encodeURIComponent(ruta) : '';
@@ -372,7 +490,7 @@ function iniciar(raiz) {
             ${d.siguiente ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${esc(d.siguiente)}">Siguiente nivel →</a>`
                           : (hrefRuta ? `<a class="btn btn-primary nl-lab__sig-nivel" href="${hrefRuta}">Volver a la ruta →</a>` : '')}
             ${tplCx ? `<details class="nl-lab__conexion"><summary>💡 ¿Para qué te sirve esto?</summary>${tplCx.innerHTML}</details>` : ''}
-            <p class="nl-lab__ayuda">Toca un número arriba para volver a ver cualquier ${poe ? 'escena' : 'caso'}.</p>
+            <p class="nl-lab__ayuda">Toca una pestaña arriba para volver a ver cualquier ${poe ? 'escena' : etapas ? 'etapa' : 'caso'}.</p>
             <p class="nl-guia-ok">✓ Guardado en tu guía de estudio · <a href="${urlGuia()}">Ver guía</a></p>`;
         panel.querySelectorAll('.nl-lab__sig-nivel, .nl-guia-ok a').forEach(a => a.addEventListener('click', async ev => {
             if (!guiaPromesa) return;
@@ -429,6 +547,9 @@ function iniciar(raiz) {
         };
         if (poe) {
             (N.nombres || []).forEach(n => rot(n.t, n.x * sx, n.y * sx, '#F59E0B', n.i));
+        } else if (etapas) {
+            // Rótulos de todas las etapas sobre la secuencia
+            casos.forEach(cs => ((cs.anim || {}).rotulos || []).forEach(n => rot(n.t, n.x * sx, n.y * sx, '#F59E0B', n.i)));
         } else {
             // Cada caso: su zona marcada con su número
             casos.forEach((cs, i) => {
@@ -456,7 +577,13 @@ function iniciar(raiz) {
             try { bloques.push({ t: 'imagenes', items: [{ src: await imagenGuia(), titulo: N.guia_img || d.titulo, pie: N.guia_pie || '' }] }); }
             catch { /* sin imagen */ }
             if (N.cuadro) bloques.push({ t: 'tabla', cab: N.cuadro, filas: casos.filter(cs => cs.fila).map(cs => [cs.corto || cs.titulo].concat(cs.fila)) });
-            bloques.push(poe
+            if (etapas) {
+                const CE = N.cuadro_etapas, hechos = casos.flatMap(cs => cs.pasos.filter(p => p.fila));
+                bloques.push({ t: 'tabla', cab: ['Etapa', 'SNP · nervio', 'SNC · médula'], filas: casos.filter(cs => cs.snp || cs.snc).map(cs => [cs.titulo, cs.snp || '', cs.snc || '']) });
+                if (CE) bloques.push({ t: 'tabla', cab: ['Etapa'].concat(CE.cols), filas: CE.filas.map(f => [f].concat(CE.cols.map((_, k) =>
+                    hechos.filter(p => p.fila === f && p.ok === k).map(p => p.celda).join('; ')))) });
+                bloques.push({ t: 'tabla', cab: ['Hecho', 'Ocurre', 'Para recordar'], filas: hechos.map(p => [p.celda || p.p, p.ops[p.ok], p.exp || '']) });
+            } else bloques.push(poe
                 ? { t: 'tabla', cab: ['Escena', 'Qué pasa', 'Para recordar'], filas: casos.map(cs => {
                     const pr = cs.pasos.find(p => p.tipo === 'predice');
                     return [cs.titulo, pr ? pr.ops[pr.ok] : '', cs.exp || ''];

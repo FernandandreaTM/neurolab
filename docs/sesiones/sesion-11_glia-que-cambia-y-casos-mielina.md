@@ -1,4 +1,4 @@
-# Sesión 11 · Tarjetas de «Glía que cambia» y casos de mielina con imágenes reales · 21-10-2026
+# Sesión 11 · Tarjetas de «Glía que cambia», casos de mielina con imágenes reales y la lesión por etapas · 21-10-2026
 
 ## Qué se hizo
 
@@ -6,6 +6,7 @@
 |---|---|---|---|
 | 1 | La glía en acción V · Glía que cambia | Revisión científica de la imagen corregida (`img/_fuentes/Biomedical Neuroscience Cell Montage.png`): sirven los 8 cuadros. Cortada en 8 PNG de 320 px con los nombres de §11b | `img/cartas/` (8 PNG), `docs/prompts-imagenes.md` |
 | 2 | La glía en acción III · Cuando se ataca la mielina | El nombre de la enfermedad se ve desde el inicio (pestañas y título) y cada caso trae **«Sobre la enfermedad»** con el contexto para razonar sin saberla de memoria. El caso (ficha + imagen real) va en la **vista**, en lugar del mapa del cuerpo. El paso «tocar el cuerpo» pasa a **SNC o SNP** en el panel, como las otras preguntas. Pacientes ajustados a las imágenes | `data/seed.sql` (act. 13, nivel 3), `js/escenas.js`, `css/mesa.css`, `img/glia-accion/casos/` (4 JPG) |
+| 3 | La glía en acción IV · Tras la lesión | La secuencia se presenta **antes**, animada por etapas, y las preguntas se responden **en el panel** (sin tarjetas en la vista). Pasa de práctica «elegir» (nivel 9 de `practica_niveles`, que sale del seed) a escenas en modo «etapas» | `data/seed.sql` (act. 13, nivel 4), `js/escenas.js`, `css/mesa.css` |
 
 ## Revisión de las 8 tarjetas (nivel V)
 
@@ -39,6 +40,16 @@
 
 Las imágenes en alta resolución quedaron en `img/_fuentes/casos-mielina/` (fuera de git).
 
+## Nivel IV rediseñado (modo «etapas»)
+
+| Fase | Vista | Panel |
+|---|---|---|
+| Mira (4 etapas: antes, justo después del corte, días a semanas, resultado) | La etapa en grande: columna de `lesion-comparacion.jpg` recortada en SNP y SNC, lado a lado, que entra con animación; rótulos que aparecen en orden; en la 3 la punta del axón avanza por el tubo de Schwann y en la 4 choca con la cicatriz. Miniatura de la secuencia con las etapas que vienen tapadas (toca = secuencia completa) | Qué pasa en el SNP y en el SNC · «Siguiente etapa» |
+| Clasifica (10 hechos) | La etapa del hecho en grande, quieta; miniatura con la etapa marcada; «Ver cuadro» | Hecho + 3 botones: Solo SNP · Solo SNC · En ambos; pista si se equivoca; explicación del anterior; barra de avance |
+| Cierre | Cuadro por etapa (Solo SNP · Solo SNC · En ambos) | Errores, por repasar (los hechos fallados) |
+
+Guía: secuencia rotulada + tabla Etapa · SNP · SNC + cuadro por etapa + tabla Hecho · Ocurre · Para recordar. Los 10 hechos, sus pistas y explicaciones son los mismos de antes («paso» pasó a «etapa»).
+
 ## Motor `escenas` (modo «casos»)
 
 | Campo | Uso |
@@ -51,9 +62,16 @@ Las imágenes en alta resolución quedaron en `img/_fuentes/casos-mielina/` (fue
 
 Sigue funcionando el modo anterior (fondo + zonas + `tocar`). El autocompletar docente sirve igual.
 
+| Modo «etapas» | Uso |
+|---|---|
+| `cols`, `filas_y`, `cols_t` (nivel) | Columnas de la secuencia (x), filas para los velos (y) y nombre de cada etapa |
+| `recortes` (nivel) | Filas que se muestran en grande, lado a lado: `{t, c: "snp"/"snc", y: [y0, y1]}` |
+| Caso con `col` + paso `"mira"` (`boton`) | Etapa animada (`anim`: rótulos, efectos, flujos; partícula nueva `cono`); `snp` y `snc` = texto del panel |
+| Paso `"sistema"` con 3 `ops` y `col`, `fila`, `celda`, `exp` | Hecho a clasificar; llena `cuadro_etapas` (`filas`, `cols`) |
+
 ## Pruebas
 
-PHP 8.3 + Playwright, 1366×660 y 390×844: recorrido completo del nivel III (un error a propósito con pista), visor de la foto, cierre, guía de `celulas-2` con la cuadrícula y el cuadro; niveles I (escenas «poe») y V (tarjetas nuevas) sin cambios de funcionamiento. Sin errores de JavaScript.
+PHP 8.3 + Playwright, 1366×660 y 390×844: recorrido completo del nivel III (un error a propósito con pista, visor de la foto, cierre) y del nivel IV (las 4 etapas, los 10 hechos con un error a propósito, «Ver cuadro», miniatura, cierre); guía de `celulas-2` con la cuadrícula, la secuencia rotulada y los cuadros; niveles I (escenas «poe») y V (tarjetas nuevas) sin cambios de funcionamiento. Sin errores de JavaScript.
 
 ## Qué subir (FileZilla)
 
@@ -61,11 +79,11 @@ PHP 8.3 + Playwright, 1366×660 y 390×844: recorrido completo del nivel III (un
 |---|---|
 | `js/escenas.js` | |
 | `css/mesa.css` | |
-| `data/seed.sql` | Después abrir `admin/seed.php` |
+| `data/seed.sql` | Después abrir `admin/seed.php` (el nivel IV deja de usar `practica_niveles` 9) |
 | `img/glia-accion/casos/em.jpg`, `gb.jpg`, `nmo.jpg`, `cmt.jpg` | Carpeta nueva |
 | `img/cartas/microglia-vigilante.png`, `microglia-m1-inflamatoria.png`, `microglia-m2-reparadora.png`, `astrocito-a1-toxico.png`, `astrocito-a2-protector.png`, `astrocito-de-la-cicatriz.png`, `glia-radial.png`, `precursor-ng2.png` | |
 
-Quien ya había empezado el nivel III conserva su avance; quien lo terminó con la versión anterior debe rehacerlo para tener la guía nueva.
+Quien ya había empezado el nivel III conserva su avance; quien lo terminó con la versión anterior debe rehacerlo para tener la guía nueva. El nivel IV empieza de cero para todos (el desbloqueo del nivel V se mantiene).
 
 ## Estado al cierre
 

@@ -1006,3 +1006,47 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
     .nl-esc__caso { grid-template-columns: 1fr; padding: .5rem; }
     .nl-esc__foto-btn img { max-height: 46vh; }
 }
+
+/* Secuencia por etapas (escenas «etapas»): la etapa se destapa; SNP/SNC en el panel; 3 respuestas */
+.nl-esc__destapa { animation: nlEscDestapa 1s ease forwards; }
+@keyframes nlEscDestapa { from { opacity: 1; } to { opacity: 0; } }
+.nl-esc__narr p { margin: .45rem 0; padding: .55rem .75rem; border-radius: 10px; border-left: 4px solid; background: rgba(255,255,255,.05); font-size: .87rem; line-height: 1.45; color: var(--gray-100); }
+.nl-esc__narr b { display: block; margin-bottom: .15rem; font-size: .68rem; letter-spacing: .05em; text-transform: uppercase; }
+.nl-esc__narr .is-snp { border-color: #FBBF24; }
+.nl-esc__narr .is-snp b { color: #FCD34D; }
+.nl-esc__narr .is-snc { border-color: #A78BFA; }
+.nl-esc__narr .is-snc b { color: #C4B5FD; }
+.nl-esc__sis[data-n="3"] { grid-template-columns: repeat(3, 1fr); }
+.nl-esc__sis[data-n="3"] .nl-esc__sis-btn { align-items: center; text-align: center; padding: .7rem .4rem; }
+.nl-esc__sis[data-n="3"] .nl-esc__sis-btn strong { font-size: 1rem; }
+.nl-esc__sis-btn.is-ambos { border-color: #F59E0B; background: linear-gradient(90deg, #FFFBEB, #F5F3FF); color: #3B1D6E; }
+@media (prefers-reduced-motion: reduce) { .nl-esc__destapa { animation-duration: .01s; } }
+/* Etapa en grande: la columna recortada por fila, SNP | SNC, y la miniatura de la secuencia */
+.nl-esc__etapa { display: flex; justify-content: center; align-items: flex-start; gap: .9rem; width: 100%; padding: .5rem .6rem 0; }
+.nl-esc__rec { margin: 0; width: min(46%, calc((var(--alto) - 11rem) * var(--rw, .7))); animation: nlEscEntra .7s ease; }
+.nl-esc__rec figcaption { margin-bottom: .3rem; font-size: .74rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
+.nl-esc__rec.is-snp figcaption { color: #FCD34D; }
+.nl-esc__rec.is-snc figcaption { color: #C4B5FD; }
+.nl-esc__rec-lienzo { position: relative; width: 100%; border-radius: 12px; background: #fff; }
+.nl-esc__rec-lienzo svg { display: block; width: 100%; height: auto; border-radius: 12px; }
+.nl-esc__rec.is-snp .nl-esc__rec-lienzo { box-shadow: 0 0 0 3px #FBBF24; }
+.nl-esc__rec.is-snc .nl-esc__rec-lienzo { box-shadow: 0 0 0 3px #A78BFA; }
+@keyframes nlEscEntra { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.nl-esc__mapa { flex: none; padding: 0; border: 1px solid var(--gray-700); border-radius: 8px; background: #fff; line-height: 0; cursor: zoom-in; }
+.nl-esc__mapa svg { display: block; width: auto; height: 64px; aspect-ratio: 1200 / 984; border-radius: 8px; }
+.nl-esc__barra:has(.nl-esc__mapa) .nl-lam__ayuda-vista { flex: 0 1 auto; text-align: left; }
+.nl-esc__mapa-txt { font-size: .72rem; color: var(--gray-500); }
+@media (max-width: 900px) {
+    .nl-esc__etapa { gap: .5rem; padding: .3rem .45rem 0; }
+    .nl-esc__rec { width: calc(50% - .25rem); min-width: 0; }
+    .nl-esc__rec figcaption { font-size: .62rem; }
+    .nl-esc__mapa svg { height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .nl-esc__rec { animation: none; } }
+.nl-esc__puntos { display: flex; gap: 4px; margin: .5rem 0 .2rem; padding: 0; list-style: none; }
+.nl-esc__puntos li { flex: 1; height: 8px; border-radius: 99px; background: rgba(255,255,255,.12); }
+.nl-esc__puntos li.is-ok { background: #22C55E; }
+.nl-esc__puntos li.is-repasar { background: var(--repasar); }
+.nl-esc__puntos li.is-actual { background: #F59E0B; }
+.nl-esc__prog { margin: 0 0 .3rem; font-size: .74rem; font-weight: 700; color: var(--gray-300); }
+.nl-esc__etapa.is-quieta .nl-esc__rec { animation: none; }
