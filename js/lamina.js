@@ -189,6 +189,7 @@ function iniciar(raiz) {
     if (!sel) sel = caps[0];
     let modo = 'lamina';           // qué muestra la vista: 'lamina' | 'captura'
     let lamActual = null;
+    let lamPendiente = null;       // lámina elegida con el iframe oculto: se carga al mostrarlo
     let recorte = null;            // rectángulo en % mientras se recorta
     let etqSel = null;             // etiqueta elegida para poner
     let enc = null;                // encaje del molde mientras se ajusta: { cx, cy, s }
@@ -210,8 +211,10 @@ function iniciar(raiz) {
         if (!laminas[k]) return;
         if (lamActual !== k) {
             lamActual = k;
-            iframe.src = laminas[k].url;
             caption.textContent = laminas[k].caption || '';
+            // el visor externo calcula su tamaño al cargar: oculto quedaría en 0×0 y sin imagen
+            if (iframe.hidden) { lamPendiente = laminas[k].url; iframe.src = 'about:blank'; }
+            else { lamPendiente = null; iframe.src = laminas[k].url; }
         }
         btnsTin.forEach(b => b.classList.toggle('active', b.dataset.lamina === k));
     }
@@ -224,6 +227,7 @@ function iniciar(raiz) {
         const hayImg = !!(s && (s.img || s.bruta)) || verCierre;
         if (modo === 'captura' && !hayImg) modo = 'lamina';
         iframe.hidden = modo !== 'lamina';
+        if (!iframe.hidden && lamPendiente) { iframe.src = lamPendiente; lamPendiente = null; }
         caption.hidden = modo !== 'lamina';
         editor.hidden = modo !== 'captura';
         btnsVer.forEach(b => {
@@ -795,10 +799,12 @@ function iniciar(raiz) {
 
     // Inicio
     const primera = (sel && sel.lamina) || Object.keys(laminas)[0];
+    const s0 = est.caps[sel.clave];
+    const vistaIni = verCierre || (s0 && (s0.paso === 'recortar' || s0.paso === 'etiquetar' || s0.listo)) ? 'captura' : 'lamina';
+    if (vistaIni === 'captura') iframe.hidden = true;
     if (primera) ponerLamina(primera);
     pintar();
-    const s0 = est.caps[sel.clave];
-    verVista(verCierre || (s0 && (s0.paso === 'recortar' || s0.paso === 'etiquetar' || s0.listo)) ? 'captura' : 'lamina');
+    verVista(vistaIni);
 }
 
 if (RAIZ) iniciar(RAIZ);
