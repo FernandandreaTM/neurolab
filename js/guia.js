@@ -229,6 +229,11 @@ function listaDeTabla(b) {
         return `<ul class="nl-g-qa">${filas.map(f => `<li><strong>${esc(f[0])}</strong>
             <span>→ ${esc(f[1])}</span>${f[2] ? `<small>${esc(f[2])}</small>` : ''}</li>`).join('')}</ul>`;
     }
+    if (cab[0] === 'Caso' && cab[1] === 'Pregunta') {   // escenas: Caso, «pregunta → respuesta» (unidas con ·), Para recordar
+        return `<ul class="nl-g-qa">${filas.map(f => `<li><em class="nl-g-qa__caso">${esc(f[0])}</em>${String(f[1] || '').split(' · ').filter(Boolean).map(q => {
+            const [pr, ...re] = q.split(' → ');
+            return `<strong>${esc(pr)}</strong>${re.length ? `<span>→ ${esc(re.join(' → '))}</span>` : ''}`; }).join('')}${f[2] ? `<small>${esc(f[2])}</small>` : ''}</li>`).join('')}</ul>`;
+    }
     if (cab[1] === 'Pregunta') {    // quiz: ✓/✗, Pregunta, Respuesta correcta, Para recordar
         return `<ul class="nl-g-qa nl-g-qa--quiz">${filas.map(f => `<li class="${f[0] === '✗' ? 'is-mal' : 'is-ok'}">
             <i aria-label="${f[0] === '✗' ? 'Por repasar' : 'Correcta'}">${esc(f[0])}</i><strong>${esc(f[1])}</strong>

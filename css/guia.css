@@ -189,3 +189,4 @@
     .nl-g-act { margin-top: 7mm; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+.nl-g-qa__caso { display: inline-block; margin-bottom: .15rem; padding: .05rem .55rem; border-radius: 999px; background: #EDE9FE; color: #5B21B6; font-size: .72rem; font-weight: 800; font-style: normal; letter-spacing: .02em; }

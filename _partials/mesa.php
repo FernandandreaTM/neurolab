@@ -344,6 +344,17 @@ nl_barra([
         <p>Completa primero el nivel anterior para desbloquear este.</p>
     </div>
     <div class="nl-mesa__vista nl-lam__vista">
+        <?php if (!empty($nivelLam['sim']['url'])): $simE = $nivelLam['sim']; ?>
+        <div class="nl-lam__barra nl-esc__simbarra">
+            <div class="nl-lam__ver" role="group" aria-label="Qué ver">
+                <button type="button" class="nl-lam__ver-btn active" data-ver="esquema">🖼 Esquema</button>
+                <button type="button" class="nl-lam__ver-btn" data-ver="sim">🧪 Simulador</button>
+            </div>
+            <a class="nl-esc__simlink" href="<?= htmlspecialchars($simE['url']) ?>" target="_blank" rel="noopener">Abrir el simulador en otra pestaña ↗</a>
+        </div>
+        <iframe data-src="<?= htmlspecialchars($simE['url']) ?>" class="nl-mesa__iframe nl-esc__sim" hidden allowfullscreen title="<?= htmlspecialchars($simE['t'] ?? 'Simulador') ?>"></iframe>
+        <?php if (!empty($simE['pie'])): ?><p class="nl-mesa__caption nl-esc__simpie" hidden><?= htmlspecialchars($simE['pie']) ?></p><?php endif; ?>
+        <?php endif; ?>
         <div class="nl-lam__editor nl-esc__vista" id="nl-esc-vista"></div>
     </div>
     <aside class="nl-mesa__panel">

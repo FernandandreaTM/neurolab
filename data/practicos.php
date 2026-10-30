@@ -126,4 +126,46 @@ return [
              'guia' => ['quiz-celulas-nerviosas-2' => 'Quiz de cierre']],
         ],
     ],
+    'potencial-accion' => [
+        'titulo'     => 'Canales iónicos y potencial de acción',
+        'asignatura' => 'ETMP097 Neurobiología',
+        'objetivo'   => 'Explicar cómo los gradientes de iones y los canales de membrana generan el potencial de reposo, los potenciales locales y el potencial de acción, usando simuladores.',
+        'intro'      => 'Avanza a tu ritmo, en orden. Trabajarás con dos simuladores de NeuroLab: el de la membrana y el del potencial de acción. Cada nivel se corrige solo y suma una sección a tu guía de estudio; al final descárgala en PDF.',
+        'pasos' => [
+            ['slug' => 'canales-membrana',
+             'titulo' => 'Canales de membrana (2 niveles)',
+             'tarea' => 'Con el simulador de la membrana: arma el reposo, mide el potencial, prueba la bomba Na⁺/K⁺ y abre canales de Na⁺ y de K⁺ (cuadro comparativo); luego descubre qué estímulo abre los canales en cada parte de la neurona. Cada nivel suma una sección a tu guía.',
+             'guia' => ['canales-membrana:1' => 'Nivel I: reposo y canales',
+                        'canales-membrana:2' => 'Nivel II: ¿qué abre los canales?'],
+             'conexion' => [
+                'canales-membrana:1' => [
+                    'terapia-ocupacional' => 'Los gradientes de Na⁺ y K⁺ son la batería de nervios y músculos. Por eso las alteraciones del K⁺ en la sangre (por diuréticos, vómitos o insuficiencia renal) causan debilidad o calambres que cambian lo que el paciente puede hacer en la sesión; y los anestésicos locales actúan bloqueando canales de Na⁺.',
+                    'fonoaudiologia' => 'Los gradientes iónicos también son la batería del oído: la endolinfa de la cóclea es rica en K⁺, y al abrirse los canales de las células ciliadas entra K⁺ a favor de su gradiente: así responden al sonido.'],
+                'canales-membrana:2' => [
+                    'terapia-ocupacional' => 'Cada receptor de la mano (tacto, presión, temperatura) abre canales distintos: es lo que exploras al evaluar la sensibilidad y lo que buscas estimular en la reeducación sensitiva.',
+                    'fonoaudiologia' => 'Las células ciliadas abren canales mecánicos cuando se inclinan con el sonido, y el glutamato que liberan abre canales por ligando en el nervio auditivo: así empieza la audición.'],
+             ]],
+            ['slug' => 'potencial-accion-neurona',
+             'titulo' => 'El potencial de acción (3 niveles)',
+             'tarea' => 'Con el simulador del potencial de acción: del potencial local al de acción (umbral, todo o nada y sumación), las fases y qué hacen los canales en cada una, y el período refractario. Cada nivel suma una sección a tu guía.',
+             'guia' => ['potencial-accion-neurona:1' => 'Nivel I: del potencial local al de acción',
+                        'potencial-accion-neurona:2' => 'Nivel II: las fases y sus canales',
+                        'potencial-accion-neurona:3' => 'Nivel III: el período refractario'],
+             'conexion' => [
+                'potencial-accion-neurona:1' => [
+                    'terapia-ocupacional' => 'La motoneurona suma miles de entradas excitatorias e inhibitorias antes de disparar. En la espasticidad se pierde parte de la inhibición que baja desde el encéfalo: la motoneurona llega al umbral con facilidad y el músculo responde de más.',
+                    'fonoaudiologia' => 'Las neuronas de la vía auditiva suman entradas de ambos oídos y comparan cuándo llega cada una: así localizas de dónde viene un sonido.'],
+                'potencial-accion-neurona:2' => [
+                    'terapia-ocupacional' => 'Los anestésicos locales y algunos antiepilépticos actúan sobre los canales de Na⁺; los fármacos que alteran el K⁺ cambian la repolarización. Conocerlos te ayuda a entender la fatiga o la debilidad de un paciente en tratamiento.',
+                    'fonoaudiologia' => 'La anestesia dental bloquea los canales de Na⁺ de las fibras del trigémino: por eso, mientras dura, cambian la sensibilidad y la articulación del habla.'],
+                'potencial-accion-neurona:3' => [
+                    'terapia-ocupacional' => 'El período refractario limita cuántos potenciales de acción por segundo puede enviar una motoneurona; la fuerza se gradúa con esa frecuencia y con cuántas motoneuronas se activan. Por eso la FES se programa con una frecuencia determinada.',
+                    'fonoaudiologia' => 'Una fibra auditiva no puede disparar con cada ciclo de un sonido agudo por su período refractario: varias fibras se turnan para seguirlo.'],
+             ]],
+            ['slug' => 'quiz-potencial-accion',
+             'titulo' => 'Quiz de cierre',
+             'tarea' => '15 preguntas para repasar todo el práctico, de lo general a los casos clínicos de tu carrera (elige TO o Fono arriba). Tu resultado y las explicaciones quedan en tu guía.',
+             'guia' => ['quiz-potencial-accion' => 'Quiz de cierre']],
+        ],
+    ],
 ];

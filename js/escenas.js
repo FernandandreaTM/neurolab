@@ -7,6 +7,16 @@
  *     y «elegir» (alternativas con pista); al terminar, la lesión se marca en el fondo y el caso suma una fila al cuadro.
  *     Si el caso trae «foto», la vista muestra la ficha del caso (enfermedad, paciente, «contexto») junto a la imagen
  *     real; «dx» en el nivel muestra el nombre de la enfermedad desde el inicio.
+ *   · Pasos comunes: «mira» (instrucción con botón; `vista: "sim"` abre el simulador), «numero» (valor medido, `rango` [mín, máx]).
+ *     `capas` en el nivel ([{src, casos}]): imágenes que se superponen al fondo (y quedan) cuando se resuelve alguno de esos casos
+ *     `sim` en el nivel ({url, t, pie}) agrega la pestaña del simulador; `fondo`/`fondo_ok` en un caso cambian la imagen
+ *     (antes y después de resolverlo); efectos con `a: "traza"` se dibujan como una línea que avanza.
+ *   · `simulador: "membrana"` (nivel): el simulador propio (js/sim-membrana.js) ocupa la vista; pasos «sim» con `checks`
+ *     [{t, c}] (c = nombre en CHEQUEOS) que se marcan en vivo y, opcional, `q` {p, ops, ok, pista}: una pregunta que se
+ *     habilita al cumplirse la lista y se responde en el mismo paso; `reposo_tras` = clave del caso que habilita «Armar reposo».
+ *     `simulador: "pa"`: simulador del potencial de acción (js/sim-pa.js), mismos pasos «sim»; `sim_cfg` {vista: "neurona", max, ventana}
+ *     (dibujo y estímulos por registro). «Empezar de nuevo» también reinicia el simulador. Un caso con `esquema: true`
+ *     muestra el fondo del nivel (pasos «elegir»/«tocar» con animación) en vez del simulador.
  *   · modo «etapas»: una secuencia en columnas (`cols`, filas `filas_y`). Cada etapa es un caso con `col` y un paso
  *     «mira» (la columna se destapa y se anima; texto SNP/SNC en el panel); después un caso con pasos «sistema»
  *     que marcan su columna (`col`) y llenan el cuadro por etapa (`cuadro_etapas`, con `fila` y `celda`).
@@ -16,6 +26,8 @@
 import { markDone, bloqueado } from './progress.js';
 import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia } from './carrera.js';
+import { crearSimMembrana, CHEQUEOS } from './sim-membrana.js';
+import { crearSimPA, CHEQUEOS as CHEQUEOS_PA } from './sim-pa.js';
 
 const RAIZ = document.getElementById('nl-esc');
 const MAX_GUIA = 900;
@@ -38,6 +50,11 @@ const FORMAS = {
     prot: ['Proteínas de la sangre', '<circle r="11" fill="#A78BFA" stroke="#6D28D9" stroke-width="2"/><circle r="4" cx="-3" cy="-3" fill="#EDE9FE"/>'],
     agua: ['Agua', '<path d="M0,-9 C4,-3 6,0 6,3.5 A6,6 0 0 1 -6,3.5 C-6,0 -4,-3 0,-9Z" fill="#7DD3FC" stroke="#0369A1" stroke-width="1.6"/>'],
     ca:   ['Ca²⁺', '<circle r="5.5" fill="#F87171" stroke="#B91C1C" stroke-width="2"/><text y="2.5" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">+</text>'],
+    na:   ['Na⁺', '<circle r="7" fill="#22C55E" stroke="#166534" stroke-width="2"/>'],
+    k:    ['K⁺', '<circle r="7" fill="#3B82F6" stroke="#1E3A8A" stroke-width="2"/>'],
+    cl:   ['Cl⁻', '<circle r="6" fill="#FACC15" stroke="#A16207" stroke-width="2"/>'],
+    nt:   ['Glutamato', '<polygon points="0,-7 6,4 -6,4" fill="#EC4899" stroke="#9D174D" stroke-width="1.8"/>'],
+    gaba: ['GABA', '<rect x="-5" y="-5" width="10" height="10" transform="rotate(45)" fill="#F97316" stroke="#9A3412" stroke-width="1.6"/>'],
     cono: ['Punta del axón que crece', '<circle r="8" fill="#A855F7" stroke="#6B21A8" stroke-width="2.5"/><circle r="3" cx="2.5" cy="-2" fill="#F3E8FF"/>'],
 };
 
@@ -72,6 +89,8 @@ function iniciar(raiz) {
     let N = {};
     try { N = JSON.parse(d.nivel || '{}'); } catch { N = {}; }
     const casos = N.casos || [];
+    (N.capas || []).forEach(c => { const i = new Image(); i.src = c.src; });   // capas que se destapan al resolver casos: precargadas
+    let capasVistas = null;
     if (!casos.length) return;
     const VB = N.vb || [100, 100];
     const S = N.escala || VB[0] / 640;          // tamaño de las partículas
@@ -96,6 +115,40 @@ function iniciar(raiz) {
         return;
     }
 
+    /* Pestaña del simulador (N.sim): el iframe vive fuera de la vista para no recargarse al repintar */
+    const simF = raiz.querySelector('.nl-esc__sim'), simPie = raiz.querySelector('.nl-esc__simpie');
+    const verBtns = raiz.querySelectorAll('.nl-esc__simbarra [data-ver]');
+    let enSim = false, ultPaso = '';
+    function mostrarSim(si) {
+        if (!simF) return;
+        enSim = !!si;
+        if (enSim && !simF.getAttribute('src')) simF.setAttribute('src', simF.dataset.src);
+        simF.hidden = !enSim; if (simPie) simPie.hidden = !enSim;
+        vista.hidden = enSim;
+        verBtns.forEach(b => b.classList.toggle('active', (b.dataset.ver === 'sim') === enSim));
+    }
+    verBtns.forEach(b => b.addEventListener('click', () => mostrarSim(b.dataset.ver === 'sim')));
+    /** Al cambiar de paso, la vista que pide el paso (`vista: "sim"`); al resolver un caso con animación, el esquema. */
+    function vistaPaso() {
+        if (!simF) return;
+        const e = ec(ver), p = !verCierre && !listo(ver) ? ver.pasos[e.paso] : null;
+        const k = verCierre ? 'fin' : ver.clave + ':' + e.paso;
+        if (k === ultPaso) return;
+        ultPaso = k;
+        if (p && p.vista) mostrarSim(p.vista === 'sim');
+        else if (!p && (verCierre || ver.anim || ver.fondo_ok)) mostrarSim(false);
+    }
+
+    /* Simulador propio (N.simulador): vive junto a la vista y no se repinta */
+    let simM = null, simCaja = null;
+    if (N.simulador === 'membrana' || N.simulador === 'pa') {
+        simCaja = document.createElement('div');
+        simCaja.className = 'nl-msim';
+        vista.parentNode.insertBefore(simCaja, vista);
+        simM = N.simulador === 'pa' ? crearSimPA(simCaja, N.sim_cfg || {}) : crearSimMembrana(simCaja);
+    }
+    const CHK = N.simulador === 'pa' ? CHEQUEOS_PA : CHEQUEOS;
+
     let est = null;
     try { est = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { est = null; }
     if (!est || typeof est !== 'object' || !est.c) est = { c: {}, err: 0, nombres: true };
@@ -104,7 +157,8 @@ function iniciar(raiz) {
         const e = est.c[cs.clave] || (est.c[cs.clave] = { paso: 0, r: {} });
         cs.pasos.forEach((p, i) => {
             const r = e.r[i] || (e.r[i] = { mal: [] });
-            if (p.ops && !Array.isArray(r.orden)) r.orden = p.tipo === 'sistema' ? p.ops.map((_, k) => k) : barajar(p.ops.length);
+            const ops = p.ops || (p.q && p.q.ops);
+            if (ops && !Array.isArray(r.orden)) r.orden = p.tipo === 'sistema' ? ops.map((_, k) => k) : barajar(ops.length);
         });
         return e;
     };
@@ -116,13 +170,13 @@ function iniciar(raiz) {
     let recien = false;      // el caso se acaba de resolver: se anima desde el principio
     if (instr && !Object.keys(est.c).length) instr.open = true;
 
-    const NOMBRES_PASO = { predice: 'Predice', mira: 'Mira', tocar: 'Dónde', sistema: 'SNC o SNP', tarjeta: 'Célula', elegir: 'Por qué' };
+    const NOMBRES_PASO = { predice: 'Predice', mira: 'Mira', numero: 'Mide', sim: 'Simulador', tocar: 'Dónde', sistema: 'SNC o SNP', tarjeta: 'Célula', elegir: 'Por qué' };
     const SISTEMAS = { SNC: 'Sistema nervioso central: encéfalo y médula espinal', SNP: 'Sistema nervioso periférico: nervios y ganglios' };
-    const nomPaso = p => p.nombre || NOMBRES_PASO[p.tipo] || 'Pregunta';
+    const nomPaso = p => p.nombre || (N.nombres_paso || {})[p.tipo] || NOMBRES_PASO[p.tipo] || 'Pregunta';
     const pct = (x, y) => [x / VB[0] * 100, y / VB[1] * 100];
     /** En «casos» el diagnóstico (corto) se ve sólo al resolverlo (salvo «dx»); antes, el paciente. */
     const nombreCaso = cs => (poe || N.dx || listo(cs) ? cs.corto : '') || cs.titulo;
-    const malCaso = cs => Object.values(ec(cs).r).some(r => r.mal.length || r.fallo);
+    const malCaso = cs => Object.values(ec(cs).r).some(r => r.mal.length || r.fallo || (r.qmal || []).length);
 
     /* ---------------- Animación de un caso ---------------- */
     function particula(f, dd, dur, t, rep) {
@@ -137,8 +191,11 @@ function iniciar(raiz) {
         let svg = '';
         (a.efectos || []).forEach(ef => {
             const col = ef.c || 'rgba(239,68,68,.35)';
-            const attrs = ef.l ? `stroke="${col}" stroke-width="${ef.w || 18}"` : `fill="${col}" stroke="${ef.s || 'none'}" stroke-width="${ef.sw || 4}"`;
-            svg += `<g class="nl-esc__ef" style="animation-delay:${ef.t || 0}s"><g class="${ef.a === 'pulso' ? 'nl-esc__pulso' : ef.a === 'crece' ? 'nl-esc__crece' : ''}">${formaSvg(ef, attrs)}</g></g>`;
+            const traza = ef.a === 'traza';
+            const attrs = (ef.l ? `stroke="${col}" stroke-width="${ef.w || 18}"` : `fill="${col}" stroke="${ef.s || 'none'}" stroke-width="${ef.sw || 4}"`)
+                + (traza ? ' pathLength="1"' : '') + (ef.dash ? ` stroke-dasharray="${ef.dash}"` : '');
+            const cls = traza ? 'nl-esc__traza' : ef.a === 'pulso' ? 'nl-esc__pulso' : ef.a === 'crece' ? 'nl-esc__crece' : '';
+            svg += `<g class="nl-esc__ef" style="animation-delay:${ef.t || 0}s"><g class="${cls}"${traza ? ` style="animation-delay:${ef.t || 0}s;animation-duration:${ef.dur || 2}s"` : ''}>${formaSvg(ef, attrs)}</g></g>`;
         });
         (a.flujos || []).forEach(fl => {
             const n = fl.n || 4, dur = fl.dur || 3, t0 = fl.t || 0, rep = fl.rep !== false;
@@ -237,6 +294,18 @@ function iniciar(raiz) {
     /* ---------------- Vista ---------------- */
     function pintarVista() {
         const cs = ver, e = ec(cs);
+        if (simM) {
+            const cuadroFin = verCierre && N.cuadro && !est.vsim, esq = !verCierre && cs.esquema;
+            simM.mostrar(!cuadroFin && !esq); vista.hidden = !cuadroFin && !esq;
+            simM.permitirReposo(N.reposo_tras && casos.some(c => c.clave === N.reposo_tras && listo(c)));
+            if (!cuadroFin && !esq) return;
+            if (cuadroFin) {
+                vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>
+                    <div class="nl-esc__barra"><span class="nl-esc__botones"><button type="button" class="nl-esc__btn" data-acc="sim">🧪 Volver al simulador</button></span></div>`;
+                vista.querySelector('[data-acc="sim"]').addEventListener('click', () => { est.vsim = true; guardar(); pintarVista(); });
+                return;
+            }
+        }
         if (verCierre && N.cuadro_etapas) { pintarCuadroEtapas(false); return; }
         if (verCierre && N.cuadro) { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">Tu cuadro comparativo</p>${cuadro(true)}</div>`; return; }
         if (cs.vista === 'cuadro') { vista.innerHTML = `<div class="nl-esc__cuadro-caja"><p class="nl-tip__fila-etq">${esc(cs.titulo)}</p>${cuadro(true)}</div>`; return; }
@@ -248,21 +317,26 @@ function iniciar(raiz) {
         }
         const hecho = listo(cs);
         const p = !hecho ? cs.pasos[e.paso] : null;
-        const animar = cs.anim && (hecho || (p && p.tipo === 'mira'));
+        const animar = cs.anim && (hecho || (p && p.tipo === 'mira' && p.anim !== false));
+        const fondo = (hecho && cs.fondo_ok) || cs.fondo || d.fondo;
+        const capas = (N.capas || []).filter(c => c.casos.some(k => { const x = casos.find(y => y.clave === k); return x && listo(x); }));
+        if (!capasVistas) capasVistas = new Set(capas.map(c => c.src));
+        const capasHtml = capas.map(c => { const nueva = !capasVistas.has(c.src); capasVistas.add(c.src);
+            return `<img class="nl-esc__capa-img${nueva ? ' is-nueva' : ''}" src="${esc(c.src)}" alt="" draggable="false">`; }).join('');
         let svg = velos(cs, p), html = '';
         // Zonas ya halladas en este caso (modo casos)
         cs.pasos.forEach((ps, i) => {
-            if (ps.tipo !== 'tocar' || !(e.r[i] || {}).ok || animar) return;
+            if (ps.tipo !== 'tocar' || !((e.r[i] || {}).ok || (e.r[i] || {}).tocado) || animar) return;
             ps.ok.forEach(k => { if (zonas[k]) svg += `<g class="nl-esc__zona-ok">${formaSvg(zonas[k], zonas[k].l ? 'stroke="rgba(239,68,68,.55)" stroke-width="22"' : 'fill="rgba(239,68,68,.35)" stroke="#EF4444" stroke-width="4"')}</g>`; });
         });
         if (animar) { svg += animSvg(cs.anim); html += rotulos(cs.anim.rotulos); }
-        if (est.nombres && N.nombres && !animar) html += rotulos(N.nombres, true);   // durante la animación hablan sus propios rótulos
+        if (est.nombres && N.nombres && !animar && !(p && p.tipo === 'tocar')) html += rotulos(N.nombres.filter(n => !n.con || casos.some(x => x.clave === n.con && listo(x))), true);   // al tocar y durante la animación, sin nombres
         if (marca && p && p.tipo === 'tocar') { const [x, y] = pct(marca[0], marca[1]); html += `<span class="nl-rompe__marca" style="left:${x}%;top:${y}%">✗</span>`; }
         const ley = animar ? formasDe(cs.anim) : [];
-        const tocable = p && p.tipo === 'tocar';
+        const tocable = p && p.tipo === 'tocar' && !(e.r[e.paso] || {}).tocado;
         vista.innerHTML = `
             <div class="nl-lam__lienzo nl-circ__lienzo--fijo nl-esc__lienzo${tocable ? ' is-tocable' : ''}" id="nl-esc-lienzo">
-              <img src="${esc(d.fondo)}" alt="${esc(N.alt || 'Esquema')}" draggable="false">
+              <img src="${esc(fondo)}" alt="${esc(N.alt || 'Esquema')}" draggable="false">${capasHtml}
               <svg class="nl-circ__capa nl-esc__capa" viewBox="0 0 ${VB[0]} ${VB[1]}" preserveAspectRatio="none" aria-hidden="true">${svg}</svg>
               ${html}
             </div>
@@ -270,7 +344,7 @@ function iniciar(raiz) {
               <p class="nl-lam__ayuda-vista">${tocable ? `<strong>Toca en ${esc(N.donde || 'la imagen')}</strong>` : animar ? `<strong>${esc(cs.titulo)}</strong>: mira lo que pasa` : p && p.col != null ? `<strong>${esc(N.cols_t ? N.cols_t[p.col] : '')}</strong> marcada en la imagen` : hecho ? esc(cs.titulo) : `<strong>${esc(cs.titulo)}</strong>`}</p>
               ${ley.length ? `<span class="nl-esc__ley">${ley.map(f => `<span><svg viewBox="-12 -12 24 24" aria-hidden="true">${FORMAS[f][1]}</svg>${FORMAS[f][0]}</span>`).join('')}</span>` : ''}
               <span class="nl-esc__botones">
-                ${N.nombres && !animar ? `<button type="button" class="nl-esc__btn" data-acc="nombres" aria-pressed="${est.nombres ? 'true' : 'false'}">${est.nombres ? '✓ ' : ''}Nombres</button>` : ''}
+                ${N.nombres && !animar && !(p && p.tipo === 'tocar') ? `<button type="button" class="nl-esc__btn" data-acc="nombres" aria-pressed="${est.nombres ? 'true' : 'false'}">${est.nombres ? '✓ ' : ''}Nombres</button>` : ''}
                 ${animar ? '<button type="button" class="nl-esc__btn" data-acc="repetir">▶ Ver de nuevo</button>' : ''}
                 ${etapas ? '<button type="button" class="nl-esc__btn" data-acc="ampliar">🔍 Ampliar</button>' : ''}
                 ${N.cuadro_etapas && conFilas(cs) ? '<button type="button" class="nl-esc__btn" data-acc="cuadro">▦ Ver cuadro</button>' : ''}
@@ -328,7 +402,11 @@ function iniciar(raiz) {
     function tocar(cs, xy) {
         if (instr) instr.open = false;
         const e = ec(cs), i = e.paso, p = cs.pasos[i], r = e.r[i];
-        if (p.ok.some(k => zonas[k] && dentro(zonas[k], xy[0], xy[1]))) { r.ok = true; r.xy = xy; avanzar(cs); return; }
+        if (p.ok.some(k => zonas[k] && dentro(zonas[k], xy[0], xy[1]))) {
+            r.xy = xy; marca = null;
+            if (p.q) { r.tocado = true; guardar(); pintar(); return; }   // la pregunta del paso aparece en el mismo panel
+            r.ok = true; avanzar(cs); return;
+        }
         const otra = Object.keys(zonas).find(k => dentro(zonas[k], xy[0], xy[1]));
         r.mal.push(otra && zonas[otra].nombre ? `Tocaste ${zonas[otra].nombre}. ${p.pista || ''}` : (p.pista || 'Ahí no.'));
         est.err++; marca = xy; guardar(); pintar();
@@ -349,6 +427,20 @@ function iniciar(raiz) {
         r.ok = true; r.elegida = io; avanzar(cs);
     }
 
+    /** Paso «numero»: el valor leído en el simulador, dentro de `rango`. */
+    function medir(cs, txt) {
+        if (instr) instr.open = false;
+        const e = ec(cs), i = e.paso, p = cs.pasos[i], r = e.r[i];
+        const v = parseFloat(String(txt).replace(/[−–]/g, '-').replace(',', '.').replace(/[^0-9.+-]/g, ''));
+        if (!isFinite(v)) { r.mal.push('Escribe solo el número (con su signo).'); est.err++; guardar(); pintarPanel(); actualizar(); return; }
+        const [a, b] = p.rango;
+        if (v >= a && v <= b) { r.ok = true; r.valor = v; avanzar(cs); return; }
+        const signo = -v >= a && -v <= b;
+        r.mal.push(`${v} ${p.unidad || ''}: no calza. ${signo ? 'Revisa el signo: ¿el interior queda negativo o positivo?' : (p.pista || '') + (v < a ? ' Tu valor es muy bajo.' : ' Tu valor es muy alto.')}`);
+        est.err++; guardar(); pintarPanel(); actualizar();
+        panel.querySelector('.nl-esc__num')?.classList.add('is-sacude');
+    }
+
     /* ---------------- Panel ---------------- */
     const bloque = (etq, txt, extra) => `<div class="nl-ficha__bloque${extra ? ' nl-ficha__bloque--extra' : ''}"><span class="nl-ficha__etq">${esc(etq)}</span><p>${esc(txt)}</p></div>`;
     /** Lo que pasa en el SNP y en el SNC en una etapa (modo «etapas»). */
@@ -356,7 +448,10 @@ function iniciar(raiz) {
         ${cs.snp ? `<p class="is-snp"><b>SNP · nervio (arriba)</b>${esc(cs.snp)}</p>` : ''}
         ${cs.snc ? `<p class="is-snc"><b>SNC · médula (abajo)</b>${esc(cs.snc)}</p>` : ''}</div>` : '';
     /** Respuesta ya dada: los hechos con explicación muestran sólo el último. */
-    const hecha = (p, k, ultimo) => p.tipo === 'predice' || p.tipo === 'tocar' || p.tipo === 'mira' || (p.exp && k !== ultimo) ? ''
+    const hecha = (p, k, ultimo, r) => (p.tipo === 'sim' || p.tipo === 'tocar') && p.q ? bloque('✓ ' + nomPaso({ tipo: 'elegir' }), p.q.ops[p.q.ok])
+        : p.tipo === 'sim' ? ''
+        : p.tipo === 'predice' || p.tipo === 'tocar' || p.tipo === 'mira' || (p.exp && k !== ultimo && p.tipo !== 'numero') ? ''
+        : p.tipo === 'numero' ? bloque(`✓ ${p.nombre || 'Medida'}: ${p.ok_t || ''}`, `Tu valor: ${(r || {}).valor ?? '—'} ${p.unidad || ''}${p.exp ? ' · ' + p.exp : ''}`)
         : p.exp ? bloque(`✓ ${p.celda ? p.celda + ': ' : ''}${p.ops[p.ok]}`, p.exp) : bloque('✓ ' + nomPaso(p), p.ops[p.ok]);
 
     function pintarPasos() {
@@ -379,6 +474,12 @@ function iniciar(raiz) {
     }
 
     function htmlPaso(cs, p, r) {
+        if (p.tipo === 'numero') {
+            return `<p class="nl-lab__q">${esc(p.p)}</p>
+                <form class="nl-esc__num" autocomplete="off"><input type="text" inputmode="decimal" aria-label="Valor" placeholder="${esc(p.ejemplo || 'ej.: −40')}">
+                <span>${esc(p.unidad || '')}</span><button type="submit" class="btn btn-primary btn-sm">Revisar</button></form>
+                ${r.mal.length ? `<p class="nl-lab__q-fb">✗ ${esc(r.mal[r.mal.length - 1])}</p>` : ''}`;
+        }
         const ops = r.orden.map(io => ({ io, txt: p.ops[io] }));
         if (p.tipo === 'sistema') {
             const clase = t => /ambos/i.test(t) ? 'ambos' : /SNC/.test(t) ? 'snc' : 'snp';
@@ -419,11 +520,56 @@ function iniciar(raiz) {
             const i = e.paso, p = cs.pasos[i], r = e.r[i];
             panel.className = 'nl-lab__trabajo is-pregunta';
             if (p.tipo === 'mira') {
-                panel.innerHTML = `${cab}${narr(cs)}<div class="nl-ficha__acciones"><button type="button" class="btn btn-primary btn-sm nl-mira">${esc(p.boton || 'Siguiente →')}</button></div>`;
+                const hechasM = cs.pasos.slice(0, i).map((pp, k) => hecha(pp, k, i - 1, e.r[k])).join('');
+                panel.innerHTML = `${cab}${hechasM}${narr(cs)}${p.p ? `<p class="nl-lab__q">${esc(p.p)}</p>` : ''}
+                    ${p.lista ? `<ol class="nl-esc__lista">${p.lista.map(t => `<li>${esc(t)}</li>`).join('')}</ol>` : ''}
+                    ${p.vista === 'sim' && simF ? '<p class="nl-esc__simaviso">🧪 El simulador está a la ' + (angosta() ? 'vista arriba' : 'izquierda') + '. Puedes volver al esquema con la pestaña 🖼.</p>' : ''}
+                    <div class="nl-ficha__acciones"><button type="button" class="btn btn-primary btn-sm nl-mira">${esc(p.boton || 'Siguiente →')}</button></div>`;
                 panel.querySelector('.nl-mira').addEventListener('click', () => { if (instr) instr.open = false; r.ok = true; avanzar(cs); });
                 return;
             }
-            const hechas = cs.pasos.slice(0, i).map((pp, k) => hecha(pp, k, i - 1)).join('');
+            const hechas = cs.pasos.slice(0, i).map((pp, k) => hecha(pp, k, i - 1, e.r[k])).join('');
+            if (p.tipo === 'sim' && simM) {
+                const pq = p.q ? { tipo: 'elegir', p: p.q.p, ops: p.q.ops, ok: p.q.ok, pista: p.q.pista } : null;
+                panel.innerHTML = `${cab}${hechas}<p class="nl-lab__q">🧪 ${esc(p.p)}</p>
+                    <ul class="nl-esc__checks">${p.checks.map((c, k) => `<li data-k="${k}"><span class="nl-esc__chk"></span>${esc(c.t)}</li>`).join('')}</ul>
+                    ${p.pista ? `<p class="nl-lab__ayuda">${esc(p.pista)}</p>` : ''}
+                    ${pq ? `<div class="nl-esc__simq${r.listo ? '' : ' is-bloq'}">${htmlPaso(cs, pq, r)}</div>`
+                         : '<div class="nl-ficha__acciones"><button type="button" class="btn btn-primary btn-sm nl-simok" disabled>Haz lo que falta en el simulador</button></div>'}`;
+                const btn = panel.querySelector('.nl-simok'), caja = panel.querySelector('.nl-esc__simq');
+                const revisar = s => {
+                    let todo = true;
+                    p.checks.forEach((c, k) => {
+                        const ok = !!(CHK[c.c] && CHK[c.c](s));
+                        todo = todo && ok;
+                        panel.querySelector(`[data-k="${k}"]`)?.classList.toggle('is-ok', ok);
+                    });
+                    if (todo && !r.listo) { r.listo = true; guardar(); }
+                    if (btn) { btn.disabled = !todo; btn.textContent = todo ? (p.boton || '✓ Listo, continuar →') : 'Haz lo que falta en el simulador'; }
+                    if (caja) caja.classList.toggle('is-bloq', !r.listo);
+                };
+                simM.alCambiar(s => { if (ver === cs && ec(cs).paso === i) revisar(s); });
+                revisar(simM.estado());
+                btn?.addEventListener('click', () => { if (instr) instr.open = false; r.ok = true; avanzar(cs); });
+                caja?.querySelectorAll('[data-i]:not([disabled])').forEach(b => b.addEventListener('click', () => {
+                    if (!r.listo) return;
+                    if (instr) instr.open = false;
+                    const io = Number(b.dataset.i);
+                    if (io !== p.q.ok) { r.mal.push(io); est.err++; guardar(); pintarPanel(); actualizar(); panel.querySelector('.nl-lab__alts')?.classList.add('is-sacude'); return; }
+                    r.ok = true; r.elegida = io; avanzar(cs);
+                }));
+                return;
+            }
+            if (p.tipo === 'tocar' && p.q && r.tocado) {
+                const pq = { tipo: 'elegir', p: p.q.p, ops: p.q.ops, ok: p.q.ok, pista: p.q.pista };
+                panel.innerHTML = `${cab}${hechas}<p class="nl-esc__tocado">✓ ${esc(p.p)} <b>${esc((zonas[p.ok[0]] || {}).nombre || '')}</b></p>${htmlPaso(cs, pq, { orden: r.orden, mal: r.qmal || [] })}`;
+                panel.querySelectorAll('[data-i]:not([disabled])').forEach(b => b.addEventListener('click', () => {
+                    const io = Number(b.dataset.i);
+                    if (io !== p.q.ok) { (r.qmal = r.qmal || []).push(io); est.err++; guardar(); pintarPanel(); actualizar(); panel.querySelector('.nl-lab__alts')?.classList.add('is-sacude'); return; }
+                    r.ok = true; r.elegida = io; avanzar(cs);
+                }));
+                return;
+            }
             if (p.tipo === 'tocar') {
                 panel.innerHTML = `${cab}${hechas}<p class="nl-lab__q">${esc(p.p)}</p>
                     <p class="nl-lab__ayuda">Toca el lugar en ${esc(N.donde || 'la imagen')}.</p>
@@ -432,6 +578,11 @@ function iniciar(raiz) {
             }
             panel.innerHTML = `${cab}${hechas}${p.tipo === 'predice' ? '<p class="nl-esc__poe">🔮 <strong>Predice</strong> antes de mirar: tienes una sola oportunidad.</p>' : ''}${htmlPaso(cs, p, r)}`;
             panel.querySelectorAll('[data-i]:not([disabled])').forEach(b => b.addEventListener('click', () => responder(cs, Number(b.dataset.i))));
+            const fn = panel.querySelector('.nl-esc__num');
+            if (fn) {
+                fn.addEventListener('submit', ev => { ev.preventDefault(); medir(cs, fn.querySelector('input').value); });
+                if (!angosta()) fn.querySelector('input').focus({ preventScroll: true });
+            }
             return;
         }
         // Caso resuelto: explicación
@@ -443,7 +594,7 @@ function iniciar(raiz) {
             ${rp ? `<p class="nl-esc__pred ${rp.ok ? 'is-ok' : 'is-mal'}">${rp.ok ? '🎯 Predijiste bien' : '↺ Tu predicción no era'}: «${esc(cs.pasos[pr].ops[rp.elegida])}»</p>
                     ${rp.ok ? '' : bloque('Lo que pasa en realidad', cs.pasos[pr].ops[cs.pasos[pr].ok])}` : ''}
             ${narr(cs)}
-            ${cs.pasos.map((p, k) => hecha(p, k, cs.pasos.length - 1)).join('')}
+            ${cs.pasos.map((p, k) => hecha(p, k, cs.pasos.length - 1, e.r[k])).join('')}
             ${cs.fila && N.cuadro ? bloque('Tu fila del cuadro', N.cuadro.slice(1).map((c, k) => c + ': ' + cs.fila[k]).join(' · ')) : ''}
             ${cs.exp ? bloque('Para recordar', cs.exp, true) : ''}
             ${cs.img ? `<button type="button" class="nl-mprac__mini nl-esc__mini" aria-label="Ver la imagen grande"><img src="${esc(cs.img)}" alt=""><span>🔍 ${esc(cs.img_t || 'Ver imagen real')}</span></button>` : ''}
@@ -527,7 +678,7 @@ function iniciar(raiz) {
     async function imagenGuia() {
         const fotos = casos.filter(cs => cs.foto);
         if (fotos.length) return imagenFotos(fotos);
-        const img = await cargar(d.fondo);
+        const img = await cargar(N.guia_src || d.fondo);
         const W = MAX_GUIA, H = Math.round(W * VB[1] / VB[0]);
         const c = document.createElement('canvas');
         c.width = W; c.height = H;
@@ -550,6 +701,8 @@ function iniciar(raiz) {
         } else if (etapas) {
             // Rótulos de todas las etapas sobre la secuencia
             casos.forEach(cs => ((cs.anim || {}).rotulos || []).forEach(n => rot(n.t, n.x * sx, n.y * sx, '#F59E0B', n.i)));
+        } else if (N.guia_src) {
+            /* imagen propia de la guía, ya rotulada */
         } else {
             // Cada caso: su zona marcada con su número
             casos.forEach((cs, i) => {
@@ -589,8 +742,8 @@ function iniciar(raiz) {
                     return [cs.titulo, pr ? pr.ops[pr.ok] : '', cs.exp || ''];
                 }) }
                 : { t: 'tabla', cab: ['Caso', 'Pregunta', 'Para recordar'], filas: casos.map(cs => {
-                    const el = cs.pasos.filter(p => p.tipo === 'elegir');
-                    return [cs.corto || cs.titulo, el.map(p => p.p + ' → ' + p.ops[p.ok]).join(' '), cs.exp || ''];
+                    const el = cs.pasos.map(p => p.q ? p.q : p).filter(p => p.ops || p.tipo === 'numero').filter(p => !['tarjeta', 'tocar', 'mira', 'sim'].includes(p.tipo));
+                    return [cs.corto || cs.titulo, el.map(p => p.p + ' → ' + (p.tipo === 'numero' ? p.ok_t : p.ops[p.ok])).join(' · '), cs.exp || ''];
                 }) });
             const rep = porRepasar();
             if (rep.length) bloques.push({ t: 'texto', txt: '↺ Por repasar: ' + rep.join(', ') + '.' });
@@ -612,13 +765,14 @@ function iniciar(raiz) {
         }
     }
 
-    function pintar() { pintarVista(); pintarPasos(); pintarPanel(); actualizar(); }
+    function pintar() { pintarVista(); pintarPasos(); pintarPanel(); actualizar(); vistaPaso(); }
 
     raiz.querySelector('#nl-esc-reset')?.addEventListener('click', () => {
         if (Object.keys(est.c).length && !confirm('Esto borra todas tus respuestas de este nivel. ¿Seguro?')) return;
         est = { c: {}, err: 0, nombres: est.nombres };
         guardar();
         ver = casos[0]; verCierre = false; marca = null;
+        simM?.reiniciar?.();
         pintar();
     });
 

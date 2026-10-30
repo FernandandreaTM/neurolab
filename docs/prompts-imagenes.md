@@ -350,3 +350,116 @@ Fila 2:
 | Microglía vigilante · M1 · M2 | `microglia-vigilante.png` · `microglia-m1-inflamatoria.png` · `microglia-m2-reparadora.png` |
 | Astrocito A1 · A2 · de la cicatriz | `astrocito-a1-toxico.png` · `astrocito-a2-protector.png` · `astrocito-de-la-cicatriz.png` |
 | Glía radial · Precursor NG2 | `glia-radial.png` · `precursor-ng2.png` |
+
+## 12. Práctico 3 · neurona con sus canales (opcional) → `img/potencial/neurona-canales.jpg`
+
+El nivel II de «Canales de membrana» usa hoy `img/potencial/neurona-canales.svg` (1200×800, `docs/practico-3_svg.py`; versión del 27-10-2026, 23 h:
+inhibitoria a la izquierda, aumento del cono axónico con canales de Na⁺ dependientes de voltaje y corpúsculo de Pacini con su aumento). La ilustración solo le da textura.
+Adjuntar **dos imágenes**: 1) `img/_fuentes/plantilla-neurona-canales.png` (1536×1024, plano exacto sin textos, sin leyenda y sin el recuadro del registro)
+y 2) `img/glia-snc-tejido.jpg` (muestrario de estilo). Guardar el resultado en `img/_fuentes/neurona-canales-chatgpt.png`: Claude le pega la leyenda y el
+marco del registro (grupo `superpuesto` del SVG) y lo deja como `img/potencial/neurona-canales.jpg`, con las mismas coordenadas (×1,28).
+
+```
+Usa la PRIMERA imagen como plano exacto: conserva la posición, el tamaño, la forma y el número de cada elemento. No agregues,
+quites, muevas ni unas ningún elemento. Sólo cambia el ESTILO: usa la SEGUNDA imagen únicamente como muestrario de texturas,
+colores y acabado (no copies su composición): ilustración médica en acuarela digital, con volumen, luces suaves y texturas finas,
+fondo claro. Deja vacías (solo fondo claro) la zona de abajo al centro y la de abajo a la derecha.
+
+Elementos:
+- Izquierda: trozo de piel en corte. Epidermis (capas de células rosadas apiladas) en el borde IZQUIERDO, que es la superficie;
+  dermis rosado clara a la derecha. En la dermis profunda, un corpúsculo de Pacini pequeño (cápsula ovalada en capas concéntricas,
+  como una cebolla, con el terminal nervioso ámbar al centro); el nervio ámbar sale de él hacia la derecha, nunca atravesando
+  la epidermis.
+- Neurona sensitiva ámbar: soma redondo con núcleo dentro de un ganglio (óvalo de tejido conectivo claro con células satélite),
+  una sola prolongación que se divide en T; axón con tres vainas de mielina crema que termina en un botón presináptico pequeño.
+- Segunda neurona violeta: dendrita gruesa que recibe el botón, soma grande con núcleo y nucléolo, otras tres dendritas que se
+  afinan, cono axónico y axón con vainas de mielina y nodos de Ranvier cortos entre ellas.
+- Axón inhibitorio rosado que baja desde arriba y termina en un botón sobre el lado superior izquierdo del soma.
+- Cuatro círculos de aumento unidos por líneas punteadas a su estructura:
+  · arriba a la izquierda, corpúsculo de Pacini: capas concéntricas de la cápsula (crema y durazno, translúcidas) y al centro el
+    terminal nervioso ámbar, con tres canales mecanosensibles índigo que atraviesan su membrana;
+  · abajo a la izquierda, sinapsis excitatoria: terminal presináptico ámbar con vesículas rosadas (glutamato) y una mitocondria;
+    una vesícula fusionándose; hendidura angosta y clara; membrana postsináptica violeta con densidad postsináptica oscura y tres
+    receptores-canal verdes que la atraviesan; citoplasma postsináptico liso (sin células);
+  · arriba, entre el ganglio y la neurona, sinapsis inhibitoria: terminal presináptico rosado con vesículas que contienen GABA
+    (puntos naranjos); hendidura angosta; membrana postsináptica violeta con tres receptores-canal amarillos que la atraviesan;
+    citoplasma liso;
+  · arriba a la derecha, cono axónico: arriba medio extracelular celeste, al centro la membrana del axón (bicapa violeta) y abajo
+    el axoplasma violeta claro y liso. En la membrana, tres canales de Na⁺ dependientes de voltaje turquesa que la atraviesan,
+    cada uno con un sensor de voltaje naranjo a su lado y una compuerta en la boca del poro. Aquí NO hay vesículas ni
+    neurotransmisores.
+
+Colores: piel rosado-durazno; neurona sensitiva ámbar; segunda neurona violeta; axón inhibitorio rosado; mielina crema;
+receptores de glutamato verdes; receptores de GABA amarillos; canales de voltaje turquesa con sensor naranjo; canales mecanosensibles índigo.
+1536 × 1024, sin texto, sin números, sin flechas, sin leyenda.
+
+REGLAS BIOLÓGICAS (obligatorias):
+- El receptor de la piel es un corpúsculo de Pacini: terminal nervioso único rodeado de capas concéntricas, en la dermis profunda.
+- El soma sensitivo tiene una sola prolongación que se divide en T.
+- En los aumentos de las sinapsis, las membranas pre y postsináptica no se tocan: queda una hendidura fina y continua.
+- Los receptores y canales atraviesan la membrana de lado a lado; las vesículas quedan dentro del terminal presináptico.
+- El citoplasma de las neuronas es liso: nunca relleno de células.
+- Entre dos vainas de mielina queda un nodo corto, sin mielina, del color del axón.
+- No agregues nada que no esté en la primera imagen.
+```
+
+Si algo sale mal, corregir **solo con selección de zona** («deja esta zona igual a la primera imagen»), nunca rehacer completa.
+
+## 13. Práctico 3 · actividad 15 (potencial de acción) → `img/_fuentes/` (Claude las integra después)
+
+Para las dos se adjuntan **dos imágenes**: 1) la plantilla (plano exacto, sin textos) y 2) `img/potencial/neurona-canales.jpg` (muestrario de estilo, para que se vea igual que la actividad 2). Los rótulos, los electrodos, los brillos y la onda del PA los dibuja NeuroLab encima, así que la imagen va sin texto.
+
+### 13a. Neurona simple del nivel I (fondo del simulador en vista «neurona») → `img/_fuentes/neurona-simple-chatgpt.png`
+
+Plantilla: `img/_fuentes/plantilla-neurona-simple.png` (1024×1024, cuadrada).
+
+```
+Usa la PRIMERA imagen como plano exacto: conserva la posición, el tamaño, la forma y el número de cada elemento. No agregues,
+quites, muevas ni unas ningún elemento. Solo cambia el ESTILO: usa la SEGUNDA imagen únicamente como muestrario de texturas,
+colores y acabado (no copies su composición): ilustración médica en acuarela digital, con volumen, luces suaves y texturas finas.
+
+Elementos:
+- Fondo: medio extracelular celeste muy claro y liso, sin células ni objetos. Deja vacía la franja de arriba (el tercio superior).
+- Una neurona multipolar violeta: soma redondo grande con núcleo y nucléolo; cuatro dendritas que salen del soma hacia la
+  izquierda y hacia abajo y se afinan hacia la punta (pueden tener pequeñas ramificaciones y espinas, sin cambiar su recorrido).
+- Cono axónico: el ensanchamiento con forma de cono entre el soma y el axón, del mismo violeta, sin mielina.
+- Axón horizontal violeta hacia el borde derecho, con tres vainas de mielina crema y nodos de Ranvier cortos entre ellas.
+
+Colores: neurona violeta (como la segunda neurona de la imagen de muestra); mielina crema; fondo celeste muy claro.
+1024 × 1024, sin texto, sin números, sin flechas, sin electrodos, sin leyenda.
+
+REGLAS BIOLÓGICAS (obligatorias):
+- Una sola neurona; el citoplasma es liso, nunca relleno de células.
+- El soma y el cono axónico quedan exactamente donde están en la primera imagen.
+- Entre dos vainas de mielina queda un nodo corto, sin mielina, del color del axón; el cono axónico no tiene mielina.
+- No agregues nada que no esté en la primera imagen.
+```
+
+### 13b. Axón del período refractario (nivel III, «Un solo sentido») → `img/_fuentes/axon-refractario-chatgpt.png`
+
+Plantilla: `img/_fuentes/plantilla-axon-refractario.png` (1536×1024 = `axon-refractario.svg` ×1,28, con 50 px más abajo).
+
+```
+Usa la PRIMERA imagen como plano exacto: conserva la posición, el tamaño, la forma y el número de cada elemento. No agregues,
+quites, muevas ni unas ningún elemento. Solo cambia el ESTILO: usa la SEGUNDA imagen únicamente como muestrario de texturas,
+colores y acabado (no copies su composición): ilustración médica en acuarela digital, con volumen, luces suaves y texturas finas,
+fondo claro y liso.
+
+Elementos:
+- A la izquierda, una neurona violeta: soma ovalado con núcleo y nucléolo, cinco dendritas que se afinan (dos con una pequeña
+  ramificación) y el cono axónico.
+- Un axón horizontal violeta que cruza toda la imagen hacia la derecha, con cinco vainas de mielina crema (como salchichas, con
+  células de Schwann aplanadas) y cinco nodos de Ranvier cortos entre ellas, exactamente donde están en la primera imagen.
+- Deja vacías (solo fondo claro) la franja de arriba del axón y la de abajo, donde irán los rótulos.
+
+Colores: neurona y axón violeta; mielina crema; fondo claro.
+1536 × 1024, sin texto, sin números, sin flechas, sin brillos ni marcas en los nodos, sin leyenda.
+
+REGLAS BIOLÓGICAS (obligatorias):
+- Los nodos de Ranvier son cortos, sin mielina y del color del axón; las cinco vainas tienen el mismo largo.
+- El soma tiene un solo axón, que nace del cono axónico.
+- El citoplasma es liso, nunca relleno de células.
+- No agregues nada que no esté en la primera imagen.
+```
+
+Si algo sale mal, corregir **solo con selección de zona** («deja esta zona igual a la primera imagen»), nunca rehacer completa.
