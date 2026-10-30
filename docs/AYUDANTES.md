@@ -20,7 +20,7 @@ Para Kaira y Marcelo. Hubo muchos cambios: `main` es ahora la única rama oficia
 
 ## 3. Borrar tus ramas viejas
 
-En **Current branch** verás ramas que ya no existen en GitHub (ej. `feat/atlas-por-area`, `pr/7`, `integracion`).
+En **Current branch** verás ramas que ya no existen en GitHub (ej. `feat/p2-rediseno`, `feat/atlas-por-area`, `pr/7`).
 
 1. Asegúrate de estar en `main`.
 2. **Branch → Delete…** sobre cada rama vieja (si pregunta, marca también borrar la remota).
@@ -45,10 +45,11 @@ Abre http://localhost:8000 → **Práctico Células nerviosas I** → haz al men
 | Archivo | Para qué |
 |---|---|
 | `README.md` | Qué es el proyecto ahora y dónde está cada cosa |
-| `docs/sesiones/sesion-04_*.md` | Último estado y decisiones de diseño |
+| `docs/sesiones/sesion-13_*.md` | Último estado (práctico 3) |
+| `docs/sesiones/sesion-12_*.md` → «Cómo trabajamos» | Reglas de las actividades y las preguntas |
 | `docs/sesiones/sesion-02_*.md` | Principios de la mesa de trabajo (cómo se arma una actividad) |
 | `data/practicos.php` | Cómo se define una ruta de práctico |
-| `docs/practico-2_tareas.md` | **Tareas disponibles del práctico II** |
+| `docs/practico-4_tareas.md` | **Tarea disponible del práctico 4 (casos clínicos)** |
 
 ## 6. Empezar una tarea nueva
 
@@ -56,7 +57,7 @@ Abre http://localhost:8000 → **Práctico Células nerviosas I** → haz al men
 2. **Publish branch**.
 3. Trabaja con Claude Desktop. Al iniciar el chat, pásale:
    ```
-   Trabajo en NeuroLab (carpeta del repo). Lee README.md y docs/sesiones/sesion-04_*.md.
+   Trabajo en NeuroLab (carpeta del repo). Lee README.md y docs/practico-4_tareas.md.
    Mi tarea es: <tarea asignada>. Antes de programar, propónme el plan en una tabla.
    No toques data/docente.php ni data/neurolab.db. Commits pequeños, mensajes en imperativo.
    ```
