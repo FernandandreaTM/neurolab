@@ -174,6 +174,11 @@ return [
         'objetivo'   => 'Integrar lo trabajado en los prácticos anteriores: cómo se transmite la señal en la sinapsis química, cómo las sinapsis excitatorias e inhibitorias forman un circuito y qué pasa cuando una enfermedad o un fármaco actúa sobre ellas.',
         'intro'      => 'Último práctico de la serie: integra neuronas, glía, canales y potencial de acción. Avanza a tu ritmo, en orden. Cada nivel se corrige solo y suma una sección a tu guía de estudio; al final descárgala en PDF.',
         'pasos' => [
+            ['slug' => 'sinapsis-quimica',
+             'titulo' => 'La sinapsis química (2 niveles)',
+             'tarea' => 'Con el simulador de la sinapsis: del potencial de acción a la liberación (Ca²⁺, vesículas, sumación de PPSE y recaptación) y cómo el receptor decide el efecto (GABA y acetilcolina en receptores nicotínicos y muscarínicos). Cada nivel suma una sección a tu guía.',
+             'guia' => ['sinapsis-quimica:1' => 'Nivel I: del potencial de acción a la liberación',
+                        'sinapsis-quimica:2' => 'Nivel II: el receptor decide']],
             ['slug' => 'circuito-reflejo',
              'titulo' => 'Circuito reflejo (5 niveles)',
              'tarea' => 'Un solo esquema que se arma por capas: ubica las partes de la médula, completa los extremos del arco, arma el reflejo rotuliano y el de retirada neurona por neurona (con sus sinapsis bajo la lupa) y, al final, empareja tres casos clínicos con el sitio de la lesión. Cada nivel suma una sección a tu guía.',

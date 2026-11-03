@@ -17,6 +17,7 @@
  *     `simulador: "pa"`: simulador del potencial de acción (js/sim-pa.js), mismos pasos «sim»; `sim_cfg` {vista: "neurona", max, ventana}
  *     (dibujo y estímulos por registro). «Empezar de nuevo» también reinicia el simulador. Un caso con `esquema: true`
  *     muestra el fondo del nivel (pasos «elegir»/«tocar» con animación) en vez del simulador.
+ *     `simulador: "sinapsis"`: sinapsis química (js/sim-sinapsis.js); `sim_cfg` {controles: [pa, tren, ca, recap, nt, rec], nt}.
  *   · modo «etapas»: una secuencia en columnas (`cols`, filas `filas_y`). Cada etapa es un caso con `col` y un paso
  *     «mira» (la columna se destapa y se anima; texto SNP/SNC en el panel); después un caso con pasos «sistema»
  *     que marcan su columna (`col`) y llenan el cuadro por etapa (`cuadro_etapas`, con `fila` y `celda`).
@@ -28,6 +29,7 @@ import { sumarAGuia, urlGuia } from './guia.js';
 import { conexionGuia } from './carrera.js';
 import { crearSimMembrana, CHEQUEOS } from './sim-membrana.js';
 import { crearSimPA, CHEQUEOS as CHEQUEOS_PA } from './sim-pa.js';
+import { crearSimSinapsis, CHEQUEOS as CHEQUEOS_SIN } from './sim-sinapsis.js';
 
 const RAIZ = document.getElementById('nl-esc');
 const MAX_GUIA = 900;
@@ -141,13 +143,14 @@ function iniciar(raiz) {
 
     /* Simulador propio (N.simulador): vive junto a la vista y no se repinta */
     let simM = null, simCaja = null;
-    if (N.simulador === 'membrana' || N.simulador === 'pa') {
+    if (N.simulador === 'membrana' || N.simulador === 'pa' || N.simulador === 'sinapsis') {
         simCaja = document.createElement('div');
         simCaja.className = 'nl-msim';
         vista.parentNode.insertBefore(simCaja, vista);
-        simM = N.simulador === 'pa' ? crearSimPA(simCaja, N.sim_cfg || {}) : crearSimMembrana(simCaja);
+        simM = N.simulador === 'pa' ? crearSimPA(simCaja, N.sim_cfg || {})
+            : N.simulador === 'sinapsis' ? crearSimSinapsis(simCaja, N.sim_cfg || {}) : crearSimMembrana(simCaja);
     }
-    const CHK = N.simulador === 'pa' ? CHEQUEOS_PA : CHEQUEOS;
+    const CHK = N.simulador === 'pa' ? CHEQUEOS_PA : N.simulador === 'sinapsis' ? CHEQUEOS_SIN : CHEQUEOS;
 
     let est = null;
     try { est = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { est = null; }

@@ -1119,6 +1119,17 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
 .nl-msim__estim { padding: .6rem .5rem; border-radius: 12px; border: 0; background: #F59E0B; color: #1A0E2E; font: 800 .9rem/1 inherit; cursor: pointer; box-shadow: 0 3px 0 #B45309; }
 .nl-msim__estim:disabled { opacity: .45; cursor: default; box-shadow: none; }
 .nl-msim__estim:active { transform: translateY(2px); box-shadow: 0 1px 0 #B45309; }
+.nl-msim__card.is-ca { border-left-color: #A855F7; }
+.nl-msim__card.is-recap { border-left-color: #10B981; }
+.nl-msim__card.is-nt, .nl-msim__card.is-rec { border-left-color: #EC4899; }
+.nl-msim__card.is-ca .nl-msim__sw[aria-pressed="true"] i { background: #A855F7; }
+.nl-msim__card.is-recap .nl-msim__sw[aria-pressed="true"] i { background: #10B981; }
+.nl-msim__opc { display: grid; grid-template-columns: 1fr; gap: 4px; }
+.nl-msim__opc--2 { grid-template-columns: 1fr 1fr; }
+.nl-msim__opc button { display: flex; align-items: center; gap: .4rem; min-height: 1.9rem; padding: 0 .5rem; border-radius: 8px; border: 1px solid #F9A8D4; background: #FDF2F8; color: #831843; font: 800 .74rem/1 inherit; cursor: pointer; }
+.nl-msim__opc button i { flex: none; width: .7rem; height: .7rem; border-radius: 3px; }
+.nl-msim__opc button[aria-pressed="true"] { background: #EC4899; border-color: #9D174D; color: #fff; }
+.nl-msim__opc button:disabled, .nl-msim__estim:disabled { opacity: .45; cursor: default; }
 .nl-msim__lienzo--pa { cursor: default; touch-action: pan-y; }
 @media (max-width: 900px) {
     .nl-msim__caja { flex-direction: column; }

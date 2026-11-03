@@ -51,7 +51,26 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
         }
         if (await p.$('.nl-esc__simq.is-bloq')) errs.push('sim sin completar: ' + cs.clave + ' ' + JSON.stringify(await p.evaluate(`${sim}.estado()`)));
       }
-      while (N.simulador !== 'pa' && Date.now() - t0 < 120000) {
+      if (N.simulador === 'sinapsis') {   // simulador de la sinapsis: botones reales de la interfaz
+        const sim = 'document.querySelector(".nl-msim").__sim';
+        await p.evaluate(`${sim}.prueba.vel(3)`);
+        const sw = async (k, on) => { const v = await p.getAttribute(`[data-sw="${k}"]`, 'aria-pressed') === 'true'; if (v !== on) await p.click(`[data-sw="${k}"]`); };
+        const correr = async sel => { await p.click(sel); await p.waitForTimeout(300); await p.waitForFunction(`!${sim}.estado().corriendo`, null, { timeout: 40000 }); await p.waitForTimeout(300); };
+        let trenHecho = false;
+        for (const c of ps.checks) {
+          if (c.c === 'caOff') await sw('ca', false);
+          if (c.c === 'caOn') await sw('ca', true);
+          if (c.c === 'recapOff') await sw('recap', false);
+          if (c.c === 'ntGaba') await p.click('[data-nt="gaba"]');
+          if (c.c === 'ntAch') await p.click('[data-nt="ach"]');
+          if (c.c === 'recNic') await p.click('[data-rec="nic"]');
+          if (c.c === 'recMus') await p.click('[data-rec="mus"]');
+          if (['lib1', 'sinLib', 'largo', 'ppsi', 'nic', 'mus'].includes(c.c)) await correr('[data-acc="pa"]');
+          if ((c.c === 'tren' || c.c === 'paPost') && !trenHecho) { trenHecho = true; await correr('[data-acc="tren"]'); }
+        }
+        if (await p.$('.nl-esc__simq.is-bloq')) errs.push('sim sin completar: ' + cs.clave + ' ' + JSON.stringify(await p.evaluate(`${sim}.estado()`)));
+      }
+      while (N.simulador !== 'pa' && N.simulador !== 'sinapsis' && Date.now() - t0 < 120000) {
         if (!(await p.$('.nl-simok[disabled]')) && !(await p.$('.nl-esc__simq.is-bloq'))) break;
         for (const [k, c] of ps.checks.entries()) {
           if (await p.$(`.nl-esc__checks li[data-k="${k}"].is-ok`)) continue;
@@ -105,7 +124,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
   }
   const fin = await p.$('.nl-fin'); if (fin) { await fin.click(); }
   await snap(1500);
-  if (process.env.GUIA) { await p.goto('http://127.0.0.1:8080/guia.php?p=potencial-accion'); await p.waitForTimeout(1500); await p.screenshot({ path: '/tmp/guia.png', fullPage: true }); }
+  if (process.env.GUIA) { await p.goto(`http://127.0.0.1:8080/guia.php?p=${process.env.RUTA || 'potencial-accion'}`); await p.waitForTimeout(1500); await p.screenshot({ path: '/tmp/guia.png', fullPage: true }); }
   const guia = await p.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('nl_guia') || '{}')));
   console.log(tag, 'pasos', guard, 'errores JS:', errs, 'guia:', guia.length ? guia : 'ver clave');
   await b.close();
