@@ -986,6 +986,20 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
 .nl-esc__sobre { padding: .55rem .75rem; border-radius: 10px; background: #F5F3FF; border-left: 4px solid #8B5CF6; }
 .nl-esc__sobre-etq { display: block; margin-bottom: .15rem; font-size: .68rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #6D28D9; }
 .nl-esc__sobre p { margin: 0; font-size: .84rem; line-height: 1.45; color: #2E1A47; }
+.nl-esc__col { display: flex; flex-direction: column; gap: .7rem; min-width: 0; }
+.nl-esc__sitios { padding: .6rem .7rem .7rem; border-radius: 14px; background: rgba(255,255,255,.06); border: 2px solid transparent; }
+.nl-esc__sitios.is-activo { border-color: #F59E0B; background: rgba(245,158,11,.08); }
+.nl-esc__sitios-etq { margin: 0 0 .45rem; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #FCD34D; }
+.nl-esc__mcartas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.nl-esc__mcartas.is-sacude { animation: nlLabMal 320ms ease; }
+.nl-esc__mcarta { display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .35rem .3rem .45rem; border-radius: 12px; border: 2px solid #DDD6FE; background: #fff; color: #2E1065; font: 800 .74rem/1.15 inherit; text-align: center; cursor: pointer; }
+.nl-esc__mcarta .nl-ico { width: 100%; max-width: 92px; height: auto; aspect-ratio: 1; object-fit: contain; border-radius: 8px; }
+.nl-esc__mcarta:hover:not([disabled]) { border-color: #F59E0B; transform: translateY(-2px); }
+.nl-esc__mcarta[disabled] { cursor: default; }
+.nl-esc__mcarta.is-mal { opacity: .4; border-color: var(--repasar); background: #FFF1F0; }
+.nl-esc__mcarta.is-ok { border-color: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,.35); }
+.nl-esc__mcarta.is-off { opacity: .35; }
+@media (max-width: 900px) { .nl-esc__mcartas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .nl-esc__foto { display: flex; flex-direction: column; align-items: center; gap: .45rem; margin: 0; min-width: 0; }
 .nl-esc__foto-btn { position: relative; max-width: 100%; padding: 0; border: 0; background: none; line-height: 0; cursor: zoom-in; }
 .nl-esc__foto-btn img { display: block; max-width: 100%; max-height: calc(var(--alto) - 10.5rem); border-radius: 10px; background: #000; }

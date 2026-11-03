@@ -6,7 +6,7 @@
  *   · modo «casos»: pasos «tocar» (una zona del fondo), «sistema» (SNC o SNP), «tarjeta» (célula con ícono)
  *     y «elegir» (alternativas con pista); al terminar, la lesión se marca en el fondo y el caso suma una fila al cuadro.
  *     Si el caso trae «foto», la vista muestra la ficha del caso (enfermedad, paciente, «contexto») junto a la imagen
- *     real; «dx» en el nivel muestra el nombre de la enfermedad desde el inicio.
+ *     real; «dx» en el nivel muestra el nombre de la enfermedad desde el inicio; `cartas_mesa` pone las tarjetas bajo la ficha.
  *   · Pasos comunes: «mira» (instrucción con botón; `vista: "sim"` abre el simulador), «numero» (valor medido, `rango` [mín, máx]).
  *     `capas` en el nivel ([{src, casos}]): imágenes que se superponen al fondo (y quedan) cuando se resuelve alguno de esos casos
  *     `sim` en el nivel ({url, t, pie}) agrega la pestaña del simulador; `fondo`/`fondo_ok` en un caso cambian la imagen
@@ -374,12 +374,28 @@ function iniciar(raiz) {
     /** Caso con imagen real: ficha (enfermedad, paciente, contexto) + imagen que se amplía en el visor. */
     function pintarFicha(cs) {
         const hecho = listo(cs);
+        // `cartas_mesa` (nivel): las tarjetas del paso «tarjeta» se eligen en la mesa, bajo la ficha
+        const iT = N.cartas_mesa ? cs.pasos.findIndex(p => p.tipo === 'tarjeta') : -1;
+        let cartas = '';
+        if (iT >= 0) {
+            const e = ec(cs), pT = cs.pasos[iT], rT = e.r[iT], activo = e.paso === iT, resuelto = e.paso > iT;
+            cartas = `<div class="nl-esc__sitios${activo ? ' is-activo' : ''}">
+                <p class="nl-esc__sitios-etq">${esc(pT.nombre || 'Tarjetas')}${activo ? ' · toca la tarjeta' : ''}</p>
+                <div class="nl-esc__mcartas">${rT.orden.map(io => {
+                    const txt = pT.ops[io], mal = rT.mal.includes(io), ok = resuelto && io === pT.ok, off = resuelto && io !== pT.ok;
+                    return `<button type="button" class="nl-esc__mcarta${mal ? ' is-mal' : ''}${ok ? ' is-ok' : ''}${off ? ' is-off' : ''}" data-mc="${io}"${activo && !mal ? '' : ' disabled'}>
+                        ${iconos[txt] || ''}<span>${esc(txt)}</span></button>`;
+                }).join('')}</div></div>`;
+        }
         vista.innerHTML = `
             <div class="nl-esc__caso">
+              <div class="nl-esc__col">
               <div class="nl-esc__ficha">
                 <p class="nl-esc__enf">${esc(cs.corto)}${hecho ? ' <span class="nl-esc__ok">✓ Resuelto</span>' : ''}</p>
                 <p class="nl-esc__pac"><strong>${esc(cs.titulo)}.</strong> ${esc(cs.situacion || '')}</p>
                 ${cs.contexto ? `<div class="nl-esc__sobre"><span class="nl-esc__sobre-etq">Sobre la enfermedad</span><p>${esc(cs.contexto)}</p></div>` : ''}
+              </div>
+              ${cartas}
               </div>
               <figure class="nl-esc__foto">
                 <button type="button" class="nl-esc__foto-btn" aria-label="Ver la imagen grande"><img src="${esc(cs.foto)}" alt="${esc(cs.foto_t || cs.corto)}"><span>🔍 Ampliar</span></button>
@@ -387,6 +403,11 @@ function iniciar(raiz) {
               </figure>
             </div>`;
         vista.querySelector('.nl-esc__foto-btn').addEventListener('click', () => abrirVisor(cs.foto, cs.foto_t, cs.foto_pie));
+        vista.querySelectorAll('[data-mc]:not([disabled])').forEach(b => b.addEventListener('click', () => {
+            const antes = ec(cs).paso;
+            responder(cs, Number(b.dataset.mc));
+            if (ver === cs && ec(cs).paso === antes) { pintarFicha(cs); vista.querySelector('.nl-esc__mcartas')?.classList.add('is-sacude'); }
+        }));
         recien = false;
     }
 
@@ -489,6 +510,11 @@ function iniciar(raiz) {
             return `<p class="nl-lab__q">${esc(p.p)}</p>
                 <div class="nl-esc__sis" data-n="${ops.length}">${ops.map(o => `<button type="button" class="nl-esc__sis-btn is-${clase(String(o.txt))}${r.mal.includes(o.io) ? ' is-mal' : ''}" data-i="${o.io}"${r.mal.includes(o.io) ? ' disabled' : ''}>
                     <strong>${esc(o.txt)}</strong>${SISTEMAS[o.txt] ? `<small>${esc(SISTEMAS[o.txt])}</small>` : ''}</button>`).join('')}</div>
+                ${r.mal.length ? `<p class="nl-lab__q-fb">✗ Pista: ${esc(p.pista || 'intenta de nuevo.')}</p>` : ''}`;
+        }
+        if (p.tipo === 'tarjeta' && N.cartas_mesa && cs.foto) {
+            return `<p class="nl-lab__q">${esc(p.p)}</p>
+                <p class="nl-lab__ayuda">👈 Toca la tarjeta en la mesa, bajo la ficha del caso.</p>
                 ${r.mal.length ? `<p class="nl-lab__q-fb">✗ Pista: ${esc(p.pista || 'intenta de nuevo.')}</p>` : ''}`;
         }
         if (p.tipo === 'tarjeta') {

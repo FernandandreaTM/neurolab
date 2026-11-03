@@ -110,7 +110,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
       await p.mouse.click(box.x + x / N.vb[0] * box.width, box.y + y / N.vb[1] * box.height);
     } else {
       const txt = equivocar ? ps.ops[(ps.ok + 1) % ps.ops.length] : ps.ops[ps.ok];
-      const btns = await p.$$('#nl-esc-trabajo [data-i]');
+      const btns = [...await p.$$('#nl-esc-trabajo [data-i]'), ...await p.$$('#nl-esc-vista [data-mc]:not([disabled]), .nl-esc__mcarta:not([disabled])')];
       let hit = false;
       for (const bt of btns) { const t = (await bt.innerText()).replace(/^[A-D]\s+/, '').trim(); if (t === txt.trim()) { await bt.click(); hit = true; break; } }
       if (!hit) { errs.push('sin botón: ' + txt); break; }

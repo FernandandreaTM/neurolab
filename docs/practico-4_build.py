@@ -88,6 +88,7 @@ for c in N['casos']:
         if p['tipo'] == 'tarjeta':
             p['ops'] = SITIOS
 N['casos'] = [c for c in N['casos'] if c['clave'] not in {n['clave'] for n in NUEVOS}] + NUEVOS
+N['cartas_mesa'] = True
 N['guia_pie'] = "Imágenes: Lanfear's Bane (CC BY-SA 3.0); Lucien Monfils (CC BY-SA 4.0); W. R. Gowers (dominio público); Kurukumbi y cols. (CC BY 2.0); Pittigrilli (CC BY 4.0)."
 nuevo = json.dumps(d, ensure_ascii=False).replace("'", "''")
 SEED.write_text(txt[:ini] + nuevo + txt[fin:], encoding='utf-8')
