@@ -10,7 +10,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
   p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (m.type() === 'error' && !/phet|ERR_|403|Failed to load/.test(m.text())) errs.push(m.text()); });
   // desbloquear niveles previos
-  await p.goto(`http://127.0.0.1:8080/actividad.php?slug=${slug}&nivel=${nivel}&ruta=potencial-accion`);
+  await p.goto(`http://127.0.0.1:8080/actividad.php?slug=${slug}&nivel=${nivel}&ruta=${process.env.RUTA || "potencial-accion"}`);
   await p.evaluate(([slug, n]) => { const d = JSON.parse(localStorage.getItem('nl_progress') || '{}'); for (let i = 1; i < 6; i++) d[slug + ':' + i] = true; localStorage.setItem('nl_progress', JSON.stringify(d)); }, [slug, nivel]);
   await p.reload();
   await p.waitForTimeout(400);
@@ -71,7 +71,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
       await snap(100);
       if (ps.q) {
         const txt = equivocar ? ps.q.ops[(ps.q.ok + 1) % ps.q.ops.length] : ps.q.ops[ps.q.ok];
-        for (const bt of await p.$$('.nl-esc__simq [data-i]')) { const tx = (await bt.innerText()).replace(/^[A-D]\s*/, '').trim(); if (tx === txt.trim()) { await bt.click(); break; } }
+        for (const bt of await p.$$('.nl-esc__simq [data-i]')) { const tx = (await bt.innerText()).replace(/^[A-D]\s+/, '').trim(); if (tx === txt.trim()) { await bt.click(); break; } }
         if (equivocar) { errores++; await snap(300); continue; }
       } else await p.click('.nl-simok');
     }
@@ -80,7 +80,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
       await p.click('.nl-esc__num button');
     } else if (ps.tipo === 'tocar' && ps.q && e.r && e.r[e.paso] && e.r[e.paso].tocado) {
       const txt = equivocar ? ps.q.ops[(ps.q.ok + 1) % ps.q.ops.length] : ps.q.ops[ps.q.ok];
-      for (const bt of await p.$$('#nl-esc-trabajo [data-i]')) { const tx = (await bt.innerText()).replace(/^[A-D]\s*/, '').trim(); if (tx === txt.trim()) { await bt.click(); break; } }
+      for (const bt of await p.$$('#nl-esc-trabajo [data-i]')) { const tx = (await bt.innerText()).replace(/^[A-D]\s+/, '').trim(); if (tx === txt.trim()) { await bt.click(); break; } }
     } else if (ps.tipo === 'tocar') {
       if (await p.$('.nl-esc__sim:not([hidden])')) await p.click('[data-ver="esquema"]');
       const z = N.zonas[ps.ok[0]];
@@ -93,7 +93,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
       const txt = equivocar ? ps.ops[(ps.ok + 1) % ps.ops.length] : ps.ops[ps.ok];
       const btns = await p.$$('#nl-esc-trabajo [data-i]');
       let hit = false;
-      for (const bt of btns) { const t = (await bt.innerText()).replace(/^[A-D]\s*/, '').trim(); if (t === txt.trim()) { await bt.click(); hit = true; break; } }
+      for (const bt of btns) { const t = (await bt.innerText()).replace(/^[A-D]\s+/, '').trim(); if (t === txt.trim()) { await bt.click(); hit = true; break; } }
       if (!hit) { errs.push('sin botón: ' + txt); break; }
     }
     await p.waitForTimeout(250);

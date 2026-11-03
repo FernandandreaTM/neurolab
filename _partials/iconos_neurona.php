@@ -46,6 +46,21 @@ function nl_icono_neurona($nombre) {
                       <path d='M49 24 V36 M52 24 V36 M55 24 V36' stroke='#E11D48' stroke-width='.8'/>
                       <circle cx='14' cy='30' r='7' $soma/>",
     ];
+    // Sitios de la sinapsis (casos clínicos): el mismo dibujo con la parte destacada
+    $sitios = ['boton-presinaptico' => 'b', 'hendidura-sinaptica' => 'h', 'receptor-postsinaptico' => 'r', 'astrocito-vecino' => 'a'];
+    if (isset($sitios[$clave])) {
+        $on = $sitios[$clave];
+        $c = fn($k) => $k === $on ? "fill='#FBCFE8' stroke='#DB2777' stroke-width='1.8'" : "fill='#EDE9FE' stroke='#A78BFA' stroke-width='1.2'";
+        $hend = $on === 'h' ? "<rect x='14' y='33' width='32' height='5' rx='2' fill='#F9A8D4'/>" : '';
+        $rec = $on === 'r' ? '#DB2777' : '#A78BFA';
+        return '<svg class="nl-ico" viewBox="0 0 60 60" aria-hidden="true">' . $hend
+            . "<path {$c('b')} d='M25 0 V8 Q12 12 12 22 Q12 31 30 31 Q48 31 48 22 Q48 12 35 8 V0 Z'/>"
+            . "<circle cx='23' cy='22' r='2.6' fill='#C4B5FD'/><circle cx='30' cy='25' r='2.6' fill='#C4B5FD'/><circle cx='37' cy='22' r='2.6' fill='#C4B5FD'/>"
+            . "<path {$c('r')} d='M6 60 V44 Q6 40 12 40 H48 Q54 40 54 44 V60 Z'/>"
+            . "<path d='M20 40 v-2 M27 40 v-2 M33 40 v-2 M40 40 v-2' stroke='$rec' stroke-width='3' stroke-linecap='round'/>"
+            . "<path {$c('a')} d='M60 10 Q50 12 51 22 Q52 33 56 36 Q58 38 60 38 Z'/>"
+            . '</svg>';
+    }
     if (!isset($svg[$clave])) return '';
     return '<svg class="nl-ico" viewBox="0 0 60 60" aria-hidden="true">' . $svg[$clave] . '</svg>';
 }
