@@ -77,3 +77,20 @@ N['guia_pie'] = "Imágenes: Lanfear's Bane (CC BY-SA 3.0); Lucien Monfils (CC BY
 nuevo = json.dumps(d, ensure_ascii=False).replace("'", "''")
 SEED.write_text(txt[:ini] + nuevo + txt[fin:], encoding='utf-8')
 print('casos:', [c['clave'] for c in N['casos']])
+
+# Circuito reflejo (actividad 9), nivel II: todas las piezas a la vez (sin grupos)
+txt = SEED.read_text(encoding='utf-8')
+ini = txt.index("  (9, 'tareas', '") + len("  (9, 'tareas', '")
+fin = txt.index("}'", ini) + 1
+d = json.loads(txt[ini:fin].replace("''", "'"))
+n2 = d['niveles'][1]
+n2.pop('grupos', None)
+for p in n2['piezas']:
+    p.pop('grupo', None)
+n2['instrucciones'] = ("La médula ya está. Completa los huecos punteados: toca un hueco y elige su pieza, o arrastra la pieza "
+    "a cualquier parte de su hueco. Las piezas están en cualquier orden: fíjate qué trae la información (lado <strong>sensitivo</strong>) "
+    "y qué la lleva al músculo (lado <strong>motor</strong>). <strong>Verde</strong>: correcto. <strong>Rojo</strong>: por repasar. "
+    "<strong>Naranjo</strong>: lo que estás haciendo.")
+nuevo = json.dumps(d, ensure_ascii=False, separators=(',', ':')).replace("'", "''")
+SEED.write_text(txt[:ini] + nuevo + txt[fin:], encoding='utf-8')
+print('circuito nivel II: sin grupos')
