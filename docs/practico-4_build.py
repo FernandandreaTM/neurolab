@@ -29,7 +29,7 @@ NUEVOS = [
      "exp": "En el Parkinson mueren las neuronas dopaminérgicas de la sustancia negra que liberan dopamina en el estriado. Sin dopamina se altera el circuito de los ganglios basales que facilita el movimiento: aparecen temblor de reposo, lentitud y rigidez. La dopamina no cruza la barrera hematoencefálica; la L-dopa sí, con un transportador, y las neuronas que quedan la convierten en dopamina. Como las neuronas siguen muriendo, con los años el efecto de cada dosis dura menos.",
      "fila": ["Botón presináptico (sustancia negra → estriado)", "Dopamina", "Menos dopamina en el estriado", "Temblor y lentitud; mejora con L-dopa"]},
     {"clave": "miastenia", "titulo": "Ana, 29 años", "corto": "Miastenia gravis",
-     "situacion": "Al final del día se le caen los párpados y ve doble. Si habla mucho rato la voz se le apaga, y le cuesta masticar al terminar de comer. Todo mejora después de descansar.",
+     "situacion": "Al final del día se le cae el párpado derecho y ve doble. Si habla mucho rato la voz se le apaga, y le cuesta masticar al terminar de comer. Todo mejora después de descansar.",
      "contexto": "Es una enfermedad autoinmune: anticuerpos atacan una proteína de la placa motora. Los nervios conducen bien y liberan acetilcolina en cantidad normal. Se trata con piridostigmina, que inhibe la acetilcolinesterasa.",
      "pasos": [
         sitio("Si el nervio libera acetilcolina normal, ¿dónde está la proteína que atacan los anticuerpos?", 2,
@@ -62,6 +62,21 @@ NUEVOS = [
      "fila": ["Botón presináptico (fusión de vesículas)", "Acetilcolina", "No se libera ACh", "El músculo se relaja por unos tres meses"]},
 ]
 
+FOTOS = {
+    "parkinson": ("img/sinapsis/casos/parkinson.jpg",
+                  "Dibujo de un paciente con enfermedad de Parkinson (1886): tronco encorvado, brazos flexionados pegados al cuerpo.",
+                  "William R. Gowers · Dominio público · Wikimedia Commons"),
+    "miastenia": ("img/sinapsis/casos/miastenia.jpg",
+                  "a) Párpado derecho caído (ptosis). b) Minutos después de una dosis de edrofonio, un inhibidor de la acetilcolinesterasa de acción corta: la ptosis mejora.",
+                  "Kurukumbi y cols., J Med Case Rep 2008 · CC BY 2.0 · Wikimedia Commons"),
+    "botox": ("img/sinapsis/casos/botox.jpg",
+              "Frasco de toxina botulínica, con una regla en centímetros para mostrar su tamaño.",
+              "Pittigrilli · CC BY 4.0 · Wikimedia Commons"),
+}
+for c in NUEVOS:
+    if c["clave"] in FOTOS:
+        c["foto"], c["foto_t"], c["foto_pie"] = FOTOS[c["clave"]]
+
 txt = SEED.read_text(encoding='utf-8')
 ini = txt.index("  (17, 'tareas', '") + len("  (17, 'tareas', '")
 fin = txt.index("', NULL, 1);", ini)
@@ -72,8 +87,8 @@ for c in N['casos']:
     for p in c['pasos']:
         if p['tipo'] == 'tarjeta':
             p['ops'] = SITIOS
-N['casos'] += [c for c in NUEVOS if c['clave'] not in claves]
-N['guia_pie'] = "Imágenes: Lanfear's Bane (CC BY-SA 3.0); Lucien Monfils (CC BY-SA 4.0)."
+N['casos'] = [c for c in N['casos'] if c['clave'] not in {n['clave'] for n in NUEVOS}] + NUEVOS
+N['guia_pie'] = "Imágenes: Lanfear's Bane (CC BY-SA 3.0); Lucien Monfils (CC BY-SA 4.0); W. R. Gowers (dominio público); Kurukumbi y cols. (CC BY 2.0); Pittigrilli (CC BY 4.0)."
 nuevo = json.dumps(d, ensure_ascii=False).replace("'", "''")
 SEED.write_text(txt[:ini] + nuevo + txt[fin:], encoding='utf-8')
 print('casos:', [c['clave'] for c in N['casos']])
