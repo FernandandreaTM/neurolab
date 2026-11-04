@@ -61,6 +61,23 @@ function nl_icono_neurona($nombre) {
             . "<path {$c('a')} d='M60 10 Q50 12 51 22 Q52 33 56 36 Q58 38 60 38 Z'/>"
             . '</svg>';
     }
+    // Sitios de la placa motora: terminal del axón motor, hendidura con lámina basal, fibra muscular estriada y célula de Schwann terminal
+    $placa = ['terminal-del-axon-motor' => 'b', 'hendidura-de-la-placa' => 'h', 'receptor-de-la-fibra-muscular' => 'r', 'celula-de-schwann-terminal' => 'a'];
+    if (isset($placa[$clave])) {
+        $on = $placa[$clave];
+        $c = fn($k, $f, $s) => $k === $on ? "fill='#FBCFE8' stroke='#DB2777' stroke-width='1.8'" : "fill='$f' stroke='$s' stroke-width='1.2'";
+        $hend = $on === 'h' ? "<path d='M8 36 Q30 41 52 36' stroke='#DB2777' stroke-width='3' fill='none'/>" : "<path d='M8 36 Q30 41 52 36' stroke='#94A3B8' stroke-width='1' stroke-dasharray='2 2' fill='none'/>";
+        $rec = $on === 'r' ? '#DB2777' : '#14B8A6';
+        return '<svg class="nl-ico" viewBox="0 0 60 60" aria-hidden="true">'
+            . "<path {$c('r', '#FECACA', '#DC2626')} d='M2 60 V42 Q16 38 30 44 Q44 38 58 42 V60 Z'/>"
+            . "<path d='M10 47 V60 M18 46 V60 M26 47 V60 M34 47 V60 M42 46 V60 M50 47 V60' stroke='#F87171' stroke-width='.8'/>"
+            . $hend
+            . "<path {$c('b', '#FEF3C7', '#D97706')} d='M26 0 V10 Q14 16 14 26 Q14 34 30 34 Q46 34 46 26 Q46 16 34 10 V0 Z'/>"
+            . "<circle cx='24' cy='25' r='2.6' fill='#5EEAD4'/><circle cx='30' cy='28' r='2.6' fill='#5EEAD4'/><circle cx='36' cy='25' r='2.6' fill='#5EEAD4'/>"
+            . "<path d='M20 41 v-2 M27 42 v-2 M33 42 v-2 M40 41 v-2' stroke='$rec' stroke-width='3' stroke-linecap='round'/>"
+            . "<path {$c('a', '#E0E7FF', '#6366F1')} d='M23 0 Q8 6 9 20 Q10 30 14 31 Q11 20 16 13 Q20 7 25 6 Z M37 0 Q52 6 51 20 Q50 30 46 31 Q49 20 44 13 Q40 7 35 6 Z'/>"
+            . '</svg>';
+    }
     if (!isset($svg[$clave])) return '';
     return '<svg class="nl-ico" viewBox="0 0 60 60" aria-hidden="true">' . $svg[$clave] . '</svg>';
 }
