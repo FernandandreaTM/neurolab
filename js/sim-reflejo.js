@@ -10,7 +10,7 @@
  * Cada registro se calcula entero al empezar (espigas en ms, impulsos por cada camino, ángulo de la rodilla) y todo lo
  * dibujado depende del instante `tp`: la barra permite pausar, volver, arrastrar y ver a 0,25× o 0,5×.
  * La pierna (muslo fijo; pierna y pie giran en la rodilla) se dibuja con trazos SVG (Path2D); con `fondo` y `pierna`
- * (ilustraciones) se usan las imágenes y el código solo dibuja lo que se mueve.
+ * (ilustraciones; la pierna en PNG transparente) se usan las imágenes y el código dibuja encima lo que se mueve.
  * Uso: const sim = crearSimReflejo(caja, { controles: ['golpe', 'clavo', 'inh'], ascendente: false });
  * sim.estado(); sim.alCambiar(fn). CHEQUEOS: condiciones con nombre para los pasos «sim».
  */
@@ -324,7 +324,7 @@ export function crearSimReflejo(caja, cfg = {}) {
         g.beginPath(); g.moveTo(ROTULA[0], ROTULA[1] + 8); g.lineTo(tub[0], tub[1]); g.stroke();
         // pierna y pie (giran en la rodilla)
         g.save(); g.translate(K[0], K[1]); g.rotate(a); g.translate(-K[0], -K[1]);
-        if (lista(IMG.pierna)) { g.save(); g.clip(PP.piernaClip); g.drawImage(IMG.pierna, 0, 0, 760, 720); g.restore(); }   // ilustración recortada con la silueta
+        if (lista(IMG.pierna)) g.drawImage(IMG.pierna, 0, 0, 760, 720);   // ilustración con fondo transparente (docs/practico-4_imagenes.py)
         else {
             g.fillStyle = '#FDE7D6'; g.strokeStyle = '#C2876B'; g.lineWidth = 2; g.fill(PP.pierna); g.stroke(PP.pierna);
             g.strokeStyle = '#FDE68A'; g.lineWidth = 9; g.lineCap = 'round'; g.stroke(P2D.nocPie);   // nervio de la pierna
@@ -511,7 +511,7 @@ export function crearSimReflejo(caja, cfg = {}) {
     }
     function zona() {
         const b = sw;
-        g.fillStyle = '#F8FAFC'; g.fillRect(0, 0, 760, 720);
+        g.fillStyle = lista(IMG.fondo) ? '#FFFFFF' : '#F8FAFC'; g.fillRect(0, 0, 760, 720);
         g.save(); g.translate(ESC.dx, ESC.dy); g.scale(ESC.s, ESC.s);   // la escena completa, con margen para que el pie no salga
         anatomia(b);
         if (ASC && ultimoTipo === 'ret') encefalo(b);
