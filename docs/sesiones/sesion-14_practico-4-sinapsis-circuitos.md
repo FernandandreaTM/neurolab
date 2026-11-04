@@ -86,22 +86,36 @@ Formato: ficha + foto; pasos Sitio (tarjeta) → Qué cambia → Qué se observa
 | `docs/practico-4_reflejo-img.py` | Correcciones del esquema del circuito |
 | `docs/practico-3_test.js` | Ahora también `simulador: "sinapsis"`, `cartas_mesa` y `RUTA=sinapsis-circuitos` (`RUTA=… GUIA=1 node docs/practico-3_test.js sinapsis-quimica 1 1366 660 a`) |
 
-## Pendientes
+## Pendientes para la sesión 15 (pedidos de Fer, 04-11)
 
-1. Revisar en producción la actividad 16 (ritmo de la animación, barra en celular) y los casos con las tarjetas en la mesa.
-2. Rediseño del circuito reflejo de 5 a 3 niveles (propuesta de la sesión: I arco + asta dorsal/ventral; II rotuliano y retirada con una pregunta de integración por sinapsis en vez de lupas; III ¿dónde se cortó? + sitio D placa motora/botulismo).
-3. Las guías `guia-sinapsis-1/2.svg` usan un esquema simple: actualizarlas al estilo del fondo si Fer quiere.
-4. De la sesión 13: quiz del práctico 3, alternativas de Fono (f1, f2, f4: la correcta sigue siendo la más larga).
+| # | Tema | Qué hacer |
+|---|---|---|
+| 1 | Casos clínicos (act. 17): preguntas ambiguas | En cada caso dejar explícito si se pregunta **qué cambia por la enfermedad** o **qué cambia por el fármaco** (p. ej. Parkinson: falta de dopamina vs. efecto de la L-dopa; miastenia: anticuerpos vs. piridostigmina). Revisar enunciados y alternativas de los 5 casos |
+| 2 | Casos clínicos: tarjetas según el tipo de sinapsis | El astrocito no corresponde en la placa motora. Hacer tarjetas por tipo de sinapsis (central con astrocito; neuromuscular con fibra muscular y acetilcolinesterasa/lámina basal; etc.), con prompt de ChatGPT (un solo prompt para el set) y elegir el set por caso |
+| 3 | Circuito reflejo (act. 9): rehacer más realista | Tomar como referencia el esquema típico del reflejo rotuliano de las clases de Fer **Sensorial I o II** (probablemente de Tortora), en `C:\Users\ferna\OneDrive - Universidad Austral de Chile\Docencia` (carpetas Neurobiología / ETMP097). Mixto: ilustración de ChatGPT (plantilla + prompt) + animación SVG: **la pierna se extiende** en el rotuliano y **se aleja de un clavo** en el de retirada |
+| 3a | Criterios del circuito | Circuitos limpios, sin cruces de cables ni extensiones innecesarias, anatómicamente correctos. No centrarse en monosináptico/polisináptico: que entiendan el **rol de las interneuronas** y que el reflejo **se resuelve en la médula de forma automática** |
+| 3b | Vía ascendente | En alguna etapa (no todo de una vez), mostrar que la señal de dolor **también sube por la vía ascendente hasta la corteza**: por eso el dolor se hace consciente aunque el reflejo ya ocurrió |
+| 4 | Largo del práctico | Son 3 actividades y la 1 (sinapsis, 2 niveles) es intensa: buscar formas de **sintetizar** y eliminar preguntas repetidas entre actividades (sinapsis, circuito y casos) |
+| 5 | Menores | Guías `guia-sinapsis-1/2.svg` al estilo del fondo (opcional); alternativas de Fono del quiz del práctico 3 (f1, f2, f4) |
 
 ## Prompt para la sesión siguiente
 
 ```
 Retomo NeuroLab (C:\repo\neurolab). Lee completo docs/sesiones/sesion-14_practico-4-sinapsis-circuitos.md
-(«Pendientes», «Cómo trabajamos», «Herramientas») y, si hace falta, «Cómo trabajamos» de la sesión 12.
-Primero: [mis correcciones tras usar el práctico 4 en producción].
-Después: el rediseño del circuito reflejo de 5 a 3 niveles (pendiente 2): propónmelo en una tabla y espera
-mi confirmación antes de programar. Pide al inicio permiso de borrado en la carpeta del repo para que git
-funcione. Usa docs/practico-4_build.py y docs/practico-3_test.js (PHP 8.3 + Playwright, 1366×660 y 390×844,
-revisando capturas). Commits con mi autoría en main; al final la lista para FileZilla y
-docs/sesiones/sesion-15_*.md.
+(sobre todo «Pendientes para la sesión 15», «Cómo trabajamos» y «Herramientas»); si hace falta, «Cómo trabajamos»
+de la sesión 12. Al inicio pide permiso de borrado en la carpeta del repo para que git funcione.
+Trabajamos el práctico 4 (ruta sinapsis-circuitos), en este orden, proponiendo cada parte en una tabla y
+esperando mi confirmación antes de programar:
+1. Revisión de síntesis del práctico completo (pendiente 4): qué preguntas se repiten o sobran entre la sinapsis,
+   el circuito y los casos, y cómo acortar.
+2. Casos clínicos (actividad 17): preguntas claras sobre enfermedad vs. fármaco (pendiente 1) y tarjetas de sitio
+   por tipo de sinapsis, con un solo prompt de ChatGPT para el set (pendiente 2).
+3. Circuito reflejo (actividad 9) rehecho (pendientes 3, 3a, 3b): pídeme acceso a mi carpeta de Docencia en
+   OneDrive para buscar el esquema del reflejo rotuliano en mis clases «Sensorial I» o «Sensorial II»; propón los
+   niveles (rotuliano con la pierna que se extiende, retirada con el pie que se aleja del clavo, interneuronas,
+   resolución medular automática y, en una etapa aparte, la vía ascendente hasta la corteza) y luego la plantilla
+   + prompt de ChatGPT para la ilustración; la pierna se anima en SVG.
+Usa docs/practico-4_build.py y docs/practico-3_test.js (PHP 8.3 + Playwright, 1366×660 y 390×844, revisando
+capturas). Commits con mi autoría en main (yo hago el Push); entrega con carpeta de origen nueva y verifica md5.
+Al final la lista para FileZilla y docs/sesiones/sesion-15_*.md.
 ```
