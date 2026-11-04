@@ -69,9 +69,25 @@ disponer(false);
 
 // Estructuras (coordenadas locales de la zona)
 const MEM_PRE = 360, MEM_POST = 455;
-const CA_X = [255, 445], VES_D = [300, 350, 400], REC_X = [270, 350, 430], MUS_X = [290, 370], KCH_X = 490;
+const VES_D = [300, 350, 400], REC_X = [270, 350, 430], MUS_X = [290, 370], KCH_X = 490;
 const ASTRO_T = [130, 386], ENZ = [[208, 404], [534, 404]];
 const RES = [[250, 200], [310, 150], [372, 212], [432, 168], [300, 268], [440, 270]];
+// Canales de Ca²⁺ en el costado derecho del botón (cerca de la zona activa) y el Ca²⁺ que espera afuera
+const CA_CH = [[506, 340], [527, 282]];
+const CA_FUERA = [[574, 262], [602, 290], [632, 268], [586, 328], [622, 318], [656, 296], [566, 298], [646, 340]];
+const SLOT = [[-8, -6], [8, -7], [0, 2], [-9, 9], [9, 8]];          // neurotransmisor dentro de cada vesícula
+// Contorno de la membrana del axón y del botón (izquierdo; el derecho es su reflejo): por ahí corre el PA
+const CONTORNO = (() => {
+    const pts = [], bez = (a, b, c, d, n) => { for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t;
+        pts.push([u * u * u * a[0] + 3 * u * u * t * b[0] + 3 * u * t * t * c[0] + t * t * t * d[0], u * u * u * a[1] + 3 * u * u * t * b[1] + 3 * u * t * t * c[1] + t * t * t * d[1]]); } };
+    for (let y = 0; y <= 50; y += 5) pts.push([322, y]);
+    bez([322, 50], [322, 90], [170, 100], [170, 230], 40);
+    bez([170, 230], [170, 320], [190, 360], [240, 360], 34);
+    for (let x = 245; x <= 350; x += 5) pts.push([x, 360]);
+    return pts;
+})();
+const PA_DUR = 2.4;                                                  // ms que tarda el PA en recorrer el contorno
+const PA_ICA = (() => { let k = 0, d = 1e9; CONTORNO.forEach(([x, y], i) => { const e = Math.hypot(700 - x - CA_CH[1][0], y - CA_CH[1][1]); if (e < d) { d = e; k = i; } }); return k / CONTORNO.length; })();
 const sitios = (tipo) => tipo === 'mus' ? MUS_X.flatMap(x => [[x - 11, MEM_POST - 38], [x + 11, MEM_POST - 38]])
     : REC_X.flatMap(x => [[x - 15, MEM_POST - 40], [x + 15, MEM_POST - 40]]);
 
@@ -181,7 +197,10 @@ export function crearSimSinapsis(caja, cfg = {}) {
     function guion(b) {
         const rnd = azar(semilla++ * 7919), r = (a, z) => a + rnd() * (z - a);
         b.ca2 = []; b.mol = []; b.iones = [];
-        if (b.ca) b.pas.forEach(tp => CA_X.forEach(x => { for (let i = 0; i < 3; i++) b.ca2.push({ t0: tp - 0.1 + i * 0.22, dur: 0.9, x0: x + r(-16, 16), y0: MEM_PRE + 34 + r(0, 22), x1: x + r(-12, 12), y1: MEM_PRE - 46 - r(0, 34) }); }));
+        if (b.ca) b.pas.forEach(tp => { for (let k = 0; k < 6; k++) {
+            const [cx, cy] = CA_CH[k % 2], [fx, fy] = CA_FUERA[k];
+            b.ca2.push({ k, t0: tp + k * 0.07, pts: [[fx, fy], [cx + 28, cy], [cx - 30, cy + r(-4, 4)], [VES_D[k % 3] + r(-14, 14), MEM_PRE - 58 + r(-12, 12)]], durs: [0.32, 0.22, 0.55] });
+        } });
         // neurotransmisor: 15 moléculas por fusión; 6 encajan en los sitios de los receptores y se van al final
         const sit = sitios(b.tipo), p = P[b.tipo], tc = b.recap ? p.tc : p.tcOff;
         if (b.ca) b.pas.forEach(tp => {
@@ -190,13 +209,14 @@ export function crearSimSinapsis(caja, cfg = {}) {
                 const v = VES_D[j % 3], enSitio = j < sit.length;
                 const [tx, ty] = enSitio ? sit[j] : [r(225, 545), r(MEM_PRE + 22, MEM_POST - 54)];
                 const rango_ = enSitio ? j * 0.25 : 2 + (j - sit.length);   // las que encajan, últimas en irse
-                const t2 = tf + 0.18 + r(0, 0.2);
+                const t2 = tf + 0.32 + r(0, 0.2);
                 const tl = Math.max(t2 + 0.4, tf + 0.6 + tc * Math.log(15 / (rango_ + 0.5)));
                 let dest;
                 if (b.nt === 'ach') { const e = ENZ[tx < 370 ? 0 : 1]; dest = { x: e[0], y: e[1], modo: 'enzima' }; }
                 else if (b.recap) dest = { x: ASTRO_T[0] + 6, y: ASTRO_T[1] + r(-14, 14), modo: 'astro' };
                 else dest = { x: tx < 370 ? -10 : 710, y: ty + r(-20, 20), modo: 'difunde' };
-                b.mol.push({ x0: v + r(-8, 8), y0: MEM_PRE - 4, tx, ty, tf, t2, tl, dur: b.nt === 'ach' ? 0.5 : (dest.modo === 'difunde' ? 1.6 : 0.8), dest, enSitio, rot: r(-0.3, 0.3) });
+                const [sx, sy] = SLOT[Math.floor(j / 3)];
+                b.mol.push({ x0: v + sx, y0: MEM_PRE - 18 + sy, xm: v + sx * 0.4, ym: MEM_PRE + 6, tm: tf + 0.15, tx, ty, tf, t2, tl, dur: b.nt === 'ach' ? 0.5 : (dest.modo === 'difunde' ? 1.6 : 0.8), dest, enSitio, rot: r(-0.3, 0.3) });
             }
         });
         // iones por los receptores (o por el canal de K⁺): uno cada vez que la corriente acumulada suma 1
@@ -272,7 +292,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
     function vesicula(x, y, n, a, r = 20) {
         g.globalAlpha = .35 + .65 * a; g.fillStyle = '#FFFFFF'; g.strokeStyle = '#FB923C'; g.lineWidth = 2.5;
         g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.stroke(); g.globalAlpha = 1;
-        if (a > .3) { ntDib(x - 7, y - 4, n, a, 5); ntDib(x + 7, y - 3, n, a, 5); ntDib(x, y + 7, n, a, 5); }
+        if (a > .3) SLOT.forEach(([dx, dy]) => ntDib(x + dx, y + dy, n, a, 5.5));
     }
     // Receptor-canal: dos mitades con un sitio con la forma del neurotransmisor arriba de cada una; se abren al unirlo
     function receptorCanal(x, ab, tp, ntR) {
@@ -338,34 +358,50 @@ export function crearSimSinapsis(caja, cfg = {}) {
         }
         texto('Botón presináptico', 392, 30, 17, '#9A3412');
         texto('Hendidura', 690, 412, 15, '#0C4A6E', 'right');
-        // potencial de acción que baja por el axón
+        // potencial de acción: una onda que corre por la membrana del axón y del botón (por ambos lados)
         if (b) b.pas.forEach(p0 => {
-            const u = (t - (p0 - 2)) / 2;
-            if (u >= 0 && u <= 1.15) {
-                const y = Math.min(1, u) * 300 + 20;
-                const gr = g.createRadialGradient(350, y, 4, 350, y, 64);
-                gr.addColorStop(0, 'rgba(245,158,11,.75)'); gr.addColorStop(1, 'rgba(245,158,11,0)');
-                g.fillStyle = gr; g.beginPath(); g.arc(350, y, 64, 0, Math.PI * 2); g.fill();
-                if (u <= 1) texto('PA', 386, y + 6, 16, '#B45309');
+            const N = CONTORNO.length, f = (t - (p0 - PA_DUR * PA_ICA)) / PA_DUR * N;
+            if (f < 0 || f > N + 30) return;
+            g.save(); g.lineCap = 'round'; g.shadowColor = 'rgba(250,204,21,.9)'; g.shadowBlur = 14;
+            for (const lado of [1, -1]) {
+                for (let k = Math.max(1, Math.floor(f - 30)); k <= Math.min(N - 1, Math.floor(f)); k++) {
+                    const a = 1 - (f - k) / 30, P0 = CONTORNO[k - 1], P1 = CONTORNO[k];
+                    const X = q => lado > 0 ? 700 - q[0] : q[0];
+                    g.strokeStyle = `rgba(250,204,21,${a.toFixed(2)})`; g.lineWidth = 4 + 6 * a;
+                    g.beginPath(); g.moveTo(X(P0), P0[1]); g.lineTo(X(P1), P1[1]); g.stroke();
+                }
             }
+            g.restore();
+            const fr = CONTORNO[Math.min(N - 1, Math.max(0, Math.floor(f)))];
+            if (f <= N) texto('PA', 700 - fr[0] + 14, fr[1] + 6, 16, '#B45309');
         });
         // vesículas de reserva y acopladas
         RES.forEach(([x, y]) => vesicula(x, y, ntAct, 1));
         VES_D.forEach(x => {
-            let f = 1;
-            if (b && b.ca) b.pas.forEach(p0 => { const u = t - (p0 + 0.8); if (u >= 0 && u < 2.6) f = Math.min(f, u < .5 ? 0 : (u - .5) / 2.1); });
+            let f = 1, baja = 0;
+            if (b && b.ca) b.pas.forEach(p0 => {
+                const u = t - (p0 + 0.8);
+                if (u >= -0.45 && u < 0) baja = Math.max(baja, (u + 0.45) / 0.45);
+                if (u >= 0 && u < 2.6) f = Math.min(f, u < .5 ? 0 : (u - .5) / 2.1);
+            });
             if (f < .05) { g.strokeStyle = '#FB923C'; g.lineWidth = 3; g.beginPath(); g.arc(x, MEM_PRE - 4, 16, Math.PI * 0.15, Math.PI * 0.85, true); g.stroke(); }
-            else vesicula(x, MEM_PRE - 26, ntAct, f);
+            else vesicula(x, MEM_PRE - 26 + 8 * (f < 1 ? 0 : baja), ntAct, f);
         });
-        // canales de Ca²⁺
-        CA_X.forEach(x => {
+        // canales de Ca²⁺ (costado derecho) y el Ca²⁺ que espera afuera
+        CA_CH.forEach(([x, y]) => {
             let ab = 0;
-            if (b) b.pas.forEach(p0 => { const u = t - p0; if (u > -0.3 && u < 1.6) ab = Math.max(ab, u < 0 ? (u + .3) / .3 : 1 - Math.max(0, u - 1) / .6); });
-            const gap = 4 + ab * 8;
+            if (b && b.ca) b.pas.forEach(p0 => { const u = t - p0; if (u > -0.3 && u < 1.6) ab = Math.max(ab, u < 0 ? (u + .3) / .3 : 1 - Math.max(0, u - 1) / .6); });
+            const gap = 3 + ab * 8;
             g.fillStyle = '#E9D5FF'; g.strokeStyle = '#6B21A8'; g.lineWidth = 2;
-            rr(x - 16 - gap, MEM_PRE - 22, 16, 44, 6); g.fill(); g.stroke();
-            rr(x + gap, MEM_PRE - 22, 16, 44, 6); g.fill(); g.stroke();
-            if (!caAct) { g.fillStyle = '#DC2626'; rr(x - 18, MEM_PRE + 20, 36, 10, 4); g.fill(); }
+            rr(x - 22, y - gap - 14, 44, 14, 6); g.fill(); g.stroke();
+            rr(x - 22, y + gap, 44, 14, 6); g.fill(); g.stroke();
+            if (!caAct) { g.fillStyle = '#DC2626'; rr(x + 24, y - 16, 9, 32, 4); g.fill(); }
+        });
+        const rt = performance.now() / 1000;
+        CA_FUERA.forEach(([x, y], k) => {
+            let a = 1;
+            if (b && b.ca && k < 6) b.pas.forEach(p0 => { const u = t - (p0 + k * 0.07); if (u >= 0 && u < 6) a = Math.min(a, u < 5 ? 0 : u - 5); });
+            if (a > 0.02) ionDib(x + Math.sin(rt * 1.3 + k * 2) * 3, y + Math.cos(rt * 1.1 + k) * 3, 'ca', a, 11);
         });
         // receptores
         if (tpAct === 'mus') {
@@ -388,7 +424,8 @@ export function crearSimSinapsis(caja, cfg = {}) {
         // neurotransmisor
         if (b) b.mol.forEach(m => {
             if (t < m.tf) return;
-            if (t < m.t2) { const u = (t - m.tf) / (m.t2 - m.tf); ntDib(m.x0 + (m.tx - m.x0) * u, m.y0 + (m.ty - m.y0) * u, ntAct, 1, 9, m.rot * (1 - u)); return; }
+            if (t < m.tm) { const u = (t - m.tf) / (m.tm - m.tf); ntDib(m.x0 + (m.xm - m.x0) * u, m.y0 + (m.ym - m.y0) * u, ntAct, 1, 5.5 + 1.5 * u); return; }
+            if (t < m.t2) { const u = (t - m.tm) / (m.t2 - m.tm); ntDib(m.xm + (m.tx - m.xm) * u, m.ym + (m.ty - m.ym) * u, ntAct, 1, 7 + 2 * u, m.rot * (1 - u)); return; }
             if (t < m.tl) {
                 const fl = m.enSitio ? 0 : 1;
                 ntDib(m.tx + Math.sin(t * 5 + m.tx) * 3 * fl, m.ty + Math.cos(t * 4 + m.ty) * 2 * fl, ntAct, 1, m.enSitio ? 8 : 9, m.enSitio ? 0 : m.rot);
@@ -402,7 +439,14 @@ export function crearSimSinapsis(caja, cfg = {}) {
         });
         // Ca²⁺ e iones
         if (b) {
-            b.ca2.forEach(q => { const u = (t - q.t0) / q.dur; if (u < 0 || u > 1) return; const a = u < .15 ? u / .15 : u > .75 ? (1 - u) / .25 : 1; ionDib(q.x0 + (q.x1 - q.x0) * u, q.y0 + (q.y1 - q.y0) * u, 'ca', a, 11); });
+            b.ca2.forEach(q => {
+                let u = t - q.t0; if (u < 0) return;
+                for (let L = 0; L < 3; L++) {
+                    if (u > q.durs[L]) { u -= q.durs[L]; continue; }
+                    const v = u / q.durs[L], A = q.pts[L], B = q.pts[L + 1], a = L === 2 && v > .6 ? (1 - v) / .4 : 1;
+                    ionDib(A[0] + (B[0] - A[0]) * v, A[1] + (B[1] - A[1]) * v, 'ca', a, 11); return;
+                }
+            });
             b.iones.forEach(q => { const u = (t - q.t0) / q.dur; if (u < 0 || u > 1) return; const a = u < .15 ? u / .15 : u > .75 ? (1 - u) / .25 : 1; ionDib(q.x0 + (q.x1 - q.x0) * u, q.y0 + (q.y1 - q.y0) * u, q.ion, a, 12); });
         }
         // electrodo de registro
