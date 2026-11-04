@@ -143,7 +143,7 @@ S1 = {"n": 1, "tipo": "escenas", "modo": "casos", "simulador": "sinapsis", "dx":
             ["Se sumaron los PPSE en el tiempo", "Un solo PPSE llegó al umbral", "Se liberó un neurotransmisor distinto", "Se abrieron canales de K⁺ en la dendrita"],
             "Presiona ⚡⚡⚡ Tren de potenciales.",
             "Cada PPSE solo no llega al umbral. ¿Qué pasa si llega otro antes de que el anterior termine?",
-            "Con un tren, cada nuevo PPSE llega antes de que el anterior se apague y se suman (sumación temporal, como en el práctico 3) hasta alcanzar el umbral: la neurona postsináptica dispara un potencial de acción. Así la frecuencia de potenciales de acción codifica la intensidad de la señal.",
+            "Con un tren, cada nuevo PPSE llega antes de que el anterior se apague y se suman (sumación temporal, como en el práctico 3) hasta alcanzar el umbral: la neurona postsináptica dispara un potencial de acción. Así la frecuencia de potenciales de acción codifica la intensidad de la señal. Durante el tren entra algo de Ca²⁺ por otro receptor de glutamato, el NMDA, que se destapa (sale el Mg²⁺) solo cuando la neurona está despolarizada.",
             ["Tren de potenciales", "Se libera glutamato una y otra vez", "Los PPSE se suman: potencial de acción"]),
         sim("ca", "c · Sin Ca²⁺", "Bloquea los canales de Ca²⁺ y vuelve a probar:",
             [("Canales de Ca²⁺ bloqueados", "caOff"), ("Da 1 potencial de acción", "sinLib")],

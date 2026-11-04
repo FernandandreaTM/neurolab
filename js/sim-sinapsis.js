@@ -28,7 +28,7 @@ const NT = {
     gaba: { nombre: 'GABA', col: '#F97316', borde: '#9A3412' },
     ach:  { nombre: 'Acetilcolina', col: '#14B8A6', borde: '#115E59' },
 };
-const ION = { na: ['#22C55E', '#166534', 'Na⁺'], cl: ['#EAB308', '#854D0E', 'Cl⁻'], k: ['#3B82F6', '#1E3A8A', 'K⁺'], ca: ['#A855F7', '#581C87', 'Ca²⁺'] };
+const ION = { na: ['#22C55E', '#166534', 'Na⁺'], cl: ['#EAB308', '#854D0E', 'Cl⁻'], k: ['#3B82F6', '#1E3A8A', 'K⁺'], ca: ['#A855F7', '#581C87', 'Ca²⁺'], mg: ['#94A3B8', '#334155', 'Mg²⁺'] };
 const POST = { glu: 'Neurona postsináptica', gaba: 'Neurona postsináptica', nic: 'Fibra muscular', mus: 'Célula del corazón' };
 const VELS = [0.25, 0.5, 1];
 
@@ -70,10 +70,10 @@ disponer(false);
 
 // Estructuras (coordenadas locales de la zona)
 const MEM_PRE = 360, MEM_POST = 455;
-const VES_D = [300, 350, 400], REC_X = [270, 350, 430], MUS_X = [290, 370], KCH_X = 490;
+const VES_D = [300, 350, 400], REC_X = [260, 335, 410], NMDA_X = 495, MUS_X = [290, 370], KCH_X = 490;
 const ASTRO_T = [130, 386], ENZ = [[208, 392], [534, 392]];
 // Iones que esperan según su gradiente: Na⁺ o Cl⁻ afuera (en la hendidura, junto a los receptores); K⁺ adentro
-const ION_FUERA = [[174, 430], [200, 442], [226, 430], [470, 442], [496, 430], [522, 442], [548, 430], [576, 442]];
+const ION_FUERA = [[158, 434], [181, 444], [204, 432], [227, 442], [542, 432], [565, 444], [588, 432], [611, 444]];
 const K_DENTRO = [[452, 532], [480, 556], [512, 530], [540, 556], [568, 534], [596, 556], [466, 578], [620, 534]];
 const RES = [[250, 200], [310, 150], [372, 212], [432, 168], [300, 268], [440, 270]];
 // Canales de Ca²⁺ en el costado derecho del botón (cerca de la zona activa) y el Ca²⁺ que espera afuera
@@ -93,13 +93,15 @@ const CONTORNO = (() => {
 const PA_DUR = 2.4;                                                  // ms que tarda el PA en recorrer el contorno
 const PA_ICA = (() => { let k = 0, d = 1e9; CONTORNO.forEach(([x, y], i) => { const e = Math.hypot(700 - x - CA_CH[1][0], y - CA_CH[1][1]); if (e < d) { d = e; k = i; } }); return k / CONTORNO.length; })();
 const sitios = (tipo) => tipo === 'mus' ? MUS_X.flatMap(x => [[x - 11, MEM_POST - 38], [x + 11, MEM_POST - 38]])
-    : REC_X.flatMap(x => [[x - 15, MEM_POST - 40], [x + 15, MEM_POST - 40]]);
+    : REC_X.flatMap(x => [[x - 15, MEM_POST - 40], [x + 15, MEM_POST - 40]]).concat(tipo === 'glu' ? [[NMDA_X - 17, MEM_POST - 48], [NMDA_X + 17, MEM_POST - 48]] : []);
+// Receptor NMDA: su Mg²⁺ sale del poro solo con la membrana despolarizada (visual: −56 → −40 mV)
+const destapeMg = v => Math.max(0, Math.min(1, (v + 56) / 16));
 
 /* ---------- Modelo: un registro completo ---------- */
 function simular(cfgR) {
     const { pas, ca, recap, tipo } = cfgR, p = P[tipo];
     const n = Math.round(TS / DT);
-    const V = new Float32Array(n), C = new Float32Array(n), R = new Float32Array(n), Sg = new Float32Array(n), K = new Float32Array(n), I = new Float32Array(n);
+    const NO = new Float32Array(n), V = new Float32Array(n), C = new Float32Array(n), R = new Float32Array(n), Sg = new Float32Array(n), K = new Float32Array(n), I = new Float32Array(n);
     let v = -70, c = 0, r = 0, s = 0, k = 0, spk = -1, post = 0, lib = false, vmax = -70, vmin = -70;
     const fus = pas.map(t => t + 0.8);
     for (let i = 0; i < n; i++) {
@@ -117,12 +119,14 @@ function simular(cfgR) {
             if (v >= -55 && tipo !== 'mus') { spk = t; post++; }
         }
         vmax = Math.max(vmax, v); vmin = Math.min(vmin, v);
-        V[i] = v; C[i] = c; R[i] = r; Sg[i] = s; K[i] = k; I[i] = cur;
+        V[i] = v; C[i] = c; R[i] = r; Sg[i] = s; K[i] = k; I[i] = cur; NO[i] = tipo === 'glu' ? c * destapeMg(v) : 0;
     }
-    return { V, C, R, Sg, K, I, post, lib, vmax, vmin };
+    return { V, C, R, Sg, K, I, NO, post, lib, vmax, vmin };
 }
 // Iones por PPSE de referencia (1 PA, con recaptación): normaliza el número de iones dibujados
 const K_FLUJO = {};
+// Ca²⁺ por el NMDA: 28 iones con un tren sin recaptación (excitotoxicidad)
+const K_NMDA = (() => { const m = simular({ pas: TREN, ca: true, recap: false, tipo: 'glu' }); let tot = 0; for (let i = 0; i < m.NO.length; i++) tot += m.NO[i] * DT; return 28 / tot; })();
 for (const [tp, meta] of [['glu', 8], ['gaba', 6], ['nic', 8], ['mus', 9]]) {
     const m = simular({ pas: [T_PA], ca: true, recap: true, tipo: tp });
     let tot = 0; for (let i = 0; i < m.I.length; i++) tot += Math.abs(m.I[i]) * DT;
@@ -249,17 +253,19 @@ export function crearSimSinapsis(caja, cfg = {}) {
     // Excitotoxicidad (glutamato, sin recaptación, tren): mientras la neurona sigue despolarizada y hay glutamato,
     // entra Ca²⁺ en masa por los receptores (NMDA) y se acumula adentro
     function guionExcito(b) {
-        b.excito = [];
-        if (!(b.tipo === 'glu' && !b.recap && b.tren && b.lib)) return;
+        b.excito = []; b.acumula = b.tipo === 'glu' && !b.recap && b.tren;
+        if (b.tipo !== 'glu' || !b.lib) return;
+        let tot = 0; for (let i = 0; i < b.NO.length; i++) tot += b.NO[i] * DT;
+        if (tot <= 0) return;
+        const kf = b.tren && b.recap ? Math.max(K_NMDA, 3 / tot) : K_NMDA;      // con un tren normal entra algo de Ca²⁺
         const rnd = azar(semilla++ * 104729), r = (a, z) => a + rnd() * (z - a);
-        let ult = -1e9;
-        for (let i = 0; i < b.V.length && b.excito.length < 28; i++) {
+        let acum = 0;
+        for (let i = 0; i < b.NO.length && b.excito.length < 28; i++) {
+            acum += b.NO[i] * DT * kf;
+            if (acum < 1) continue;
+            acum -= 1;
             const t = i * DT;
-            if (b.V[i] > -62 && b.C[i] > 0.12 && t - ult >= 0.8) {
-                ult = t;
-                const x = REC_X[b.excito.length % 3];
-                b.excito.push({ t0: t, dur: 0.9 / escEn(b, t), pts: [[r(240, 470), r(372, 392)], [x + r(-3, 3), MEM_POST - 50], [x + r(-8, 8), MEM_POST + 40], [r(190, 600), r(505, 660)]] });
-            }
+            b.excito.push({ t0: t, dur: 0.9 / escEn(b, t), pts: [[r(445, 560), r(372, 392)], [NMDA_X + r(-3, 3), MEM_POST - 58], [NMDA_X + r(-6, 6), MEM_POST + 48], [r(190, 600), r(505, 660)]] });
         }
     }
     const idx = (b, t) => clamp(Math.floor(t / DT), 0, b.V.length - 1);
@@ -292,7 +298,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
         if (b.lib && b.tipo === 'gaba' && b.vmin < -72) hist.ppsi = true;
         if (uno && b.lib && b.tipo === 'nic' && b.vmax > -66) hist.nic = true;
         if (b.tren && b.post > 0 && b.tipo === 'nic') hist.trenNic = true;
-        if (b.excito && b.excito.length) hist.excito = true;
+        if (b.acumula && b.excito.length >= 15) hist.excito = true;
         if (b.lib && b.tipo === 'mus' && b.vmin < -74) hist.mus = true;
     }
 
@@ -336,6 +342,21 @@ export function crearSimSinapsis(caja, cfg = {}) {
             g.fillStyle = '#fff'; g.strokeStyle = col[2]; g.lineWidth = 1.6; formaNT(0, -40, ntR, 8.5); g.fill(); g.stroke();
             g.restore();
         });
+    }
+    // Receptor NMDA (glutamato): más grande, violeta, con el Mg²⁺ en el poro; se abre con glutamato + despolarización
+    function receptorNMDA(x, ab, mg) {
+        const gap = 3 + ab * 10;
+        if (ab > .1) { g.fillStyle = `rgba(253,224,71,${.18 + ab * .25})`; g.beginPath(); g.ellipse(x, MEM_POST + 6, 50, 56, 0, 0, Math.PI * 2); g.fill(); }
+        [-1, 1].forEach(ld => {
+            g.save(); g.translate(x + ld * (gap + 12), MEM_POST + 6); g.rotate(-ld * ab * 0.12);
+            g.fillStyle = '#C7D2FE'; g.strokeStyle = '#4338CA'; g.lineWidth = 2.2;
+            rr(-12, -46, 24, 96, 9); g.fill(); g.stroke();
+            g.fillStyle = '#fff'; g.strokeStyle = '#F472B6'; g.lineWidth = 1.6; formaNT(0, -48, 'glu', 8.5); g.fill(); g.stroke();
+            g.restore();
+        });
+        // Mg²⁺: tapa el poro en reposo y sale hacia la hendidura al despolarizarse
+        const y = MEM_POST + 4 - mg * 74;
+        ionDib(x, y, 'mg', 1 - mg * .75, 11);
     }
     // Receptor metabotrópico (7 hélices) con su proteína G pegada por dentro
     function receptorG(x, act) {
@@ -443,6 +464,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
         } else {
             const ab = b ? Math.min(1, b.R[idx(b, t - 0.35)] * 2.2) : 0;   // se abre justo después de que encaja el neurotransmisor
             REC_X.forEach(x => receptorCanal(x, ab, tpAct, ntAct));
+            if (tpAct === 'glu') { const j = b ? idx(b, t - 0.35) : 0; receptorNMDA(NMDA_X, b ? Math.min(1, b.NO[j] * 3) : 0, b ? destapeMg(b.V[idx(b, t)]) : 0); }
         }
         // iones que esperan según su gradiente (se van al pasar por el canal y vuelven después)
         {
@@ -499,8 +521,8 @@ export function crearSimSinapsis(caja, cfg = {}) {
                 const u = (t - q.t0) / q.dur; if (u < 0) return;
                 const [A, B, C, D] = q.pts;
                 let P, Q, v;
-                if (u < .35) { P = A; Q = B; v = u / .35; } else if (u < .6) { P = B; Q = C; v = (u - .35) / .25; } else if (u < 1) { P = C; Q = D; v = (u - .6) / .4; } else { P = Q = D; v = 1; n++; }
-                ionDib(P[0] + (Q[0] - P[0]) * v, P[1] + (Q[1] - P[1]) * v, 'ca', 1, 11);
+                if (u < .35) { P = A; Q = B; v = u / .35; } else if (u < .6) { P = B; Q = C; v = (u - .35) / .25; } else if (u < 1) { P = C; Q = D; v = (u - .6) / .4; } else { if (!b.acumula) return; P = Q = D; v = 1; n++; }
+                ionDib(P[0] + (Q[0] - P[0]) * v, P[1] + (Q[1] - P[1]) * v, 'ca', !b.acumula && u > .8 ? (1 - u) / .2 : 1, 11);
             });
             if (n) {
                 g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(239,68,68,${Math.min(.32, n * .012).toFixed(3)})`;
@@ -522,6 +544,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
         item((a, b) => ionDib(a, b, 'ca', 1, 9), 'Ca²⁺');
         if (tp === 'mus') item((a, b) => ionDib(a, b, 'k', 1, 9), 'K⁺');
         else item((a, b) => ionDib(a, b, tp === 'gaba' ? 'cl' : 'na', 1, 9), tp === 'gaba' ? 'Cl⁻' : 'Na⁺');
+        if (tp === 'glu') item((a, b) => ionDib(a, b, 'mg', 1, 9), 'Mg²⁺');
         if (n === 'ach') item((a, b) => { g.fillStyle = '#FCA5A5'; g.strokeStyle = '#B91C1C'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(a, b); g.arc(a, b, 8, .5, Math.PI * 2 - .5); g.closePath(); g.fill(); g.stroke(); }, 'Acetilcolinesterasa');
     }
     const Ym = mv => PY0 + (40 - mv) / 135 * PH;
