@@ -71,7 +71,21 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
         }
         if (await p.$('.nl-esc__simq.is-bloq')) errs.push('sim sin completar: ' + cs.clave + ' ' + JSON.stringify(await p.evaluate(`${sim}.estado()`)));
       }
-      while (N.simulador !== 'pa' && N.simulador !== 'sinapsis' && Date.now() - t0 < 120000) {
+      if (N.simulador === 'reflejo') {   // simulador del reflejo: botones reales de la interfaz
+        const sim = 'document.querySelector(".nl-msim").__sim';
+        await p.evaluate(`${sim}.prueba.vel(4)`);
+        const sw = async (k, on) => { const v = await p.getAttribute(`[data-sw="${k}"]`, 'aria-pressed') === 'true'; if (v !== on) await p.click(`[data-sw="${k}"]`); };
+        const correr = async sel => { await p.click(sel); await p.waitForTimeout(300); await p.waitForFunction(`!${sim}.estado().corriendo`, null, { timeout: 60000 }); await p.waitForTimeout(300); };
+        for (const c of ps.checks) {
+          if (c.c === 'inhOff') await sw('inh', false);
+          if (c.c === 'inhOn') await sw('inh', true);
+          if (c.c === 'lesion') await sw('lesion', true);
+          if (c.c === 'golpe' || c.c === 'golpeSinInh') await correr('[data-acc="golpe"]');
+          if (['clavo', 'dolor', 'clavoLesion'].includes(c.c)) await correr('[data-acc="clavo"]');
+        }
+        if (await p.$('.nl-esc__simq.is-bloq')) errs.push('sim sin completar: ' + cs.clave + ' ' + JSON.stringify(await p.evaluate(`${sim}.estado()`)));
+      }
+      while (N.simulador !== 'pa' && N.simulador !== 'sinapsis' && N.simulador !== 'reflejo' && Date.now() - t0 < 120000) {
         if (!(await p.$('.nl-simok[disabled]')) && !(await p.$('.nl-esc__simq.is-bloq'))) break;
         for (const [k, c] of ps.checks.entries()) {
           if (await p.$(`.nl-esc__checks li[data-k="${k}"].is-ok`)) continue;

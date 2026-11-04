@@ -99,7 +99,7 @@ txt = SEED.read_text(encoding='utf-8')
 ini = txt.index("  (9, 'tareas', '") + len("  (9, 'tareas', '")
 fin = txt.index("}'", ini) + 1
 d = json.loads(txt[ini:fin].replace("''", "'"))
-n2 = d['niveles'][1]
+n2 = d['niveles'][1] if len(d['niveles']) > 1 and 'piezas' in d['niveles'][1] else {'piezas': []}   # desde la sesión 15 la actividad 9 es otra (ver abajo)
 n2.pop('grupos', None)
 for p in n2['piezas']:
     p.pop('grupo', None)
@@ -237,3 +237,191 @@ else:
     txt = txt[:m17] + bloque16 + txt[m17:]
 SEED.write_text(txt, encoding='utf-8')
 print('actividad 16:', [c['clave'] for n in A16['niveles'] for c in n['casos']])
+
+# ---------------------------------------------------------------------------
+# Sesión 15 · Actividad 17: enfermedad vs. fármaco y tarjetas de sitio según el tipo de sinapsis
+CENTRAL = SITIOS
+PLACA = ["Terminal del axón motor", "Hendidura de la placa", "Receptor de la fibra muscular", "Célula de Schwann terminal"]
+
+def tarjetas(ops, p, ok, pista):
+    return {"tipo": "tarjeta", "nombre": "Sitio", "p": p, "ops": ops, "ok": ok, "pista": pista}
+
+PASOS17 = {
+    "isrs": [
+        tarjetas(CENTRAL, "¿Dónde está el SERT que bloquea la fluoxetina?", 0, "El SERT devuelve la serotonina a la neurona que la liberó."),
+        elegir("Fármaco", "Con la fluoxetina, ¿qué pasa con la serotonina en la hendidura?",
+               ["Aumenta: no se recapta", "Disminuye: no se libera", "Aumenta: se libera más", "Disminuye: se degrada más"],
+               "Si su salida está bloqueada, ¿se va o se queda en la hendidura?"),
+        elegir("Se observa", "Con la fluoxetina, ¿cuándo mejora el ánimo de Camila?",
+               ["En semanas: las neuronas se adaptan", "En minutos: la serotonina sube rápido", "En horas: el fármaco llega al encéfalo", "En días: se libera más serotonina"],
+               "La serotonina sube pronto, pero el ánimo no cambia al mismo ritmo. ¿Qué tienen que hacer las neuronas primero?"),
+    ],
+    "acv": [
+        tarjetas(CENTRAL, "Por el ACV, ¿dónde están la mayoría de los transportadores de glutamato que dejan de funcionar?", 3,
+                 "Recuerda el ciclo glutamato-glutamina del práctico 2: ¿qué célula capta el glutamato y lo devuelve como glutamina?"),
+        elegir("Tratamiento", "A Jorge le destapan la arteria a las 2 horas. ¿Qué se espera?",
+               ["Mejora en parte: se salva la penumbra", "Mejora del todo: revive el centro", "No mejora: ya murió toda la zona", "Mejora en parte: la glía las reemplaza"],
+               "Las neuronas del centro murieron en minutos. ¿Qué pasa con las de la penumbra si la sangre vuelve a tiempo?"),
+    ],
+    "parkinson": [
+        tarjetas(CENTRAL, "Por la enfermedad, ¿dónde falla la sinapsis del estriado?", 0,
+                 "Las neuronas que murieron, ¿son las que liberan la dopamina o las que la reciben?"),
+        elegir("Enfermedad", "Por la enfermedad, ¿qué pasa con la dopamina en el estriado?",
+               ["Disminuye: se libera menos", "Aumenta: no se recapta", "Disminuye: se degrada más", "Aumenta: se libera más"],
+               "Si faltan las neuronas que la liberan, ¿llega más o menos dopamina a la hendidura?"),
+        elegir("Fármaco", "¿Por qué el fármaco es L-dopa y no dopamina?",
+               ["Cruza la barrera y se convierte en dopamina", "No cruza la barrera y actúa desde la sangre",
+                "Cruza la barrera y bloquea la recaptación", "No cruza la barrera y activa los músculos"],
+               "Recuerda «¿Qué cruza la barrera?» del práctico 2: la L-dopa y la dopamina estaban en tarjetas distintas."),
+    ],
+    "miastenia": [
+        tarjetas(PLACA, "Por la enfermedad, ¿dónde está la proteína que atacan los anticuerpos?", 2,
+                 "El nervio libera acetilcolina normal: el problema no está en quien envía la señal, sino en quien la recibe."),
+        elegir("Enfermedad", "Por la enfermedad, ¿por qué la debilidad aumenta con el uso?",
+               ["Cada impulso libera menos ACh y no se alcanza el umbral", "Cada impulso libera más ACh y se bloquean los receptores",
+                "Cada impulso gasta Ca²⁺ y el nervio deja de conducir", "Cada impulso daña la mielina del nervio motor"],
+               "Con pocos receptores, el potencial de la placa queda justo. Del práctico 3: ¿qué pasa si una despolarización no llega al umbral?"),
+        elegir("Fármaco", "Con la piridostigmina, ¿qué pasa con la acetilcolina en la hendidura?",
+               ["Aumenta: no se degrada", "Disminuye: se degrada más", "Aumenta: se libera más", "Disminuye: no se libera"],
+               "La acetilcolinesterasa es la enzima que degrada la acetilcolina. Si está inhibida, ¿la acetilcolina dura más o menos?"),
+    ],
+    "botox": [
+        tarjetas(PLACA, "¿Dónde actúa la toxina botulínica?", 0,
+                 "¿Dónde están las vesículas que necesitan fusionarse para liberar el neurotransmisor?"),
+        elegir("Enfermedad", "Por el ACV, ¿por qué sus flexores están tensos si el nervio y la placa están sanos?",
+               ["Falta el control que baja del encéfalo", "Falta acetilcolina en la placa motora", "Falta la sensitiva que viene del huso", "Falta la interneurona que excita al flexor"],
+               "En el circuito reflejo viste que la médula resuelve sola. ¿Qué dejó de llegarle a la médula desde arriba?"),
+        elegir("Fármaco", "Con la toxina, ¿por qué el efecto dura solo unos tres meses?",
+               ["Brotan terminales nuevas que liberan ACh", "Se forman receptores nuevos en el músculo",
+                "Se regenera la mielina del nervio motor", "Nacen motoneuronas nuevas en la médula"],
+               "La toxina no mata a la neurona: ¿qué puede hacer su terminal para recuperar la sinapsis?"),
+    ],
+}
+FILAS17 = {
+    "isrs": ["Botón presináptico (SERT)", "Serotonina", "Poca señal de serotonina", "Fluoxetina: no se recapta; el ánimo mejora en semanas"],
+    "acv": ["Astrocito vecino (recaptación)", "Glutamato", "Sin ATP no se recapta: excitotoxicidad", "Destapar la arteria a tiempo salva la penumbra"],
+    "parkinson": ["Botón presináptico (sustancia negra → estriado)", "Dopamina", "Mueren las neuronas: menos dopamina", "L-dopa: cruza la barrera y se convierte en dopamina"],
+    "miastenia": ["Receptor de la fibra muscular (nicotínico)", "Acetilcolina", "Anticuerpos: menos receptores", "Piridostigmina: la ACh dura más en la hendidura"],
+    "botox": ["Terminal del axón motor (fusión de vesículas)", "Acetilcolina", "ACV: sin control desde el encéfalo, espasticidad", "Toxina: no se libera ACh; relaja por unos tres meses"],
+}
+EXP_BOTOX = ("Tras un ACV, las vías que bajan del encéfalo dejan de controlar a la médula: los reflejos de estiramiento quedan exagerados y "
+    "los músculos, tensos (espasticidad). La toxina botulínica corta SNAP-25, una proteína del complejo que fusiona la vesícula con la "
+    "membrana de la terminal del axón motor. Sin fusión no se libera acetilcolina y el músculo inyectado se relaja: es una parálisis local y "
+    "reversible, que abre una ventana para estirar y entrenar en terapia (en Fono se usa, por ejemplo, en la disfonía espasmódica). El efecto "
+    "dura unos tres meses porque brotan terminales nuevas y después se recupera la original. En el botulismo, la misma toxina llega a todo el "
+    "cuerpo y causa una parálisis generalizada.")
+EXP_MIASTENIA_EXTRA = (" En la placa motora no hay astrocitos: la rodean la célula de Schwann terminal y la lámina basal de la hendidura, "
+    "donde está la acetilcolinesterasa.")
+
+txt = SEED.read_text(encoding='utf-8')
+ini = txt.index("  (17, 'tareas', '") + len("  (17, 'tareas', '")
+fin = txt.index("', NULL, 1);", ini)
+d = json.loads(txt[ini:fin].replace("''", "'"))
+N = d['niveles'][0]
+orden = ["isrs", "acv", "parkinson", "miastenia", "botox"]
+N['casos'].sort(key=lambda c: orden.index(c['clave']))
+for c in N['casos']:
+    c['pasos'] = PASOS17[c['clave']]
+    c['fila'] = FILAS17[c['clave']]
+    if c['clave'] == 'botox':
+        c['exp'] = EXP_BOTOX
+        c['contexto'] = ("La toxina botulínica corta una proteína (SNAP-25) que las vesículas necesitan para fusionarse con la membrana. "
+                         "Se inyecta en el músculo y actúa solo cerca del lugar de la inyección.")
+    if c['clave'] == 'miastenia' and EXP_MIASTENIA_EXTRA.strip() not in c['exp']:
+        c['exp'] += EXP_MIASTENIA_EXTRA
+N['cuadro'] = ["Caso", "Sitio", "Neurotransmisor", "Por la enfermedad", "Con el tratamiento"]
+N['subtitulo'] = "Cinco casos: enfermedad, fármaco y cuadro comparativo"
+N['instrucciones'] = ("Cinco pacientes con una enfermedad o un tratamiento que actúa en la sinapsis. En cada uno, lee el caso y mira la imagen "
+    "(tócala para ampliarla). Primero elige en la mesa <strong>dónde</strong> actúa: las tarjetas cambian según la sinapsis (entre neuronas del "
+    "encéfalo o placa motora). Luego responde lo que cambia <strong>por la enfermedad</strong> y lo que cambia <strong>con el fármaco</strong> "
+    "o el tratamiento: cada pregunta dice de cuál se trata. Cada caso suma una fila a tu cuadro comparativo. <strong>Verde</strong>: correcto. "
+    "<strong>Rojo</strong>: por repasar. <strong>Naranjo</strong>: lo que estás haciendo.")
+nuevo = json.dumps(d, ensure_ascii=False).replace("'", "''")
+SEED.write_text(txt[:ini] + nuevo + txt[fin:], encoding='utf-8')
+print('actividad 17 (sesión 15):', [(c['clave'], len(c['pasos'])) for c in N['casos']])
+
+# ---------------------------------------------------------------------------
+# Sesión 15 · Actividad 9: CIRCUITO REFLEJO rehecho con el simulador propio js/sim-reflejo.js (2 niveles, un paso por caso)
+def simr(clave, titulo, p, checks, q, ops, pista_sim, pista_q, exp, fila):
+    return sim(clave, titulo, p, checks, q, ops, pista_sim, pista_q, exp, [None] + fila)
+
+R1 = {"n": 1, "tipo": "escenas", "modo": "casos", "simulador": "reflejo", "dx": True,
+      "titulo": "El reflejo se resuelve en la médula", "subtitulo": "Rotuliano, interneuronas y retirada",
+      "fondo": "img/reflejo/guia-reflejo-1.jpg", "vb": [1200, 720], "alt": "Pierna, médula espinal y neuronas del reflejo rotuliano y de retirada",
+      "guia_src": "img/reflejo/guia-reflejo-1.jpg", "guia_img": "El reflejo se resuelve en la médula",
+      "guia_pie": "Simulador de NeuroLab: reflejo rotuliano (pierna extendida) con su registro. Esquema basado en Tortora, Principios de anatomía y fisiología.",
+      "sim_cfg": {"controles": ["golpe", "clavo", "inh"]},
+      "nombres_paso": {"elegir": "Pregunta"},
+      "instrucciones": "Una persona sentada con la pierna colgando, su médula espinal y las neuronas de dos reflejos. Usa los botones de la izquierda: el <strong>🔨 golpe en el tendón</strong>, el <strong>📌 clavo bajo el pie</strong> y el interruptor de las <strong>interneuronas inhibitorias</strong>. Sigue los impulsos (puntos amarillos) por cada neurona y mira la pierna. A la derecha, el <strong>registro</strong>: cada raya es un potencial de acción de esa neurona y la curva es el ángulo de la rodilla. Con la barra bajo el simulador puedes volver a verlo, pausarlo o verlo a 0,5× o 0,25×. En cada caso cumple la lista y responde. Cada caso llena una fila del <strong>cuadro</strong>.",
+      "cuadro": ["Caso", "Estímulo", "Receptor", "En la médula", "Respuesta"],
+      "casos": [
+        simr("rot", "a · Reflejo rotuliano", "Golpea el tendón rotuliano:",
+             [("Da el golpe en el tendón y mira el recorrido completo", "golpe")],
+             "¿Dónde se conectó la sensitiva del huso con la motoneurona?",
+             ["En la médula, en el asta ventral", "En la corteza, en el área motora", "En el ganglio de la raíz dorsal", "En el músculo, junto al huso"],
+             "Presiona 🔨 Golpe en el tendón y sigue los puntos amarillos desde el huso.",
+             "Sigue el camino azul: ¿dónde termina y dónde empieza el rojo?",
+             "El golpe estira el cuádriceps y su huso muscular. La neurona sensitiva, con el soma en el ganglio de la raíz dorsal, lleva la señal por la raíz dorsal hasta el asta ventral y ahí libera glutamato sobre la motoneurona del extensor. La motoneurona dispara, su axón sale por la raíz ventral y el cuádriceps se contrae: la pierna se extiende. Todo ocurre en la médula, sin pasar por el encéfalo: por eso es automático y rápido.",
+             ["Golpe en el tendón", "Huso muscular (estiramiento)", "Sensitiva → motoneurona del extensor", "El extensor se contrae: la pierna se extiende"]),
+        simr("inh", "b · Sin interneurona inhibitoria", "Apaga las interneuronas inhibitorias y vuelve a golpear:",
+             [("Interneuronas inhibitorias apagadas", "inhOff"), ("Da el golpe y compara con la curva gris anterior", "golpeSinInh")],
+             "La pierna se extendió menos. ¿Por qué?",
+             ["El flexor no se relajó y se opuso", "El extensor recibió menos señal", "La sensitiva no llegó a la médula", "El tendón se estiró menos esta vez"],
+             "Apaga el interruptor «Interneuronas inhibitorias» y presiona 🔨 Golpe en el tendón.",
+             "Mira la fila de la motoneurona del flexor en el registro: ¿dejó de disparar esta vez?",
+             "Una colateral de la sensitiva excita a una interneurona inhibitoria, que libera glicina sobre la motoneurona del flexor y la frena (un PPSI, como el del GABA en la sinapsis): el antagonista se relaja mientras el extensor se contrae. Es la inhibición recíproca. Sin ella, el flexor mantiene su tono y, al estirarse, se contrae: se opone al movimiento, que queda más pequeño y rígido. Las interneuronas deciden a quién se excita y a quién se frena.",
+             ["Golpe, sin interneurona inhibitoria", "Huso muscular", "El flexor no se frena", "La pierna se extiende menos"]),
+        simr("ret", "c · Reflejo de retirada", "Vuelve a activar las interneuronas y pon el clavo bajo el pie:",
+             [("Interneuronas inhibitorias activas", "inhOn"), ("Pon el clavo y mira el recorrido completo", "clavo")],
+             "La sensitiva del dolor no llega a ninguna motoneurona. ¿Quién activa al flexor?",
+             ["Una interneurona excitatoria de la médula", "La corteza, cuando siente el dolor", "El huso muscular del propio flexor", "La interneurona inhibitoria del extensor"],
+             "Enciende «Interneuronas inhibitorias» y presiona 📌 Clavo bajo el pie.",
+             "Sigue el camino celeste dentro de la médula: ¿con qué neuronas hace sinapsis?",
+             "El clavo activa terminaciones libres de la planta del pie (nociceptores). La sensitiva del dolor entra por la raíz dorsal y, en el asta dorsal, excita a interneuronas: una excitatoria activa a la motoneurona del flexor (la rodilla se dobla y el pie se aleja) y una inhibitoria frena a la del extensor. Cada interneurona agrega una sinapsis y las fibras del dolor conducen más lento, así que la retirada tarda más que el rotuliano; igual se resuelve en la médula, de forma automática.",
+             ["Clavo bajo el pie", "Terminación libre (dolor)", "Interneuronas: excitan al flexor y frenan al extensor", "El flexor se contrae: el pie se aleja"]),
+      ]}
+
+R2 = {"n": 2, "tipo": "escenas", "modo": "casos", "simulador": "reflejo", "dx": True,
+      "titulo": "El dolor también sube a la corteza", "subtitulo": "Vía ascendente y lesión medular",
+      "fondo": "img/reflejo/guia-reflejo-2.jpg", "vb": [1200, 720], "alt": "Reflejo de retirada con la vía que sube al tálamo y a la corteza",
+      "guia_src": "img/reflejo/guia-reflejo-2.jpg", "guia_img": "El dolor también sube a la corteza",
+      "guia_pie": "Simulador de NeuroLab: reflejo de retirada con la vía ascendente; la corteza recibe la señal cuando el pie ya se alejó.",
+      "sim_cfg": {"controles": ["clavo", "lesion"], "ascendente": True},
+      "nombres_paso": {"elegir": "Pregunta"},
+      "instrucciones": "El mismo reflejo de retirada, ahora con la neurona que <strong>sube al encéfalo</strong> (tálamo y corteza, arriba a la derecha). Usa el <strong>📌 clavo bajo el pie</strong> y el interruptor <strong>Médula cortada más arriba</strong>. En el registro, la última fila muestra cuándo llega la señal a la corteza y cuándo se siente el dolor: compáralo con la curva de la rodilla. Con la barra bajo el simulador puedes volver a verlo o verlo más lento. En cada caso cumple la lista y responde. Cada caso llena una fila del <strong>cuadro</strong>.",
+      "cuadro": ["Caso", "Prueba", "¿Retira el pie?", "¿Siente el dolor?"],
+      "casos": [
+        simr("asc", "a · Primero el pie, después el dolor", "Pon el clavo y mira hasta el final:",
+             [("Pon el clavo y espera a que se sienta el dolor", "dolor")],
+             "El pie se alejó antes de que se sintiera el dolor. ¿Por qué?",
+             ["El reflejo se cierra en la médula, más cerca", "La corteza ordena retirar el pie al recibirla", "El dolor usa un neurotransmisor más lento", "La sensitiva hace sinapsis en el ganglio"],
+             "Presiona 📌 Clavo bajo el pie y deja correr el registro hasta que aparezca «siente dolor».",
+             "Compara en el registro cuándo se dobla la rodilla y cuándo llega la señal a la corteza.",
+             "La misma sensitiva entrega la señal en el asta dorsal a dos destinos: las interneuronas del reflejo y una neurona que cruza al otro lado de la médula y sube por la vía ascendente (espinotalámica) hasta el tálamo, que la envía a la corteza somatosensorial. Cuando la señal llega a la corteza, el reflejo ya movió la pierna; el dolor se hace consciente después, cuando la corteza la procesa. Por eso primero retiras el pie y después dices «¡ay!».",
+             ["Clavo, médula sana", "Sí, primero", "Sí, después"]),
+        simr("lesion", "b · Médula cortada más arriba", "Activa la lesión medular y vuelve a poner el clavo:",
+             [("Médula cortada más arriba", "lesion"), ("Pon el clavo y mira hasta el final", "clavoLesion")],
+             "Con la médula cortada más arriba, ¿qué pasa al pisar el clavo?",
+             ["Retira el pie, pero no siente dolor", "No retira el pie ni siente dolor", "Siente dolor, pero no retira el pie", "Retira el pie y siente dolor igual"],
+             "Cambia «Médula cortada más arriba» a «Con lesión» y presiona 📌 Clavo bajo el pie.",
+             "¿Qué parte del circuito queda bajo la lesión y cuál por encima?",
+             "La lesión corta la vía ascendente: la señal no llega a la corteza y la persona no siente el dolor de la zona bajo la lesión. Pero el arco reflejo (receptor, sensitiva, interneuronas, motoneurona y músculo) está completo bajo la lesión, así que el pie se retira igual. Pasada la etapa inicial de shock medular, estos reflejos incluso se exageran, porque también se cortan las vías que bajan del encéfalo y los regulan: es la espasticidad.",
+             ["Clavo, médula cortada arriba", "Sí: el arco está completo", "No: la señal no sube"]),
+      ]}
+
+A9 = {"laminas": {}, "niveles": [R1, R2]}
+bloque9 = (
+    "-- Actividad 9: CIRCUITO REFLEJO (práctico 4) · «escenas» modo «casos» con el simulador propio js/sim-reflejo.js\n"
+    "-- I el reflejo se resuelve en la médula (rotuliano, interneurona inhibitoria, retirada); II el dolor sube a la corteza (vía ascendente, lesión)\n"
+    "INSERT OR IGNORE INTO actividades (id, topic_id, slug, titulo, descripcion, tipo, activo, objetivo, mecanica, fuente) VALUES\n"
+    "  (9, 1, 'circuito-reflejo', 'Circuito reflejo',\n"
+    "       '" + q("Dos reflejos de la pierna con el simulador de NeuroLab. Nivel I: el reflejo rotuliano, el papel de las interneuronas y el reflejo de retirada, que se resuelven en la médula de forma automática. Nivel II: la señal de dolor también sube a la corteza, por eso se siente después de retirar el pie.") + "',\n"
+    "       'lamina', 1, '" + q("Explicar cómo un circuito de neuronas sensitivas, interneuronas y motoneuronas resuelve un reflejo en la médula, el papel de las sinapsis excitatorias e inhibitorias, y por qué el dolor se hace consciente después del reflejo.") + "',\n"
+    "       '" + q("Usar el simulador del reflejo (golpe en el tendón, clavo bajo el pie, interneuronas inhibitorias, lesión medular), seguir los impulsos y el registro de cada neurona y responder en cada caso; completar dos cuadros.") + "',\n"
+    "       '" + q("Clase Neurofisiología sensorial II (ETMP097) · Tortora, Principios de anatomía y fisiología · simulador de NeuroLab") + "');\n"
+    "INSERT OR IGNORE INTO actividad_recursos (actividad_id, tipo, url, caption, orden) VALUES\n"
+    "  (9, 'tareas', '" + q(json.dumps(A9, ensure_ascii=False)) + "', NULL, 1);\n\n\n")
+txt = SEED.read_text(encoding='utf-8')
+ini, fin = txt.index("-- Actividad 9: CIRCUITO REFLEJO"), txt.index("-- Actividad 10:")
+SEED.write_text(txt[:ini] + bloque9 + txt[fin:], encoding='utf-8')
+print('actividad 9:', [c['clave'] for n in A9['niveles'] for c in n['casos']])
