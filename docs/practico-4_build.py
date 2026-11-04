@@ -135,7 +135,7 @@ S1 = {"n": 1, "tipo": "escenas", "modo": "casos", "simulador": "sinapsis", "dx":
             ["El voltaje del potencial de acción", "El glutamato liberado en la hendidura", "El Na⁺ que entra a la postsináptica", "La bomba Na⁺/K⁺ del botón"],
             "Presiona ⚡ 1 potencial de acción y mira el botón: qué llega primero, qué se abre después.",
             "Mira el orden: primero baja el potencial de acción por el axón y recién después se abren los canales.",
-            "Los canales de Ca²⁺ del botón se abren por voltaje cuando llega el potencial de acción. Entra Ca²⁺ y eso hace que las vesículas acopladas se fusionen con la membrana y liberen glutamato. Un solo potencial de acción da un PPSE pequeño, que no llega al umbral.",
+            "Los canales de Ca²⁺ del botón se abren por voltaje cuando llega el potencial de acción. Entra Ca²⁺ y eso hace que las vesículas acopladas se fusionen con la membrana y liberen glutamato. Un solo potencial de acción da un PPSE pequeño, que no llega al umbral. En la sinapsis real, los canales de Ca²⁺ están junto a las vesículas acopladas (aquí van al costado para distinguirlos).",
             ["1 potencial de acción", "Entra Ca²⁺ y se libera glutamato", "PPSE pequeño, bajo el umbral"]),
         sim("ca", "b · Sin Ca²⁺", "Bloquea los canales de Ca²⁺ y vuelve a probar:",
             [("Canales de Ca²⁺ bloqueados", "caOff"), ("Da 1 potencial de acción", "sinLib")],
