@@ -35,9 +35,9 @@ Fer dejó a Claude trabajando solo («avanza todo lo posible; después solo hace
 
 | Detalle | |
 |---|---|
-| Tarjetas de la placa motora | «Terminal del axón motor», «Hendidura de la placa», «Receptor de la fibra muscular», «Célula de Schwann terminal». Mientras no estén las de ChatGPT, dibujo SVG de respaldo en `_partials/iconos_neurona.php` |
+| Tarjetas de la placa motora | «Terminal del axón motor», «Hendidura de la placa», «Receptor de la fibra muscular», «Axón motor mielinizado» (ChatGPT, 2.ª versión; la 1.ª tenía una célula de Schwann terminal en casquete sobre el botón, que no se ve en clase). Respaldo SVG en `_partials/iconos_neurona.php` |
 | Cuadro | Caso · Sitio · Neurotransmisor · Por la enfermedad · Con el tratamiento |
-| Miastenia | «Para recordar» agrega: en la placa no hay astrocitos (célula de Schwann terminal y lámina basal con la acetilcolinesterasa) |
+| Miastenia | «Para recordar» agrega: el nervio y su mielina están sanos (sensibilidad y conducción normales); en la placa no hay astrocitos: la acetilcolinesterasa está en la lámina basal |
 
 ## 3 · Actividad 9 · Circuito reflejo (simulador `js/sim-reflejo.js`)
 
@@ -116,3 +116,14 @@ Usa docs/practico-4_build.py y docs/practico-3_test.js (PHP 8.3 + Playwright, 13
 capturas). Commits con mi autoría en main (yo hago el Push); entrega con carpeta de origen nueva y verifica md5.
 Al final la lista para FileZilla y docs/sesiones/sesion-16_*.md.
 ```
+
+## Anexo (04-11, 02:00–02:40): imágenes de ChatGPT integradas
+
+| Imagen | Resultado |
+|---|---|
+| Fondo del reflejo (`img/reflejo/fondo.jpg`) | Calza con la plantilla; sin errores anatómicos. Blanco > 240 pasa a blanco puro (no se nota el borde) |
+| Pierna (`img/reflejo/pierna.png`) | Salió 68 px más arriba: se alinea con la plantilla por código (borde de arriba y de atrás) y el blanco pasa a transparente; se dibuja sin recorte |
+| Tarjetas de la placa motora (`img/cartas/terminal-del-axon-motor.png`, `hendidura-de-la-placa.png`, `receptor-de-la-fibra-muscular.png`, `axon-motor-mielinizado.png`) | 2.ª versión con el prompt corregido (§15): sin casquete, mielina que termina antes de la terminal, lámina basal pegada al músculo, receptores en las crestas |
+| Guías `guia-reflejo-1/2.jpg` | Regeneradas con la ilustración |
+
+Para subir, además de la lista de arriba: `img/reflejo/fondo.jpg`, `img/reflejo/pierna.png` y las 4 tarjetas de `img/cartas/`. Pendientes 1 y 2 de la sesión 16: hechos.

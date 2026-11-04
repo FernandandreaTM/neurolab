@@ -45,7 +45,7 @@ def pierna():
 pierna()
 
 # Tarjetas de la placa motora: cuadrícula 2 × 2, en el orden del prompt
-PLACA = ['terminal-del-axon-motor', 'hendidura-de-la-placa', 'receptor-de-la-fibra-muscular', 'celula-de-schwann-terminal']
+PLACA = ['terminal-del-axon-motor', 'hendidura-de-la-placa', 'receptor-de-la-fibra-muscular', 'axon-motor-mielinizado']
 src = F / 'sitios-placa-chatgpt.png'
 if src.exists():
     im = Image.open(src).convert('RGB')

@@ -241,7 +241,7 @@ print('actividad 16:', [c['clave'] for n in A16['niveles'] for c in n['casos']])
 # ---------------------------------------------------------------------------
 # Sesión 15 · Actividad 17: enfermedad vs. fármaco y tarjetas de sitio según el tipo de sinapsis
 CENTRAL = SITIOS
-PLACA = ["Terminal del axón motor", "Hendidura de la placa", "Receptor de la fibra muscular", "Célula de Schwann terminal"]
+PLACA = ["Terminal del axón motor", "Hendidura de la placa", "Receptor de la fibra muscular", "Axón motor mielinizado"]
 
 def tarjetas(ops, p, ok, pista):
     return {"tipo": "tarjeta", "nombre": "Sitio", "p": p, "ops": ops, "ok": ok, "pista": pista}
@@ -310,8 +310,8 @@ EXP_BOTOX = ("Tras un ACV, las vías que bajan del encéfalo dejan de controlar 
     "reversible, que abre una ventana para estirar y entrenar en terapia (en Fono se usa, por ejemplo, en la disfonía espasmódica). El efecto "
     "dura unos tres meses porque brotan terminales nuevas y después se recupera la original. En el botulismo, la misma toxina llega a todo el "
     "cuerpo y causa una parálisis generalizada.")
-EXP_MIASTENIA_EXTRA = (" En la placa motora no hay astrocitos: la rodean la célula de Schwann terminal y la lámina basal de la hendidura, "
-    "donde está la acetilcolinesterasa.")
+EXP_MIASTENIA_EXTRA = (" El nervio motor y su mielina están sanos: por eso la sensibilidad y la conducción son normales. "
+    "En la placa motora no hay astrocitos: la acetilcolinesterasa está en la lámina basal de la hendidura.")
 
 txt = SEED.read_text(encoding='utf-8')
 ini = txt.index("  (17, 'tareas', '") + len("  (17, 'tareas', '")

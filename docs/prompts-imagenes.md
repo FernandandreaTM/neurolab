@@ -522,7 +522,8 @@ Casos clínicos (actividad 17): la miastenia y la toxina botulínica usan este s
 (`boton-presinaptico`, `hendidura-sinaptica`, `receptor-postsinaptico`, `astrocito-vecino`) queda para ISRS, ACV y Parkinson.
 Adjuntar `img/_fuentes/sitios-sinapsis-chatgpt.png` como referencia. Guardar el resultado como
 `img/_fuentes/sitios-placa-chatgpt.png` y correr `python3 docs/practico-4_imagenes.py` (corta 4 PNG de 320 px:
-`terminal-del-axon-motor`, `hendidura-de-la-placa`, `receptor-de-la-fibra-muscular`, `celula-de-schwann-terminal`).
+`terminal-del-axon-motor`, `hendidura-de-la-placa`, `receptor-de-la-fibra-muscular`, `axon-motor-mielinizado`).
+Versión usada: la 2.ª (la 1.ª tenía una célula de Schwann terminal como casquete sobre el botón; se cambió por el axón con mielina, que los estudiantes conocen del práctico 2).
 Mientras no estén, el sitio muestra un dibujo SVG de respaldo (`_partials/iconos_neurona.php`).
 
 ```
@@ -530,19 +531,20 @@ Adjunto mi set de tarjetas de la sinapsis entre dos neuronas como referencia. Cr
 1024 × 1024 px dividida en 4 cuadros iguales (2 × 2, de 512 × 512), separados por espacio blanco, con
 exactamente el mismo estilo, encuadre y paleta de la referencia: ilustración médico-educativa
 semi-realista y limpia, fondo blanco puro, SIN texto, SIN letras, SIN números, SIN flechas con rótulos.
-Cada cuadro se verá como tarjeta a 60-120 px: formas simples y muy legibles.
+Cada cuadro se verá como tarjeta a 60-120 px: formas simples y muy legibles, sin adornos.
 En los 4 cuadros aparece la MISMA placa motora (unión neuromuscular), vista de lado:
-- Arriba, la terminal del axón motor (amarillo dorado) con vesículas llenas de acetilcolina (puntitos
-  turquesa), cubierta por encima por una célula de Schwann terminal (celeste lila, como un casquete
-  sobre la terminal). No hay astrocito.
-- En medio, la hendidura, un poco más ancha que en la referencia, con la lámina basal (franja fina gris
-  rosácea) y la acetilcolinesterasa (pequeñas enzimas color coral sobre la lámina).
+- Arriba, el axón motor baja desde el borde superior envuelto en mielina (vaina blanco azulada en
+  segmentos, como salchichas cortas); la mielina termina un poco antes de la terminal.
+- La terminal del axón motor (amarillo dorado, del mismo tamaño y forma que el botón de la referencia),
+  sin mielina ni ninguna otra cubierta, con vesículas llenas de acetilcolina (puntitos turquesa) y una
+  vesícula abriéndose hacia la hendidura, como en la referencia.
+- En medio, la hendidura. Pegada a la superficie del músculo y siguiendo sus pliegues, una lámina basal
+  fina gris rosácea con pequeñas enzimas color coral (acetilcolinesterasa).
 - Abajo, la fibra muscular (rojo salmón con estrías transversales finas), con pliegues en su membrana y
-  receptores de acetilcolina (pequeños canales turquesa) en las crestas de los pliegues.
-En cada cuadro se destaca una sola parte, igual que en la referencia (color más intenso y un halo
-suave; el resto más pálido):
+  receptores de acetilcolina (pequeños canales turquesa) en las crestas de los pliegues, frente a la terminal.
+En cada cuadro se destaca una sola parte (color más intenso y un halo suave; el resto más pálido):
 1 (arriba a la izquierda): la terminal del axón motor.
 2 (arriba a la derecha): la hendidura con la lámina basal y la acetilcolinesterasa.
 3 (abajo a la izquierda): la membrana de la fibra muscular con sus pliegues y receptores.
-4 (abajo a la derecha): la célula de Schwann terminal.
+4 (abajo a la derecha): el axón motor con su mielina.
 ```
