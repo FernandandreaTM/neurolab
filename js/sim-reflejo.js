@@ -494,7 +494,7 @@ export function crearSimReflejo(caja, cfg = {}) {
         // rótulos afuera del recuadro, a la izquierda, con una línea a su estructura
         const linea = (x1, y1, x2, y2) => { g.strokeStyle = '#7C3AED'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); };
         linea(552, 24, PIERNA_S1[0] - 4, PIERNA_S1[1] - 4); rotulo('Corteza (pierna)', 550, 32, 'right', '#6D28D9');
-        linea(552, 96, TALAMO_I[0] - 10, TALAMO[1]); rotulo('Tálamo', 550, 104, 'right', '#6D28D9');
+        linea(552, 96, TALAMO[0] - 6, TALAMO[1]);   // apunta al tálamo que se activa rotulo('Tálamo', 550, 104, 'right', '#6D28D9');
         if (siente || llega) {
             const t2 = siente ? 'Siente el dolor' : 'Llega la señal…';
             g.font = `800 ${22 * FS()}px Inter, system-ui, sans-serif`;

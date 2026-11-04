@@ -139,3 +139,7 @@ Para subir, además de la lista de arriba: `img/reflejo/fondo.jpg`, `img/reflejo
 | — | Prueba | `docs/practico-3_test.js`: `PERFIL=<carpeta>` encadena actividades para ver la guía completa |
 
 Para subir además: `js/sim-sinapsis.js`, `js/guia.js`, `css/guia.css` (y otra vez `js/sim-reflejo.js`, `data/seed.sql`, `img/reflejo/guia-reflejo-1/2.jpg`). Cuando esté la imagen del encéfalo: `python3 docs/practico-4_imagenes.py`, `python3 docs/practico-4_build.py`, subir `img/reflejo/encefalo.jpg` y `data/seed.sql`.
+
+## Anexo 3 (04-11, 08:20): encéfalo de ChatGPT
+
+`img/reflejo/encefalo.jpg` integrado (activado en `sim_cfg` del nivel II). Revisión anatómica: corte coronal correcto (tercer ventrículo entre los tálamos, ventrículos laterales con septum pellucidum y cuerpo del caudado, cápsula interna, núcleo lenticular, hipocampo); detalle menor: un hilo vertical dentro del tercer ventrículo. Los tálamos calzan con la plantilla. La línea del rótulo «Tálamo» apunta al tálamo que se activa. Subir: `img/reflejo/encefalo.jpg`, `data/seed.sql`, `js/sim-reflejo.js`, `img/reflejo/guia-reflejo-2.jpg`.
