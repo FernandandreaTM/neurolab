@@ -463,3 +463,9 @@ REGLAS BIOLÓGICAS (obligatorias):
 ```
 
 Si algo sale mal, corregir **solo con selección de zona** («deja esta zona igual a la primera imagen»), nunca rehacer completa.
+
+## 13. Fondo del simulador de la sinapsis (sesión 14) → `img/sinapsis/fondo.jpg`
+
+Plantilla: `img/_fuentes/plantilla-sinapsis-fondo.png` (1024 × 1024 = zona del simulador 700 × 720 × 1,4222, corrida 14 px a la derecha).
+Solo el fondo fijo; vesículas, moléculas, iones, receptores, canales, proteína G y enzimas los dibuja `js/sim-sinapsis.js` encima.
+El astrocito se borra por código para la acetilcolina. Resultado de ChatGPT en `img/_fuentes/sinapsis-fondo-chatgpt.png`.

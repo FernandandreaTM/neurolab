@@ -70,7 +70,7 @@ disponer(false);
 // Estructuras (coordenadas locales de la zona)
 const MEM_PRE = 360, MEM_POST = 455;
 const CA_X = [255, 445], VES_D = [300, 350, 400], REC_X = [270, 350, 430], MUS_X = [290, 370], KCH_X = 490;
-const ASTRO_T = [130, 408], ENZ = [[208, 404], [534, 404]];
+const ASTRO_T = [130, 386], ENZ = [[208, 404], [534, 404]];
 const RES = [[250, 200], [310, 150], [372, 212], [432, 168], [300, 268], [440, 270]];
 const sitios = (tipo) => tipo === 'mus' ? MUS_X.flatMap(x => [[x - 11, MEM_POST - 38], [x + 11, MEM_POST - 38]])
     : REC_X.flatMap(x => [[x - 15, MEM_POST - 40], [x + 15, MEM_POST - 40]]);
@@ -111,6 +111,10 @@ for (const [tp, meta] of [['glu', 8], ['gaba', 6], ['nic', 8], ['mus', 9]]) {
 
 export function crearSimSinapsis(caja, cfg = {}) {
     const CTRL = cfg.controles || ['pa', 'tren', 'ca', 'recap'];
+    // Fondo ilustrado (img/sinapsis/fondo*.jpg, 700 × 720 a 1,5×); sin imagen se usa el dibujo vectorial
+    const carga = src => { if (!src) return null; const im = new Image(); im.src = src; return im; };
+    const FONDO = { con: carga(cfg.fondo), sin: carga(cfg.fondo_ach) };
+    const lista = im => im && im.complete && im.naturalWidth > 0;
     const tiene = c => CTRL.includes(c);
     caja.innerHTML = `
       <div class="nl-msim__caja">
@@ -300,6 +304,20 @@ export function crearSimSinapsis(caja, cfg = {}) {
     function zona() {
         const b = sw, t = b ? b.tp : 0, i = b ? idx(b, t) : 0;
         const ntAct = b ? b.nt : nt, tpAct = b ? b.tipo : tipo(), caAct = b ? b.ca : ca, recapAct = b ? b.recap : recap;
+        const Vp = b ? b.V[i] : -70;
+        const imF = ntAct === 'ach' ? FONDO.sin : FONDO.con;
+        const postPath = () => { g.beginPath(); g.moveTo(150, 720); g.lineTo(150, 505); g.bezierCurveTo(150, 475, 180, MEM_POST, 230, MEM_POST); g.lineTo(560, MEM_POST);
+            g.bezierCurveTo(610, MEM_POST, 640, 475, 640, 505); g.lineTo(640, 720); };
+        if (lista(imF)) {
+            g.drawImage(imF, 0, 0, 700, 720);
+            if (Vp > -40) { g.strokeStyle = 'rgba(245,158,11,.9)'; g.lineWidth = 8; postPath(); g.stroke(); }
+            if (ntAct !== 'ach') {
+                g.fillStyle = recapAct ? '#059669' : '#CBD5E1'; rr(ASTRO_T[0] - 9, ASTRO_T[1] - 22, 16, 44, 6); g.fill();
+                if (!recapAct) { g.strokeStyle = '#DC2626'; g.lineWidth = 3; g.beginPath(); g.moveTo(ASTRO_T[0] - 14, ASTRO_T[1] - 24); g.lineTo(ASTRO_T[0] + 12, ASTRO_T[1] + 24); g.stroke(); }
+                texto('Astrocito', 10, 560, 15, '#047857');
+            }
+            texto(POST[tpAct], 395, 704, 17, '#5B21B6', 'center');
+        } else {
         g.fillStyle = '#E0F2FE'; g.fillRect(0, 0, 700, 720);
         // astrocito (solo con glutamato o GABA)
         if (ntAct !== 'ach') {
@@ -310,15 +328,14 @@ export function crearSimSinapsis(caja, cfg = {}) {
             if (!recapAct) { g.strokeStyle = '#DC2626'; g.lineWidth = 3; g.beginPath(); g.moveTo(ASTRO_T[0] - 14, ASTRO_T[1] - 24); g.lineTo(ASTRO_T[0] + 12, ASTRO_T[1] + 24); g.stroke(); }
         }
         // célula postsináptica (destello si dispara un PA)
-        const Vp = b ? b.V[i] : -70;
         g.fillStyle = '#EDE9FE'; g.strokeStyle = Vp > -40 ? '#F59E0B' : '#8B5CF6'; g.lineWidth = Vp > -40 ? 7 : 4;
-        g.beginPath(); g.moveTo(150, 720); g.lineTo(150, 505); g.bezierCurveTo(150, 475, 180, MEM_POST, 230, MEM_POST); g.lineTo(560, MEM_POST);
-        g.bezierCurveTo(610, MEM_POST, 640, 475, 640, 505); g.lineTo(640, 720); g.fill(); g.stroke();
+        postPath(); g.fill(); g.stroke();
         texto(POST[tpAct], 395, 704, 17, '#5B21B6', 'center');
         // axón y botón presináptico
         g.fillStyle = '#FFF4E0'; g.strokeStyle = '#FB923C'; g.lineWidth = 4;
         g.beginPath(); g.moveTo(322, 0); g.lineTo(322, 50); g.bezierCurveTo(322, 90, 170, 100, 170, 230); g.bezierCurveTo(170, 320, 190, MEM_PRE, 240, MEM_PRE);
         g.lineTo(460, MEM_PRE); g.bezierCurveTo(510, MEM_PRE, 530, 320, 530, 230); g.bezierCurveTo(530, 100, 378, 90, 378, 50); g.lineTo(378, 0); g.fill(); g.stroke();
+        }
         texto('Botón presináptico', 392, 30, 17, '#9A3412');
         texto('Hendidura', 690, 412, 15, '#0C4A6E', 'right');
         // potencial de acción que baja por el axón
