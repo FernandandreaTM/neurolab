@@ -16,7 +16,7 @@ Otros: repo limpio al inicio (práctico 3 commiteado, `.tmpx/` y 17 SVG sin uso 
 
 | Nivel | Casos (simulador + pregunta en el mismo paso) | Cuadro |
 |---|---|---|
-| I · Del PA a la liberación (glutamato) | a 1 PA → Ca²⁺ → PPSE bajo el umbral · b Ca²⁺ bloqueado → sin liberación · c tren → suma de PPSE → PA · d sin recaptación → PPSE más grande y largo | Prueba / En la hendidura / En la postsináptica |
+| I · Del PA a la liberación (glutamato) | a 1 PA → Ca²⁺ → PPSE bajo el umbral · b tren → suma de PPSE → PA · c Ca²⁺ bloqueado → sin liberación · d sin recaptación → PPSE más grande y largo (+ tren → excitotoxicidad: entra Ca²⁺ en masa a la neurona, que se tiñe de rojo; check `excito`) | Prueba / En la hendidura / En la postsináptica |
 | II · El receptor decide | a GABA → entra Cl⁻ (PPSI) · b ACh nicotínico → canal, Na⁺ (+ tren → PA en la fibra muscular, sin pregunta) · c ACh muscarínico → proteína G, sale K⁺, lento | NT y receptor / Tipo / Ion / Efecto |
 
 ### Simulador `js/sim-sinapsis.js`
@@ -26,9 +26,10 @@ Otros: repo limpio al inicio (práctico 3 commiteado, `.tmpx/` y 17 SVG sin uso 
 | Modelo (ms) | NT en la hendidura C (+1 por PA con Ca²⁺; τ 1 ms con recaptación, 3 sin ella; ACh 0,7 por la enzima), receptores r, célula postsináptica RC (τm 8 ms, umbral −55 con PA estilizado). Muscarínico: proteína G s → canal de K⁺ k. Glu: 1 PA ≈ +7,6 mV, tren de 5 (cada 4 ms) → PA, sin recaptación ≈ +12 mV sin PA. GABA ≈ −5 mV. Nic 1 PA ≈ +7,7 mV, tren → PA. Mus ≈ −10 mV, pico a ~55 ms |
 | Reproducción | Cada registro se calcula entero al empezar (`simular` + `guion` con semilla): todo lo dibujado depende del instante `tp`. Barra bajo el lienzo: ⏮, ⏯, línea de tiempo arrastrable con ms, 0,25× · 0,5× · 1×; cabezal naranjo en el registro. Tiempo lento cerca de cada PA (0,6 s/ms; 0,28 en tren) y rápido el resto (0,03) |
 | Dibujo | Fondo ilustrado `img/sinapsis/fondo.jpg` (ChatGPT; `fondo-sin-astrocito.jpg` con ACh) + encima lo animado: Ca²⁺ esperando afuera y 2 canales en el costado derecho del botón; PA como onda amarilla por la membrana (`CONTORNO`, ambos lados); vesículas con 5 moléculas que bajan, se abren y las sueltan; receptores con sitio de unión con la forma del NT (triángulo, rombo, hexágono) que se abren 0,35 ms después; iones por el poro; acetilcolinesterasa en «pacman»; proteína G que viaja al canal de K⁺ |
+| Iones que esperan | Na⁺/Cl⁻ afuera en la hendidura y K⁺ adentro (según su gradiente); cada uno desaparece al pasar y vuelve después |
 | Célula postsináptica | «Neurona postsináptica» (glu, GABA), «Fibra muscular» (nic), «Célula del corazón» (mus) |
 | `sim_cfg` | `controles` (pa, tren, ca, recap, nt, rec), `nt`, `fondo`, `fondo_ach` |
-| CHEQUEOS | `lib1`, `caOff`, `caOn`, `sinLib`, `tren`, `paPost`, `recapOff`, `largo`, `ntGaba`, `ntAch`, `recNic`, `recMus`, `ppsi`, `nic`, `trenNic`, `mus` (se evalúan al terminar de ver cada registro) |
+| CHEQUEOS | `lib1`, `caOff`, `caOn`, `sinLib`, `tren`, `paPost`, `recapOff`, `largo`, `ntGaba`, `ntAch`, `recNic`, `recMus`, `ppsi`, `nic`, `trenNic`, `mus`, `excito` (se evalúan al terminar de ver cada registro) |
 | Pruebas | `caja.__sim.prueba`: `vel(x)`, `pa()`, `tren()`, `ir(ms)`, `poner({ca, recap, nt, rec})` |
 | Exactitud | En «Para recordar» del caso a: en la sinapsis real los canales de Ca²⁺ están junto a las vesículas acopladas (aquí al costado para distinguirlos) |
 

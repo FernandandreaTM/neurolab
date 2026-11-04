@@ -87,8 +87,8 @@ c = [sinapsis(40, 70, '#EC4899'),
      num(60, 580, 5, 'El astrocito lo recapta y la señal termina'),
      f"<text x='40' y='40' {FONT} font-size='22' font-weight='800' fill='#1A0E2E'>Del potencial de acción a la liberación</text>",
      traza(470, 30, 350, 340, correr('glu'), 'a · 1 potencial de acción', 'PPSE bajo el umbral', rango=(-75, -45)),
-     traza(830, 30, 350, 340, correr('glu', ca=False), 'b · Ca²⁺ bloqueado', 'sin liberación', rango=(-75, -45)),
-     traza(470, 385, 350, 340, correr('glu', pas=(5, 9, 13, 17, 21)), 'c · Tren de potenciales', 'sumación → potencial de acción', rango=(-85, 38), marcas=(5, 9, 13, 17, 21)),
+     traza(830, 30, 350, 340, correr('glu', pas=(5, 9, 13, 17, 21)), 'b · Tren de potenciales', 'sumación → potencial de acción', rango=(-85, 38), marcas=(5, 9, 13, 17, 21)),
+     traza(470, 385, 350, 340, correr('glu', ca=False), 'c · Ca²⁺ bloqueado', 'sin liberación', rango=(-75, -45)),
      traza(830, 385, 350, 340, correr('glu', recap=False), 'd · Sin recaptación', 'PPSE más grande y largo', rango=(-75, -45))]
 (OUT / 'guia-sinapsis-1.svg').write_text(svg('\n'.join(c)), encoding='utf-8')
 

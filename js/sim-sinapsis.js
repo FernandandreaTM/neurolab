@@ -48,6 +48,7 @@ export const CHEQUEOS = {
     ppsi:     s => s.ppsi,
     nic:      s => s.nic,
     trenNic:  s => s.trenNic,
+    excito:   s => s.excito,
     mus:      s => s.mus,
 };
 
@@ -191,7 +192,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
         if (sw && !sw.visto) return;
         const b = { pas: tren ? TREN.slice() : [T_PA], tren, ca, recap, nt, rec, tipo: tipo(), tp: 0, visto: false };
         Object.assign(b, simular(b));
-        guion(b);
+        guion(b); guionExcito(b);
         sw = b; pausado = false;
         barridos.push(b); if (barridos.length > 4) barridos.shift();
         sincronizar();
@@ -245,6 +246,22 @@ export function crearSimSinapsis(caja, cfg = {}) {
             }
         }
     }
+    // Excitotoxicidad (glutamato, sin recaptación, tren): mientras la neurona sigue despolarizada y hay glutamato,
+    // entra Ca²⁺ en masa por los receptores (NMDA) y se acumula adentro
+    function guionExcito(b) {
+        b.excito = [];
+        if (!(b.tipo === 'glu' && !b.recap && b.tren && b.lib)) return;
+        const rnd = azar(semilla++ * 104729), r = (a, z) => a + rnd() * (z - a);
+        let ult = -1e9;
+        for (let i = 0; i < b.V.length && b.excito.length < 28; i++) {
+            const t = i * DT;
+            if (b.V[i] > -62 && b.C[i] > 0.12 && t - ult >= 0.8) {
+                ult = t;
+                const x = REC_X[b.excito.length % 3];
+                b.excito.push({ t0: t, dur: 0.9 / escEn(b, t), pts: [[r(240, 470), r(372, 392)], [x + r(-3, 3), MEM_POST - 50], [x + r(-8, 8), MEM_POST + 40], [r(190, 600), r(505, 660)]] });
+            }
+        }
+    }
     const idx = (b, t) => clamp(Math.floor(t / DT), 0, b.V.length - 1);
 
     /* ---------- Reproducción ---------- */
@@ -263,7 +280,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
 
     /* ---------- Análisis de un registro terminado ---------- */
     let hist = {};
-    function limpiarHist() { hist = { lib1: false, sinLib: false, tren: false, paPost: false, largo: false, ppsi: false, nic: false, trenNic: false, mus: false }; }
+    function limpiarHist() { hist = { lib1: false, sinLib: false, tren: false, paPost: false, largo: false, ppsi: false, nic: false, trenNic: false, mus: false, excito: false }; }
     limpiarHist();
     function analizar(b) {
         const uno = !b.tren;
@@ -275,6 +292,7 @@ export function crearSimSinapsis(caja, cfg = {}) {
         if (b.lib && b.tipo === 'gaba' && b.vmin < -72) hist.ppsi = true;
         if (uno && b.lib && b.tipo === 'nic' && b.vmax > -66) hist.nic = true;
         if (b.tren && b.post > 0 && b.tipo === 'nic') hist.trenNic = true;
+        if (b.excito && b.excito.length) hist.excito = true;
         if (b.lib && b.tipo === 'mus' && b.vmin < -74) hist.mus = true;
     }
 
@@ -473,6 +491,22 @@ export function crearSimSinapsis(caja, cfg = {}) {
                 const [A, B, C] = q.pts, L = u < .45 ? 0 : 1, v = L ? (u - .45) / .55 : u / .45, P = L ? B : A, Q = L ? C : B;
                 ionDib(P[0] + (Q[0] - P[0]) * v, P[1] + (Q[1] - P[1]) * v, q.ion, L && v > .7 ? (1 - v) / .3 : 1, 12);
             });
+        }
+        // excitotoxicidad: Ca²⁺ que entra en masa y se acumula; la neurona se tiñe de rojo
+        if (b && b.excito && b.excito.length) {
+            let n = 0;
+            b.excito.forEach(q => {
+                const u = (t - q.t0) / q.dur; if (u < 0) return;
+                const [A, B, C, D] = q.pts;
+                let P, Q, v;
+                if (u < .35) { P = A; Q = B; v = u / .35; } else if (u < .6) { P = B; Q = C; v = (u - .35) / .25; } else if (u < 1) { P = C; Q = D; v = (u - .6) / .4; } else { P = Q = D; v = 1; n++; }
+                ionDib(P[0] + (Q[0] - P[0]) * v, P[1] + (Q[1] - P[1]) * v, 'ca', 1, 11);
+            });
+            if (n) {
+                g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(239,68,68,${Math.min(.32, n * .012).toFixed(3)})`;
+                g.beginPath(); g.moveTo(150, 720); g.lineTo(150, 505); g.bezierCurveTo(150, 475, 180, MEM_POST, 230, MEM_POST); g.lineTo(560, MEM_POST);
+                g.bezierCurveTo(610, MEM_POST, 640, 475, 640, 505); g.lineTo(640, 720); g.fill(); g.restore();
+            }
         }
         // electrodo de registro
         g.strokeStyle = '#DC2626'; g.lineWidth = 3; g.lineCap = 'round';
