@@ -469,3 +469,80 @@ Si algo sale mal, corregir **solo con selección de zona** («deja esta zona igu
 Plantilla: `img/_fuentes/plantilla-sinapsis-fondo.png` (1024 × 1024 = zona del simulador 700 × 720 × 1,4222, corrida 14 px a la derecha).
 Solo el fondo fijo; vesículas, moléculas, iones, receptores, canales, proteína G y enzimas los dibuja `js/sim-sinapsis.js` encima.
 El astrocito se borra por código para la acetilcolina. Resultado de ChatGPT en `img/_fuentes/sinapsis-fondo-chatgpt.png`.
+
+## 14. Circuito reflejo · simulador (sesión 15) → `img/reflejo/fondo.jpg` y `img/reflejo/pierna.jpg`
+
+Plantillas (generadas por el simulador, `caja.__sim.prueba.plantilla('fondo' | 'pierna')`): `img/_fuentes/plantilla-reflejo-fondo.png` y
+`img/_fuentes/plantilla-reflejo-pierna.png` (1024 × 1024; la escena ocupa 1024 × 970 = 760 × 720 × 1,347). Referencia de estilo:
+`img/sinapsis/fondo.jpg`. Solo lo fijo: las neuronas, impulsos, tendones, rótula, martillo, clavo, encéfalo y rótulos los dibuja
+`js/sim-reflejo.js` encima. La pierna bajo la rodilla va aparte porque gira (el código la recorta con su silueta).
+Guardar los resultados como `img/_fuentes/reflejo-fondo-chatgpt.png` y `img/_fuentes/reflejo-pierna-chatgpt.png` y correr
+`python3 docs/practico-4_imagenes.py`.
+
+### 14a. Fondo (adjuntar la plantilla del fondo + `img/sinapsis/fondo.jpg`)
+
+```
+Adjunto dos imágenes: 1) una plantilla de 1024 × 1024 px con la posición exacta de cada elemento;
+2) una ilustración mía como referencia de estilo. Crea una ilustración médico-educativa de 1024 × 1024 px
+con el mismo estilo de la referencia (semi-realista, limpia, colores suaves, volumen y luces suaves, fondo
+blanco), respetando EXACTAMENTE la posición, el tamaño y la forma de cada elemento de la plantilla: la
+imagen se superpone por código sobre esa plantilla. SIN texto, SIN letras, SIN números, SIN flechas y SIN
+neuronas ni líneas de colores encima (las dibuja el código).
+Contenido:
+- El muslo derecho de una persona sentada en el borde de una mesa, visto de lado, cortado limpio a la
+  altura de la cadera como en un atlas (sin tronco). Piel color durazno, semitransparente, que deja ver
+  dos músculos en la posición de la plantilla: arriba el cuádriceps (rojo músculo, fibras a lo largo) y
+  abajo los isquiotibiales (rojo anaranjado). El muslo termina en la rodilla, a la izquierda. NO dibujes
+  la pierna bajo la rodilla ni el pie: esa zona queda en blanco.
+- Una mesa simple gris claro bajo el muslo, con una pata.
+- Los nervios como cordones amarillo pálido, siguiendo exactamente los trazos amarillos de la plantilla:
+  el nervio espinal baja hacia la cadera y se divide en un ramo al cuádriceps, uno a los isquiotibiales
+  y uno que sigue por debajo del muslo hasta la rodilla.
+- El ganglio de la raíz dorsal: abultamiento ovalado amarillo dorado en la raíz dorsal.
+- A la derecha, el corte transversal de la médula espinal: sustancia blanca lila muy pálida y sustancia
+  gris en forma de mariposa lila, con las astas dorsales delgadas arriba y las astas ventrales anchas
+  abajo, canal central y fisura media ventral abajo. La raíz dorsal entra arriba a la izquierda y la raíz
+  ventral sale abajo a la izquierda; ambas se unen en el nervio espinal como en la plantilla.
+Nada más: sin encéfalo, sin martillo, sin clavo, sin tendón rotuliano ni rótula.
+```
+
+### 14b. Pierna (adjuntar la plantilla de la pierna + el fondo que salió en 14a)
+
+```
+Adjunto una plantilla de 1024 × 1024 px y la ilustración anterior como referencia de estilo. Dibuja SOLO
+la pierna derecha bajo la rodilla y el pie descalzo, con el mismo tono de piel, el mismo estilo y la misma
+luz que la referencia: cuelga hacia abajo, vista de lado, con los dedos hacia la izquierda, y ocupa
+EXACTAMENTE la silueta de la plantilla (mismo lugar y tamaño). Insinúa con modelado suave la tibia al
+frente y el tendón de Aquiles atrás. Fondo blanco puro, sin sombra en el suelo, SIN texto y nada más.
+```
+
+## 15. Tarjetas de sitio de la placa motora (sesión 15) → `img/cartas/<tarjeta>.png`
+
+Casos clínicos (actividad 17): la miastenia y la toxina botulínica usan este set; el set de la sinapsis entre neuronas
+(`boton-presinaptico`, `hendidura-sinaptica`, `receptor-postsinaptico`, `astrocito-vecino`) queda para ISRS, ACV y Parkinson.
+Adjuntar `img/_fuentes/sitios-sinapsis-chatgpt.png` como referencia. Guardar el resultado como
+`img/_fuentes/sitios-placa-chatgpt.png` y correr `python3 docs/practico-4_imagenes.py` (corta 4 PNG de 320 px:
+`terminal-del-axon-motor`, `hendidura-de-la-placa`, `receptor-de-la-fibra-muscular`, `celula-de-schwann-terminal`).
+Mientras no estén, el sitio muestra un dibujo SVG de respaldo (`_partials/iconos_neurona.php`).
+
+```
+Adjunto mi set de tarjetas de la sinapsis entre dos neuronas como referencia. Crea UNA sola imagen de
+1024 × 1024 px dividida en 4 cuadros iguales (2 × 2, de 512 × 512), separados por espacio blanco, con
+exactamente el mismo estilo, encuadre y paleta de la referencia: ilustración médico-educativa
+semi-realista y limpia, fondo blanco puro, SIN texto, SIN letras, SIN números, SIN flechas con rótulos.
+Cada cuadro se verá como tarjeta a 60-120 px: formas simples y muy legibles.
+En los 4 cuadros aparece la MISMA placa motora (unión neuromuscular), vista de lado:
+- Arriba, la terminal del axón motor (amarillo dorado) con vesículas llenas de acetilcolina (puntitos
+  turquesa), cubierta por encima por una célula de Schwann terminal (celeste lila, como un casquete
+  sobre la terminal). No hay astrocito.
+- En medio, la hendidura, un poco más ancha que en la referencia, con la lámina basal (franja fina gris
+  rosácea) y la acetilcolinesterasa (pequeñas enzimas color coral sobre la lámina).
+- Abajo, la fibra muscular (rojo salmón con estrías transversales finas), con pliegues en su membrana y
+  receptores de acetilcolina (pequeños canales turquesa) en las crestas de los pliegues.
+En cada cuadro se destaca una sola parte, igual que en la referencia (color más intenso y un halo
+suave; el resto más pálido):
+1 (arriba a la izquierda): la terminal del axón motor.
+2 (arriba a la derecha): la hendidura con la lámina basal y la acetilcolinesterasa.
+3 (abajo a la izquierda): la membrana de la fibra muscular con sus pliegues y receptores.
+4 (abajo a la derecha): la célula de Schwann terminal.
+```

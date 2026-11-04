@@ -1,0 +1,39 @@
+"""Práctico 4 · sesión 15: integra las imágenes de ChatGPT (originales en img/_fuentes/, ver docs/prompts-imagenes.md §14-15).
+Uso: python3 docs/practico-4_imagenes.py   (procesa lo que exista; lo que falte lo avisa)
+  · img/_fuentes/reflejo-fondo-chatgpt.png  (1024 × 1024) → img/reflejo/fondo.jpg   (escena 760 × 720 a 2×: 1520 × 1440)
+  · img/_fuentes/reflejo-pierna-chatgpt.png (1024 × 1024) → img/reflejo/pierna.jpg  (mismo encuadre; el código la recorta con la silueta)
+  · img/_fuentes/sitios-placa-chatgpt.png   (1024 × 1024, 2 × 2) → img/cartas/<tarjeta>.png (320 px)
+Después de crear fondo.jpg y pierna.jpg, agregar a sim_cfg de los dos niveles de la actividad 9 (docs/practico-4_build.py):
+  "fondo": "img/reflejo/fondo.jpg", "pierna": "img/reflejo/pierna.jpg"."""
+import pathlib
+from PIL import Image
+
+R = pathlib.Path(__file__).resolve().parent.parent
+F = R / 'img' / '_fuentes'
+
+def escena(origen, destino):
+    src = F / origen
+    if not src.exists():
+        print('falta', src.name); return
+    im = Image.open(src).convert('RGB')
+    k = im.width / 1024
+    im = im.crop((0, 0, im.width, round(970 * k)))          # la plantilla ocupa 1024 × 970 (760 × 720 × 1,347)
+    im.resize((1520, 1440), Image.LANCZOS).save(R / destino, quality=86)
+    print('ok', destino)
+
+escena('reflejo-fondo-chatgpt.png', 'img/reflejo/fondo.jpg')
+escena('reflejo-pierna-chatgpt.png', 'img/reflejo/pierna.jpg')
+
+# Tarjetas de la placa motora: cuadrícula 2 × 2, en el orden del prompt
+PLACA = ['terminal-del-axon-motor', 'hendidura-de-la-placa', 'receptor-de-la-fibra-muscular', 'celula-de-schwann-terminal']
+src = F / 'sitios-placa-chatgpt.png'
+if src.exists():
+    im = Image.open(src).convert('RGB')
+    w, h = im.width // 2, im.height // 2
+    for i, nom in enumerate(PLACA):
+        x, y = (i % 2) * w, (i // 2) * h
+        m = round(w * 0.04)                                  # margen blanco entre cuadros
+        im.crop((x + m, y + m, x + w - m, y + h - m)).resize((320, 320), Image.LANCZOS).save(R / 'img' / 'cartas' / f'{nom}.png')
+        print('ok', f'img/cartas/{nom}.png')
+else:
+    print('falta', src.name)
