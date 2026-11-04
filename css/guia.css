@@ -126,6 +126,7 @@
 .nl-g-figuras { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .5rem; }
 .nl-g-figuras--fotos { grid-template-columns: repeat(auto-fill, minmax(260px, 360px)); justify-content: start; }
 .nl-g-figuras--fotos.is-una { grid-template-columns: minmax(0, 520px); }
+.nl-g-figuras--fotos.is-una.is-ancha, .nl-g-par .nl-g-figuras--fotos.is-una.is-ancha { grid-template-columns: minmax(0, 1fr); justify-content: stretch; }
 .nl-g-fig { margin: 0; border: 1px solid var(--g-linea); border-radius: 10px; padding: .45rem; background: #fff; break-inside: avoid; }
 .nl-g-fig svg, .nl-g-fig img { width: 100%; height: auto; display: block; border-radius: 6px; }
 .nl-g-fig figcaption { margin-top: .3rem; font-size: .8rem; line-height: 1.45; }
@@ -184,6 +185,7 @@
     .nl-g-tabla-wrap { overflow: visible; }
     .nl-g-par { grid-template-columns: 1fr; }
     .nl-g-par .nl-g-figuras--fotos.is-una, .nl-g-figuras--fotos.is-una { grid-template-columns: 115mm; justify-content: center; }
+    .nl-g-figuras--fotos.is-una.is-ancha { grid-template-columns: 170mm; }
     .nl-g-figuras--fotos { grid-template-columns: repeat(2, 80mm); }
     .nl-g-items { grid-template-columns: 1fr 1fr; column-gap: 8mm; }
     .nl-g-act { margin-top: 7mm; }

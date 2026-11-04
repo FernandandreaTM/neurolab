@@ -409,6 +409,8 @@ R2 = {"n": 2, "tipo": "escenas", "modo": "casos", "simulador": "reflejo", "dx": 
              ["Clavo, médula cortada arriba", "Sí: el arco está completo", "No: la señal no sube"]),
       ]}
 
+if (SEED.parent.parent / 'img' / 'reflejo' / 'encefalo.jpg').exists():   # ilustración del corte coronal (prompts-imagenes §16)
+    R2["sim_cfg"]["encefalo"] = "img/reflejo/encefalo.jpg"
 A9 = {"laminas": {}, "niveles": [R1, R2]}
 bloque9 = (
     "-- Actividad 9: CIRCUITO REFLEJO (práctico 4) · «escenas» modo «casos» con el simulador propio js/sim-reflejo.js\n"

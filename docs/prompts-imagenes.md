@@ -548,3 +548,29 @@ En cada cuadro se destaca una sola parte (color más intenso y un halo suave; el
 3 (abajo a la izquierda): la membrana de la fibra muscular con sus pliegues y receptores.
 4 (abajo a la derecha): el axón motor con su mielina.
 ```
+
+## 16. Encéfalo del nivel II del reflejo (sesión 15) → `img/reflejo/encefalo.jpg`
+
+Recuadro arriba a la derecha del simulador (192 × 128 de la escena). Plantilla: `img/_fuentes/plantilla-reflejo-encefalo.png`
+(1536 × 1024, generada con `caja.__sim.prueba.plantilla('encefalo')`). Referencia de estilo: `img/reflejo/fondo.jpg`.
+El código ilumina encima el tálamo derecho del dibujo y el área de la pierna (cara medial del hemisferio derecho, arriba,
+junto a la fisura): la vía del dolor cruzó en la médula, así que sube por ese lado. Guardar como
+`img/_fuentes/reflejo-encefalo-chatgpt.png` y correr `python3 docs/practico-4_imagenes.py` y luego `docs/practico-4_build.py`.
+
+```
+Adjunto una plantilla de 1536 × 1024 px y una ilustración mía como referencia de estilo. Crea una
+ilustración médico-educativa de 1536 × 1024 px con el mismo estilo de la referencia (semi-realista,
+limpia, colores suaves, volumen y luces suaves, fondo blanco puro): un corte coronal (frontal) del
+encéfalo humano a la altura del giro poscentral, visto de frente, ocupando el mismo lugar y tamaño que
+los dos hemisferios de la plantilla. SIN texto, SIN letras, SIN números, SIN flechas, SIN rótulos y SIN
+zonas resaltadas ni coloreadas de forma especial (las ilumina el código).
+Contenido:
+- Los dos hemisferios separados arriba por la fisura longitudinal, exactamente en el centro de la imagen,
+  y unidos más abajo por el cuerpo calloso.
+- La corteza como una franja gris rosácea con circunvoluciones y surcos que siguen todo el borde,
+  también por la cara medial de cada hemisferio dentro de la fisura; la sustancia blanca más pálida.
+- Los ventrículos laterales pequeños, donde están los dos óvalos blancos de la plantilla.
+- Los dos tálamos como masas ovaladas gris lila a cada lado de la línea media, exactamente donde están
+  los óvalos lila de la plantilla, con la cápsula interna por fuera de ellos.
+- El corte termina con un borde limpio por debajo de los tálamos (sin tronco encefálico ni cerebelo).
+```

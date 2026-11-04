@@ -35,8 +35,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 let W, H, ZX, S, ZH, X0, WP, VY, VH, RY, RH, VERT = false;
 function disponer(vert) {
     VERT = vert;
-    if (!vert) { W = 1200; H = 720; ZX = 760; S = 1; ZH = 720; X0 = ZX + 14; WP = W - X0 - 12; VY = 12; VH = 118; RY = VY + VH + 12; RH = H - RY - 12; }
-    else { W = 520; ZX = 520; S = 520 / 760; ZH = Math.round(720 * S); X0 = 12; WP = W - 24; VY = ZH + 10; VH = 104; RY = VY + VH + 10; RH = 460; H = RY + RH + 12; }
+    if (!vert) { W = 1200; H = 720; ZX = 760; S = 1; ZH = 720; X0 = ZX + 14; WP = W - X0 - 12; VY = 12; VH = 112; RY = VY + VH + 12; RH = H - RY - 12; }
+    else { W = 520; ZX = 520; S = 520 / 760; ZH = Math.round(720 * S); X0 = 12; WP = W - 24; VY = ZH + 10; VH = 112; RY = VY + VH + 10; RH = 560; H = RY + RH + 12; }
 }
 disponer(false);
 
@@ -45,8 +45,9 @@ const K = [122, 418];                          // rodilla: eje de giro de la pie
 const MED = { x: 600, y: 300, rx: 118, ry: 90 };
 const GANGLIO = { x: 442, y: 214, rx: 30, ry: 20 };
 const J = [392, 270];                          // unión de las raíces: nervio espinal
-const CEREBRO = { x: 560, y: 8, w: 192, h: 150 };
-const TALAMO = [672, 102], CORTEZA = [612, 44];
+const CEREBRO = { x: 560, y: 8, w: 192, h: 128 };          // corte coronal (3:2, como la ilustración de 1536 × 1024)
+const TALAMO = [668, 92], TALAMO_I = [644, 92];            // la vía cruzó en la médula: sube al tálamo del lado derecho del dibujo
+const PIERNA_S1 = [662, 30];                               // área de la pierna de la corteza somatosensorial: cara medial (lóbulo paracentral)
 const LESION = [698, 180];
 
 // Neuronas: soma, color y caminos (d en coordenadas fijas; `dPie` en coordenadas de la pierna, que gira en K)
@@ -77,8 +78,8 @@ const D = {
     nocPro: 'M549,259 C556,256 561,254 564,253',
     iexc:   'M556,284 C568,310 570,330 564,346',
     iinh2:  'M528,304 C524,318 524,328 525,337',
-    proy:   'M570,252 C592,264 602,330 612,346 C640,354 670,340 688,318 C702,290 700,236 698,206 C696,160 690,128 676,108',
-    tal:    'M672,102 C656,86 634,64 614,46',
+    proy:   'M570,252 C592,264 602,330 612,346 C640,354 670,340 688,318 C702,290 700,236 698,206 C696,160 684,120 670,99',
+    tal:    'M668,92 C669,72 666,50 663,34',
 };
 // Qué neuronas forman cada circuito (para dibujar el que corresponde)
 const CIRC = {
@@ -183,7 +184,7 @@ export function crearSimReflejo(caja, cfg = {}) {
     const ASC = !!cfg.ascendente;
     const tiene = c => CTRL.includes(c);
     const carga = src => { if (!src) return null; const im = new Image(); im.src = src; return im; };
-    const IMG = { fondo: carga(cfg.fondo), pierna: carga(cfg.pierna) };
+    const IMG = { fondo: carga(cfg.fondo), pierna: carga(cfg.pierna), encefalo: carga(cfg.encefalo) };
     const lista = im => im && im.complete && im.naturalWidth > 0;
     caja.innerHTML = `
       <div class="nl-msim__caja">
@@ -245,8 +246,11 @@ export function crearSimReflejo(caja, cfg = {}) {
     let sw = null, barridos = [], ultimoTipo = tiene('golpe') ? 'rot' : 'ret';
 
     /* ---------- Un registro ---------- */
+    // Un registro sin terminar (en pausa o a medio arrastrar) se descarta al pedir otro o al cambiar un interruptor:
+    // los botones nunca quedan bloqueados. Lo descartado no cuenta para la lista del paso.
+    function descartar() { if (sw && !sw.visto) barridos = barridos.filter(x => x !== sw); sw = null; arrastrando = false; }
     function nuevo(tipo) {
-        if (sw && !sw.visto) return;
+        descartar();
         const b = { tipo, inh, lesion, asc: ASC, tp: 0, visto: false };
         Object.assign(b, simular(b));
         const gg = G[tipo]; for (let i = 0; i < b.ang.length; i++) b.ang[i] *= gg;
@@ -281,12 +285,12 @@ export function crearSimReflejo(caja, cfg = {}) {
     function texto(t, x, y, size, col, al = 'left', w = 700) {
         g.font = `${w} ${size}px Inter, system-ui, sans-serif`; g.fillStyle = col; g.textAlign = al; g.fillText(t, x, y);
     }
-    const FS = () => VERT ? 1.5 : 1;                         // en pantallas angostas el dibujo se achica: letra más grande
+    const FS = () => VERT ? 1.3 : 1;                         // en pantallas angostas el dibujo se achica: letra más grande
     function rotulo(t, x, y, al = 'left', col = '#334155') {   // rótulo con fondo claro para que se lea sobre el dibujo
-        const fs = 13 * FS();
+        const fs = 22 * FS();
         g.font = `700 ${fs}px Inter, system-ui, sans-serif`;
         const w = g.measureText(t).width, x0 = al === 'center' ? x - w / 2 : al === 'right' ? x - w : x;
-        g.fillStyle = 'rgba(255,255,255,.82)'; rr(x0 - 4, y - fs, w + 8, fs + 5, 5); g.fill();
+        g.fillStyle = 'rgba(255,255,255,.85)'; rr(x0 - 5, y - fs, w + 10, fs + 7, 6); g.fill();
         texto(t, x, y, fs, col, al);
     }
     const rotar = (p, a) => { const c = Math.cos(a), s = Math.sin(a), x = p[0] - K[0], y = p[1] - K[1]; return [K[0] + x * c - y * s, K[1] + x * s + y * c]; };
@@ -463,50 +467,66 @@ export function crearSimReflejo(caja, cfg = {}) {
             g.beginPath(); g.arc(x, y, im.tenue ? 3.5 : 6, 0, Math.PI * 2); g.fill(); g.stroke();
         }
     }
+    // Corte coronal del encéfalo (vector de respaldo y base de la plantilla de ChatGPT)
+    function encefaloDibujo() {
+        const { x, y, w, h } = CEREBRO, m = x + w / 2;
+        g.fillStyle = '#F5EEF8'; g.strokeStyle = '#C084FC'; g.lineWidth = 2;
+        for (const s of [-1, 1]) {                                     // hemisferios con la fisura longitudinal al medio
+            g.beginPath(); g.ellipse(m + s * 45, y + 66, 43, 56, 0, 0, Math.PI * 2); g.fill(); g.stroke();
+        }
+        g.strokeStyle = '#E9D5FF'; g.lineWidth = 6;                     // corteza (borde gris)
+        for (const s of [-1, 1]) { g.beginPath(); g.ellipse(m + s * 45, y + 66, 38, 51, 0, 0, Math.PI * 2); g.stroke(); }
+        g.fillStyle = '#FFFFFF'; g.strokeStyle = '#C4B5FD'; g.lineWidth = 1.2;   // ventrículos laterales
+        for (const s of [-1, 1]) { g.beginPath(); g.ellipse(m + s * 11, y + 56, 6, 9, -s * 0.3, 0, Math.PI * 2); g.fill(); g.stroke(); }
+        g.fillStyle = '#DDD6FE'; g.strokeStyle = '#7C3AED'; g.lineWidth = 1.5;   // tálamos
+        for (const [tx, ty] of [TALAMO, TALAMO_I]) { g.beginPath(); g.ellipse(tx, ty, 10, 8, 0, 0, Math.PI * 2); g.fill(); g.stroke(); }
+    }
     function encefalo(b) {
         const { x, y, w, h } = CEREBRO;
         g.fillStyle = '#fff'; g.strokeStyle = '#CBD5E1'; g.lineWidth = 1.5; rr(x, y, w, h, 12); g.fill(); g.stroke();
-        // corte frontal del encéfalo, muy simple
-        const cx = x + w / 2, cy = y + 74;
-        g.fillStyle = '#F3E8FF'; g.strokeStyle = '#A78BFA'; g.lineWidth = 2;
-        g.beginPath(); g.ellipse(cx - 34, cy, 46, 52, 0, 0, Math.PI * 2); g.fill(); g.stroke();
-        g.beginPath(); g.ellipse(cx + 34, cy, 46, 52, 0, 0, Math.PI * 2); g.fill(); g.stroke();
+        if (lista(IMG.encefalo)) { g.save(); rr(x, y, w, h, 12); g.clip(); g.drawImage(IMG.encefalo, x, y, w, h); g.restore(); }
+        else encefaloDibujo();
         const llega = b && b.tCorteza != null && b.tp >= b.tCorteza, siente = b && b.tDolor != null && b.tp >= b.tDolor;
-        // corteza somatosensorial (franja arriba a la izquierda)
-        g.strokeStyle = siente ? '#DC2626' : llega ? '#F59E0B' : '#C4B5FD'; g.lineWidth = siente ? 9 : 7;
-        g.beginPath(); g.ellipse(cx - 34, cy, 42, 48, 0, Math.PI * 1.08, Math.PI * 1.62); g.stroke();
-        g.fillStyle = '#E9D5FF'; g.strokeStyle = '#7C3AED'; g.lineWidth = 1.5;
-        g.beginPath(); g.ellipse(TALAMO[0], TALAMO[1], 12, 9, 0, 0, Math.PI * 2); g.fill(); g.stroke();
-        g.beginPath(); g.ellipse(cx - 20, TALAMO[1], 12, 9, 0, 0, Math.PI * 2); g.fill(); g.stroke();
-        texto('Corteza', x + 10, y + 18, 12, '#6D28D9', 'left', 800);
-        texto('Tálamo', TALAMO[0] + 16, TALAMO[1] - 12, 12, '#6D28D9', 'left', 800);
-        if (siente) { g.fillStyle = '#DC2626'; rr(x + 10, y + h - 30, w - 20, 22, 8); g.fill(); texto('Siente el dolor', x + w / 2, y + h - 14, 13, '#fff', 'center', 800); }
-        else if (llega) texto('Llega la señal…', x + w / 2, y + h - 14, 13, '#B45309', 'center', 800);
+        // se iluminan el tálamo y el área de la pierna del MISMO lado (la vía ya cruzó en la médula)
+        const brillo = (px, py, rx, ry, col) => { const gr = g.createRadialGradient(px, py, 0, px, py, Math.max(rx, ry)); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(px, py, rx, ry, 0, 0, Math.PI * 2); g.fill(); };
+        if (b && b.tCorteza != null && b.tp >= b.tCorteza - 9) brillo(TALAMO[0], TALAMO[1], 16, 13, 'rgba(245,158,11,.8)');
+        if (llega) brillo(PIERNA_S1[0], PIERNA_S1[1], 12, 24, siente ? 'rgba(220,38,38,.95)' : 'rgba(245,158,11,.85)');
+        // rótulos afuera del recuadro, a la izquierda, con una línea a su estructura
+        const linea = (x1, y1, x2, y2) => { g.strokeStyle = '#7C3AED'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); };
+        linea(552, 24, PIERNA_S1[0] - 4, PIERNA_S1[1] - 4); rotulo('Corteza (pierna)', 550, 32, 'right', '#6D28D9');
+        linea(552, 96, TALAMO_I[0] - 10, TALAMO[1]); rotulo('Tálamo', 550, 104, 'right', '#6D28D9');
+        if (siente || llega) {
+            const t2 = siente ? 'Siente el dolor' : 'Llega la señal…';
+            g.font = `800 ${22 * FS()}px Inter, system-ui, sans-serif`;
+            const tw = g.measureText(t2).width;
+            g.fillStyle = siente ? '#DC2626' : '#F59E0B'; rr(550 - tw - 14, 124, tw + 18, 32, 10); g.fill();
+            texto(t2, 541, 148, 22 * FS(), '#fff', 'right', 800);
+        }
     }
     function lesionDib() {
         const [x, y] = LESION;
         g.strokeStyle = '#DC2626'; g.lineWidth = 5; g.lineCap = 'round';
         g.beginPath(); g.moveTo(x - 14, y - 10); g.lineTo(x + 14, y + 10); g.moveTo(x + 14, y - 10); g.lineTo(x - 14, y + 10); g.stroke();
-        rotulo('Lesión', x + 18, y + 5, 'left', '#B91C1C');
+        rotulo('Lesión', x - 4, y - 18, 'center', '#B91C1C');
     }
     function rotulos(b) {
         const tipo = b ? b.tipo : ultimoTipo;
-        rotulo('Médula espinal', MED.x, MED.y + MED.ry + 22, 'center', '#6D28D9');
-        rotulo('Ganglio de la raíz dorsal', GANGLIO.x - 6, GANGLIO.y - 30, 'center', '#92400E');
-        rotulo('Extensor (cuádriceps)', 250, 356, 'center', '#B91C1C');
-        rotulo('Flexor (isquiotibiales)', 262, 478, 'center', '#C2410C');
-        if (tipo === 'rot') { rotulo('Huso muscular', HUSO[0] + 4, HUSO[1] - 12, 'center', '#1D4ED8'); rotulo('Tendón rotuliano', 84, 424, 'right', '#475569'); }
-        else { const l = rotar(LIBRE, piernaRad(b)); rotulo('Terminación libre', l[0] + 76, l[1] - 10, 'left', '#0E7490'); }
+        rotulo('Médula espinal', MED.x, MED.y + MED.ry + 28, 'center', '#6D28D9');
+        rotulo('Ganglio de la raíz dorsal', GANGLIO.x - 20, GANGLIO.y - 30, 'center', '#92400E');
+        rotulo('Extensor (cuádriceps)', 250, 344, 'center', '#B91C1C');
+        rotulo('Flexor (isquiotibiales)', 262, 488, 'center', '#C2410C');
+        if (tipo === 'rot') { rotulo('Huso muscular', HUSO[0] + 10, HUSO[1] + 30, 'center', '#1D4ED8'); rotulo('Tendón rotuliano', 80, 400, 'right', '#475569'); }
+        else { const l = rotar(LIBRE, piernaRad(b)); rotulo('Terminación libre', l[0] + 80, l[1] - 6, 'left', '#0E7490'); }
     }
     function leyenda(b) {
         const tipo = b ? b.tipo : ultimoTipo;
         const lst = CIRC[tipo].concat(ASC && tipo === 'ret' ? ['proy'] : []);
-        const x = 14, y0 = 16, f = FS(), lh = 22 * f;
-        g.fillStyle = 'rgba(255,255,255,.9)'; g.strokeStyle = '#E2E8F0'; g.lineWidth = 1; rr(x - 6, y0 - 8, 236 * f, lst.length * lh + 10, 10); g.fill(); g.stroke();
+        const x = 14, y0 = 16, f = 1, lh = 30;   // la leyenda no crece en el teléfono: taparía los rótulos
+        g.fillStyle = 'rgba(255,255,255,.9)'; g.strokeStyle = '#E2E8F0'; g.lineWidth = 1; rr(x - 6, y0 - 8, 330 * f, lst.length * lh + 12, 10); g.fill(); g.stroke();
         lst.forEach((n, i) => {
             const y = y0 + 8 * f + i * lh;
-            g.fillStyle = NEU[n].col; g.beginPath(); g.arc(x + 8, y, 6 * f, 0, Math.PI * 2); g.fill();
-            texto(NEU[n].nombre, x + 22 * f, y + 5 * f, 13 * f, '#334155', 'left', 700);
+            g.fillStyle = NEU[n].col; g.beginPath(); g.arc(x + 9, y, 8 * f, 0, Math.PI * 2); g.fill();
+            texto(NEU[n].nombre, x + 26 * f, y + 7 * f, 20 * f, '#334155', 'left', 700);
         });
     }
     function zona() {
@@ -535,33 +555,33 @@ export function crearSimReflejo(caja, cfg = {}) {
         const ang = b ? angEn(b, b.tp) : 0, v = Math.round(ang);
         // rodilla
         g.fillStyle = '#0F0820'; g.strokeStyle = '#A78BFA'; g.lineWidth = 2; rr(X0, VY, WP, VH, 14); g.fill(); g.stroke();
-        texto('RODILLA', X0 + 14, VY + 26, 15, '#C4B5FD', 'left', 800);
-        texto(`${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}°`, X0 + WP / 2, VY + 66, 40, v > 3 ? '#FCA5A5' : v < -3 ? '#FDBA74' : '#93C5FD', 'center', 800);
-        texto(v > 3 ? 'se extiende' : v < -3 ? 'se flexiona' : 'en reposo', X0 + WP / 2, VY + 92, 15, '#E9D5FF', 'center', 700);
+        texto('RODILLA', X0 + 16, VY + 28, 18, '#C4B5FD', 'left', 800);
+        texto(`${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}°`, X0 + WP / 2, VY + 70, 44, v > 3 ? '#FCA5A5' : v < -3 ? '#FDBA74' : '#93C5FD', 'center', 800);
+        texto(v > 3 ? 'se extiende' : v < -3 ? 'se flexiona' : 'en reposo', X0 + WP / 2, VY + 100, 19, '#E9D5FF', 'center', 700);
         // registro
         g.fillStyle = '#fff'; rr(X0, RY, WP, RH, 14); g.fill();
         const TT = TS[tipo], filas = FILAS[tipo].concat(ASC && tipo === 'ret' ? [['tal', 'Corteza (llega la señal)']] : []);
         const PX0 = X0 + 14, PW = WP - 28, Xt = t => PX0 + PW * t / TT;
-        texto('Registro de las neuronas', X0 + 14, RY + 24, 16, '#334155', 'left', 800);
-        const fh = 38, fy0 = RY + 38;
+        texto('Registro de las neuronas', X0 + 16, RY + 30, 21, '#334155', 'left', 800);
+        const fh = 52, fy0 = RY + 44;
         filas.forEach(([n, nom], i) => {
             const y = fy0 + i * fh, col = NEU[n].col;
-            texto(nom, PX0, y + 12, 12, col, 'left', 800);
-            g.strokeStyle = '#E2E8F0'; g.lineWidth = 1; g.beginPath(); g.moveTo(PX0, y + 34); g.lineTo(PX0 + PW, y + 34); g.stroke();
+            texto(nom, PX0, y + 18, 18, col, 'left', 800);
+            g.strokeStyle = '#E2E8F0'; g.lineWidth = 1; g.beginPath(); g.moveTo(PX0, y + 48); g.lineTo(PX0 + PW, y + 48); g.stroke();
             if (!b) return;
             const hasta = b.visto ? b.TT : b.tp;
             const r = b.inhibida[n];
-            if (r && hasta > r[0]) { g.fillStyle = 'rgba(124,58,237,.12)'; g.fillRect(Xt(r[0]), y + 17, Xt(Math.min(r[1], hasta)) - Xt(r[0]), 17); texto('inhibida', Xt(r[0]) + 4, y + 30, 11, '#6D28D9', 'left', 800); }
-            g.strokeStyle = col; g.lineWidth = 2;
-            (b.sp[n] || []).forEach(t => { if (t > hasta) return; const x = Xt(t); g.beginPath(); g.moveTo(x, y + 34); g.lineTo(x, y + 19); g.stroke(); });
-            if (n === 'tal' && b.tDolor && hasta >= b.tDolor) { const x = Xt(b.tDolor); g.fillStyle = '#DC2626'; rr(x - 2, y + 17, 92, 18, 6); g.fill(); texto('siente dolor', x + 6, y + 30, 11, '#fff', 'left', 800); }
-            if (n === 'tal' && b.lesion) texto('no llega: lesión', PX0 + PW, y + 30, 11, '#B91C1C', 'right', 800);
+            if (r && hasta > r[0]) { g.fillStyle = 'rgba(124,58,237,.14)'; g.fillRect(Xt(r[0]), y + 25, Xt(Math.min(r[1], hasta)) - Xt(r[0]), 23); texto('inhibida', Xt(r[0]) + 6, y + 43, 16, '#6D28D9', 'left', 800); }
+            g.strokeStyle = col; g.lineWidth = 2.5;
+            (b.sp[n] || []).forEach(t => { if (t > hasta) return; const x = Xt(t); g.beginPath(); g.moveTo(x, y + 48); g.lineTo(x, y + 25); g.stroke(); });
+            if (n === 'tal' && b.tDolor && hasta >= b.tDolor) { const x = Xt(b.tDolor); g.fillStyle = '#DC2626'; rr(x - 2, y + 24, 128, 24, 7); g.fill(); texto('siente dolor', x + 8, y + 42, 16, '#fff', 'left', 800); }
+            if (n === 'tal' && b.lesion) texto('no llega: lesión', PX0 + PW, y + 42, 16, '#B91C1C', 'right', 800);
         });
-        // ángulo de la rodilla
-        const ay0 = fy0 + filas.length * fh + 8, ah = RY + RH - ay0 - 34, amid = ay0 + ah / 2, Ya = d => amid - d / 45 * (ah / 2);
-        texto('Ángulo de la rodilla', PX0, ay0 + 12, 12, '#334155', 'left', 800);
-        texto('+ extensión', PX0 + PW, ay0 + 12, 11, '#B91C1C', 'right', 700);
-        texto('− flexión', PX0 + PW, ay0 + ah, 11, '#C2410C', 'right', 700);
+        // ángulo de la rodilla: alto fijo, abajo
+        const ah = 128, ay0 = RY + RH - 44 - ah, amid = ay0 + ah / 2, Ya = d => amid - d / 45 * (ah / 2);
+        texto('Ángulo de la rodilla', PX0, ay0 - 8, 18, '#334155', 'left', 800);
+        texto('+ extensión', PX0 + PW, ay0 - 8, 15, '#B91C1C', 'right', 700);
+        texto('− flexión', PX0 + PW, ay0 + ah + 2, 15, '#C2410C', 'right', 700);
         g.strokeStyle = '#CBD5E1'; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(PX0, amid); g.lineTo(PX0 + PW, amid); g.stroke(); g.setLineDash([]);
         barridos.filter(s => s.tipo === tipo).forEach(s => {
             const ult = s === b, hasta = ult && !s.visto ? s.tp : s.TT;
@@ -570,8 +590,8 @@ export function crearSimReflejo(caja, cfg = {}) {
             for (let t = 0; t <= hasta; t += 2) { const x = Xt(t), y = Ya(clamp(angEn(s, t), -45, 45)); if (t) g.lineTo(x, y); else g.moveTo(x, y); }
             g.stroke();
         });
-        for (let t = 0; t <= TT; t += TT > 400 ? 100 : 50) texto(String(t), Xt(t), RY + RH - 14, 12, '#64748B', 'center', 700);
-        texto('ms', PX0 + PW, RY + RH - 2, 11, '#64748B', 'right', 700);
+        for (let t = 0; t <= TT; t += TT > 400 ? 100 : 50) texto(String(t), Xt(t), RY + RH - 16, 16, '#64748B', 'center', 700);
+        texto('ms', PX0 + PW, RY + RH - 2, 14, '#64748B', 'right', 700);
         if (b) {   // cabezal
             const x = Xt(b.tp);
             g.strokeStyle = '#F59E0B'; g.lineWidth = 2; g.beginPath(); g.moveTo(x, fy0); g.lineTo(x, ay0 + ah); g.stroke();
@@ -591,13 +611,10 @@ export function crearSimReflejo(caja, cfg = {}) {
 
     /* ---------- Herramientas ---------- */
     function sincronizar() {
-        const corre = !!(sw && !sw.visto);
-        caja.querySelectorAll('[data-acc="golpe"],[data-acc="clavo"]').forEach(b2 => { b2.disabled = corre; });
         caja.querySelectorAll('[data-sw]').forEach(b2 => {
             const on = b2.dataset.sw === 'inh' ? inh : lesion;
             b2.setAttribute('aria-pressed', on ? 'true' : 'false');
             b2.querySelector('span').textContent = b2.dataset.sw === 'inh' ? (on ? 'Activas' : 'Apagadas') : (on ? 'Con lesión' : 'Sin lesión');
-            b2.disabled = corre;
         });
         barra.classList.toggle('is-vacia', !sw);
         rango.disabled = !sw;
@@ -608,7 +625,7 @@ export function crearSimReflejo(caja, cfg = {}) {
     caja.querySelector('[data-acc="clavo"]')?.addEventListener('click', () => nuevo('ret'));
     caja.querySelectorAll('[data-sw]').forEach(b2 => b2.addEventListener('click', () => {
         if (b2.dataset.sw === 'inh') inh = !inh; else lesion = !lesion;
-        if (sw && sw.visto) sw = null;
+        descartar();
         sincronizar();
     }));
     caja.querySelector('[data-acc="borrar"]').addEventListener('click', () => { barridos = barridos.filter(b2 => b2 === sw && !b2.visto); if (sw && sw.visto) sw = null; sincronizar(); });
@@ -649,12 +666,14 @@ export function crearSimReflejo(caja, cfg = {}) {
             ir(ms) { if (sw) { sw.tp = ms; pausado = true; } },
             // plantilla para ChatGPT: la escena (coordenadas de dibujo 760 × 720) a 1024 px de ancho, sin neuronas ni rótulos
             plantilla(parte) {
-                const c = document.createElement('canvas'), k = 1024 / 760; c.width = 1024; c.height = Math.round(720 * k);
+                const enc = parte === 'encefalo', k = enc ? 1536 / CEREBRO.w : 1024 / 760;
+                const c = document.createElement('canvas'); c.width = enc ? 1536 : 1024; c.height = enc ? 1024 : Math.round(720 * k);
                 const g0 = g; g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.scale(k, k);
-                anatomia(null, parte); g = g0;
+                if (enc) { g.translate(-CEREBRO.x, -CEREBRO.y); encefaloDibujo(); } else anatomia(null, parte);
+                g = g0;
                 return c.toDataURL('image/png');
             },
-            poner(o) { if ('inh' in o) inh = o.inh; if ('lesion' in o) lesion = o.lesion; if (sw && sw.visto) sw = null; sincronizar(); },
+            poner(o) { if ('inh' in o) inh = o.inh; if ('lesion' in o) lesion = o.lesion; descartar(); sincronizar(); },
         },
     };
     caja.__sim = api;

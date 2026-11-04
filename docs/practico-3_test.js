@@ -3,9 +3,12 @@
 const { chromium } = require('playwright');
 const [,, slug, nivel, w, h, tag, errAt] = process.argv;
 (async () => {
-  const b = await chromium.launch();
-  const ctx = await b.newContext({ viewport: { width: +w, height: +h } });
-  const p = await ctx.newPage();
+  // PERFIL=<carpeta>: perfil persistente, para encadenar actividades y ver la guía completa
+  const nav = process.env.PERFIL ? null : await chromium.launch();
+  const ctx = nav ? await nav.newContext({ viewport: { width: +w, height: +h } })
+    : await chromium.launchPersistentContext(process.env.PERFIL, { viewport: { width: +w, height: +h } });
+  const b = { close: () => nav ? nav.close() : ctx.close() };
+  const p = ctx.pages()[0] || await ctx.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (m.type() === 'error' && !/phet|ERR_|403|Failed to load/.test(m.text())) errs.push(m.text()); });

@@ -192,8 +192,11 @@ export function crearSimSinapsis(caja, cfg = {}) {
     let sw = null, barridos = [], semilla = 1;
 
     /* ---------- Un registro: modelo + guion de la animación (todo en ms del registro) ---------- */
+    // Un registro sin terminar (en pausa o a medio arrastrar) se descarta al pedir otro o al cambiar un ajuste:
+    // los botones nunca quedan bloqueados. Lo descartado no cuenta para la lista del paso.
+    function descartar() { if (sw && !sw.visto) barridos = barridos.filter(x => x !== sw); sw = null; arrastrando = false; }
     function nuevo(tren) {
-        if (sw && !sw.visto) return;
+        descartar();
         const b = { pas: tren ? TREN.slice() : [T_PA], tren, ca, recap, nt, rec, tipo: tipo(), tp: 0, visto: false };
         Object.assign(b, simular(b));
         guion(b); guionExcito(b);
@@ -610,23 +613,20 @@ export function crearSimSinapsis(caja, cfg = {}) {
 
     /* ---------- Herramientas ---------- */
     function sincronizar() {
-        const corre = !!(sw && !sw.visto);
-        caja.querySelectorAll('[data-acc="pa"],[data-acc="tren"]').forEach(b2 => { b2.disabled = corre; });
         caja.querySelectorAll('[data-sw]').forEach(b2 => {
             const on = b2.dataset.sw === 'ca' ? ca : recap;
             b2.setAttribute('aria-pressed', on ? 'true' : 'false');
             b2.querySelector('span').textContent = b2.dataset.sw === 'ca' ? (on ? 'Activos' : 'Bloqueados') : (on ? 'Activa' : 'Apagada');
-            b2.disabled = corre;
         });
-        caja.querySelectorAll('[data-nt]').forEach(b2 => { b2.setAttribute('aria-pressed', b2.dataset.nt === nt ? 'true' : 'false'); b2.disabled = corre; });
-        caja.querySelectorAll('[data-rec]').forEach(b2 => { b2.setAttribute('aria-pressed', b2.dataset.rec === rec ? 'true' : 'false'); b2.disabled = corre; });
+        caja.querySelectorAll('[data-nt]').forEach(b2 => { b2.setAttribute('aria-pressed', b2.dataset.nt === nt ? 'true' : 'false'); });
+        caja.querySelectorAll('[data-rec]').forEach(b2 => { b2.setAttribute('aria-pressed', b2.dataset.rec === rec ? 'true' : 'false'); });
         const cr = caja.querySelector('.is-rec'); if (cr) cr.hidden = nt !== 'ach';
         barra.classList.toggle('is-vacia', !sw);
         rango.disabled = !sw;
         caja.querySelectorAll('[data-vel]').forEach(b2 => b2.setAttribute('aria-pressed', Number(b2.dataset.vel) === vel ? 'true' : 'false'));
         avisar();
     }
-    const ajustesCambiaron = () => { if (sw && sw.visto) { sw = null; } };
+    const ajustesCambiaron = () => descartar();
     caja.querySelector('[data-acc="pa"]').addEventListener('click', () => nuevo(false));
     caja.querySelector('[data-acc="tren"]')?.addEventListener('click', () => nuevo(true));
     caja.querySelectorAll('[data-sw]').forEach(b2 => b2.addEventListener('click', () => { if (b2.dataset.sw === 'ca') ca = !ca; else recap = !recap; ajustesCambiaron(); sincronizar(); }));

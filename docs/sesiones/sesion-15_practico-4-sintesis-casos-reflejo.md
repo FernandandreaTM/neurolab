@@ -127,3 +127,15 @@ Al final la lista para FileZilla y docs/sesiones/sesion-16_*.md.
 | Guías `guia-reflejo-1/2.jpg` | Regeneradas con la ilustración |
 
 Para subir, además de la lista de arriba: `img/reflejo/fondo.jpg`, `img/reflejo/pierna.png` y las 4 tarjetas de `img/cartas/`. Pendientes 1 y 2 de la sesión 16: hechos.
+
+## Anexo 2 (04-11, 03:00): correcciones de Fer
+
+| # | Corrección | Qué se hizo |
+|---|---|---|
+| 1 | Letra chica en el reflejo | Rótulos 22 px (escena), leyenda 20 px, filas del registro 18 px con 52 px de alto; ángulo de la rodilla con alto fijo (128 px) abajo. Teléfono: rótulos ×1,3, la leyenda no crece |
+| 1 | Encéfalo | Corrección de exactitud: la vía cruzó en la médula, así que se iluminan el tálamo **derecho del dibujo** y el área de la **pierna** en la cara medial del mismo hemisferio (antes se iluminaba la corteza del otro lado). Recuadro 3:2 con imagen opcional (`sim_cfg.encefalo`, el build la activa si existe `img/reflejo/encefalo.jpg`); rótulos «Corteza (pierna)», «Tálamo» y «Siente el dolor» afuera, a la izquierda. Prompt §16 + `img/_fuentes/plantilla-reflejo-encefalo.png` |
+| 2 | «A veces no se hace la acción» | Bug real: con un registro sin terminar (p. ej. tras arrastrar la barra, que lo deja en pausa) los botones quedaban bloqueados. Ahora nunca se bloquean: un estímulo o interruptor nuevo descarta el registro sin terminar (no cuenta para la lista). Igual en `sim-sinapsis.js` |
+| 3 | Guía: imágenes chicas | Una imagen única apaisada (ancho > 1,3 × alto) ocupa todo el ancho (`.is-ancha`, en `hidratarImagenes`); al imprimir, 170 mm |
+| — | Prueba | `docs/practico-3_test.js`: `PERFIL=<carpeta>` encadena actividades para ver la guía completa |
+
+Para subir además: `js/sim-sinapsis.js`, `js/guia.js`, `css/guia.css` (y otra vez `js/sim-reflejo.js`, `data/seed.sql`, `img/reflejo/guia-reflejo-1/2.jpg`). Cuando esté la imagen del encéfalo: `python3 docs/practico-4_imagenes.py`, `python3 docs/practico-4_build.py`, subir `img/reflejo/encefalo.jpg` y `data/seed.sql`.

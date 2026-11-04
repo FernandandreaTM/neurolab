@@ -308,4 +308,9 @@ export async function hidratarImagenes(cont) {
         im.removeAttribute('data-idb');
         if (!im.complete) await new Promise(r => { im.onload = im.onerror = r; });
     }));
+    // Imagen única apaisada (esquemas con registros): ocupa todo el ancho de la guía
+    await Promise.all(Array.from(cont.querySelectorAll('.nl-g-figuras--fotos.is-una img')).map(async im => {
+        if (!im.complete) await new Promise(r => { im.onload = im.onerror = r; });
+        if (im.naturalWidth > im.naturalHeight * 1.3) im.closest('.nl-g-figuras')?.classList.add('is-ancha');
+    }));
 }

@@ -2,6 +2,7 @@
 Uso: python3 docs/practico-4_imagenes.py   (procesa lo que exista; lo que falte lo avisa)
   · img/_fuentes/reflejo-fondo-chatgpt.png  (1024 × 1024) → img/reflejo/fondo.jpg   (escena 760 × 720 a 2×: 1520 × 1440)
   · img/_fuentes/reflejo-pierna-chatgpt.png (1024 × 1024) → img/reflejo/pierna.png  (alineada con la plantilla; blanco → transparente)
+  · img/_fuentes/reflejo-encefalo-chatgpt.png (1536 × 1024) → img/reflejo/encefalo.jpg (nivel II; el build la activa si existe)
   · img/_fuentes/sitios-placa-chatgpt.png   (1024 × 1024, 2 × 2) → img/cartas/<tarjeta>.png (320 px)
 Después de crear fondo.jpg y pierna.jpg, agregar a sim_cfg de los dos niveles de la actividad 9 (docs/practico-4_build.py):
   "fondo": "img/reflejo/fondo.jpg", "pierna": "img/reflejo/pierna.png"."""
@@ -43,6 +44,15 @@ def pierna():
     print('ok img/reflejo/pierna.png')
 
 pierna()
+
+# Encéfalo del nivel II (corte coronal, 1536 × 1024): el recuadro del simulador es 192 × 128 (3:2)
+src = F / 'reflejo-encefalo-chatgpt.png'
+if src.exists():
+    im = Image.open(src).convert('RGB').resize((768, 512), Image.LANCZOS)
+    im.point(lambda v: 255 if v > 240 else v).save(R / 'img/reflejo/encefalo.jpg', quality=88)
+    print('ok img/reflejo/encefalo.jpg')
+else:
+    print('falta', src.name)
 
 # Tarjetas de la placa motora: cuadrícula 2 × 2, en el orden del prompt
 PLACA = ['terminal-del-axon-motor', 'hendidura-de-la-placa', 'receptor-de-la-fibra-muscular', 'axon-motor-mielinizado']
