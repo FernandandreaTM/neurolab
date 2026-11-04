@@ -1144,6 +1144,22 @@ div.nl-circ__caso.is-ok .nl-circ__caso-tit { color: #86EFAC; }
 .nl-msim__opc button i { flex: none; width: .7rem; height: .7rem; border-radius: 3px; }
 .nl-msim__opc button[aria-pressed="true"] { background: #EC4899; border-color: #9D174D; color: #fff; }
 .nl-msim__opc button:disabled, .nl-msim__estim:disabled { opacity: .45; cursor: default; }
+.nl-msim__der { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: .35rem; }
+.nl-msim__der .nl-msim__lienzo { max-height: calc(var(--alto) - 3.4rem); }
+.nl-msim__play { display: flex; align-items: center; gap: .45rem; padding: .25rem .5rem; border-radius: 99px; background: rgba(255,255,255,.06); color: var(--gray-300); font-size: .72rem; }
+.nl-msim__play.is-vacia { opacity: .45; }
+.nl-msim__play > button { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 0; background: rgba(196,181,253,.16); color: #EDE9FE; font-size: .8rem; line-height: 1; cursor: pointer; padding: 0; }
+.nl-msim__play > button:hover { background: rgba(196,181,253,.3); }
+.nl-msim__play input[type=range] { flex: 1 1 auto; min-width: 60px; accent-color: #F59E0B; height: 1rem; }
+.nl-msim__t { flex: none; min-width: 3.6rem; text-align: right; font-variant-numeric: tabular-nums; }
+.nl-msim__vel { flex: none; display: inline-flex; gap: 2px; }
+.nl-msim__vel button { padding: .2rem .4rem; border-radius: 99px; border: 0; background: transparent; color: var(--gray-300); font: 700 .7rem/1 inherit; cursor: pointer; }
+.nl-msim__vel button[aria-pressed="true"] { background: #F59E0B; color: #1A0E2E; }
+@media (max-width: 900px) {
+    .nl-msim__der .nl-msim__lienzo { max-height: none; }
+    .nl-msim__play { flex-wrap: wrap; border-radius: 14px; }
+    .nl-msim__play input[type=range] { order: 5; flex-basis: 100%; }
+}
 .nl-msim__lienzo--pa { cursor: default; touch-action: pan-y; }
 @media (max-width: 900px) {
     .nl-msim__caja { flex-direction: column; }

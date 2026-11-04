@@ -66,7 +66,7 @@ const [,, slug, nivel, w, h, tag, errAt] = process.argv;
           if (c.c === 'recNic') await p.click('[data-rec="nic"]');
           if (c.c === 'recMus') await p.click('[data-rec="mus"]');
           if (['lib1', 'sinLib', 'largo', 'ppsi', 'nic', 'mus'].includes(c.c)) await correr('[data-acc="pa"]');
-          if ((c.c === 'tren' || c.c === 'paPost') && !trenHecho) { trenHecho = true; await correr('[data-acc="tren"]'); }
+          if ((c.c === 'tren' || c.c === 'paPost' || c.c === 'trenNic') && !trenHecho) { trenHecho = true; await correr('[data-acc="tren"]'); }
         }
         if (await p.$('.nl-esc__simq.is-bloq')) errs.push('sim sin completar: ' + cs.clave + ' ' + JSON.stringify(await p.evaluate(`${sim}.estado()`)));
       }
