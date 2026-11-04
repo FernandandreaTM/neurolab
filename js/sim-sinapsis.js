@@ -70,7 +70,10 @@ disponer(false);
 // Estructuras (coordenadas locales de la zona)
 const MEM_PRE = 360, MEM_POST = 455;
 const VES_D = [300, 350, 400], REC_X = [270, 350, 430], MUS_X = [290, 370], KCH_X = 490;
-const ASTRO_T = [130, 386], ENZ = [[208, 404], [534, 404]];
+const ASTRO_T = [130, 386], ENZ = [[208, 392], [534, 392]];
+// Iones que esperan según su gradiente: Na⁺ o Cl⁻ afuera (en la hendidura, junto a los receptores); K⁺ adentro
+const ION_FUERA = [[174, 430], [200, 442], [226, 430], [470, 442], [496, 430], [522, 442], [548, 430], [576, 442]];
+const K_DENTRO = [[452, 532], [480, 556], [512, 530], [540, 556], [568, 534], [596, 556], [466, 578], [620, 534]];
 const RES = [[250, 200], [310, 150], [372, 212], [432, 168], [300, 268], [440, 270]];
 // Canales de Ca²⁺ en el costado derecho del botón (cerca de la zona activa) y el Ca²⁺ que espera afuera
 const CA_CH = [[506, 340], [527, 282]];
@@ -222,16 +225,24 @@ export function crearSimSinapsis(caja, cfg = {}) {
         // iones por los receptores (o por el canal de K⁺): uno cada vez que la corriente acumulada suma 1
         let acum = 0, fin = [];
         const cap = b.tipo === 'mus' ? 3 : 6, kf = K_FLUJO[b.tipo];
+        const libre = new Array(8).fill(-1e9);             // cuándo vuelve a estar en su lugar cada ion que espera
         for (let i = 0; i < b.I.length; i++) {
             acum += Math.abs(b.I[i]) * DT * kf;
             if (acum < 1) continue;
             acum -= 1;
-            const t0 = i * DT, dur = 0.55 / escEn(b, t0) * (b.tipo === 'mus' ? 1.4 : 1);
+            const t0 = i * DT, dur = 0.8 / escEn(b, t0) * (b.tipo === 'mus' ? 1.4 : 1);
             fin = fin.filter(f => f > t0);
             if (fin.length >= cap) continue;
-            fin.push(t0 + dur);
-            if (b.tipo === 'mus') b.iones.push({ ion: 'k', t0, dur, x0: KCH_X + r(-4, 4), y0: MEM_POST + 70, x1: KCH_X + r(-14, 14), y1: MEM_POST - 56 });
-            else { const x = REC_X[Math.floor(rnd() * 3)]; b.iones.push({ ion: p.E < -60 ? 'cl' : 'na', t0, dur, x0: x + r(-3, 3), y0: MEM_POST - 54, x1: x + r(-16, 16), y1: MEM_POST + 82 }); }
+            const k = libre.findIndex(v => v <= t0);
+            if (k < 0) continue;
+            fin.push(t0 + dur); libre[k] = t0 + dur * 2.2;
+            if (b.tipo === 'mus') {
+                const [kx, ky] = K_DENTRO[k];
+                b.iones.push({ ion: 'k', k, t0, dur, pts: [[kx, ky], [KCH_X + r(-3, 3), MEM_POST + 62], [KCH_X + r(-14, 14), MEM_POST - 56]] });
+            } else {
+                const [fx, fy] = ION_FUERA[k], x = REC_X[fx < 350 ? Math.floor(rnd() * 2) : 1 + Math.floor(rnd() * 2)];
+                b.iones.push({ ion: p.E < -60 ? 'cl' : 'na', k, t0, dur, pts: [[fx, fy], [x + r(-3, 3), MEM_POST - 50], [x + r(-16, 16), MEM_POST + 82]] });
+            }
         }
     }
     const idx = (b, t) => clamp(Math.floor(t / DT), 0, b.V.length - 1);
@@ -415,6 +426,16 @@ export function crearSimSinapsis(caja, cfg = {}) {
             const ab = b ? Math.min(1, b.R[idx(b, t - 0.35)] * 2.2) : 0;   // se abre justo después de que encaja el neurotransmisor
             REC_X.forEach(x => receptorCanal(x, ab, tpAct, ntAct));
         }
+        // iones que esperan según su gradiente (se van al pasar por el canal y vuelven después)
+        {
+            const ionE = tpAct === 'mus' ? 'k' : tpAct === 'gaba' ? 'cl' : 'na', pos = tpAct === 'mus' ? K_DENTRO : ION_FUERA;
+            const rt2 = performance.now() / 1000;
+            pos.forEach(([x, y], k) => {
+                let a = 1;
+                if (b) b.iones.forEach(q => { if (q.k !== k) return; const u = (t - q.t0) / q.dur; if (u >= 0 && u < 2.2) a = Math.min(a, u < 1.6 ? 0 : (u - 1.6) / .6); });
+                if (a > .02) ionDib(x + Math.sin(rt2 * 1.2 + k * 1.7) * 2.5, y + Math.cos(rt2 + k) * 2.5, ionE, a, 12);
+            });
+        }
         // acetilcolinesterasa
         if (ntAct === 'ach') ENZ.forEach(([x, y]) => {
             const boca = b ? 0.35 + 0.3 * Math.abs(Math.sin(t * 6)) : 0.45;
@@ -447,7 +468,11 @@ export function crearSimSinapsis(caja, cfg = {}) {
                     ionDib(A[0] + (B[0] - A[0]) * v, A[1] + (B[1] - A[1]) * v, 'ca', a, 11); return;
                 }
             });
-            b.iones.forEach(q => { const u = (t - q.t0) / q.dur; if (u < 0 || u > 1) return; const a = u < .15 ? u / .15 : u > .75 ? (1 - u) / .25 : 1; ionDib(q.x0 + (q.x1 - q.x0) * u, q.y0 + (q.y1 - q.y0) * u, q.ion, a, 12); });
+            b.iones.forEach(q => {
+                const u = (t - q.t0) / q.dur; if (u < 0 || u > 1) return;
+                const [A, B, C] = q.pts, L = u < .45 ? 0 : 1, v = L ? (u - .45) / .55 : u / .45, P = L ? B : A, Q = L ? C : B;
+                ionDib(P[0] + (Q[0] - P[0]) * v, P[1] + (Q[1] - P[1]) * v, q.ion, L && v > .7 ? (1 - v) / .3 : 1, 12);
+            });
         }
         // electrodo de registro
         g.strokeStyle = '#DC2626'; g.lineWidth = 3; g.lineCap = 'round';
