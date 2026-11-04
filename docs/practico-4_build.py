@@ -154,10 +154,10 @@ S1 = {"n": 1, "tipo": "escenas", "modo": "casos", "simulador": "sinapsis", "dx":
             "Sin entrada de Ca²⁺ las vesículas no se fusionan, aunque el potencial de acción llegue al botón: no se libera neurotransmisor y la neurona postsináptica no se entera. Por eso los fármacos y toxinas que bloquean los canales de Ca²⁺ presinápticos (como algunos venenos de caracoles marinos) o el ingreso de Ca²⁺ cortan la transmisión.",
             ["Ca²⁺ bloqueado", "No entra Ca²⁺: no se libera glutamato", "Nada: sigue en reposo"]),
         sim("recap", "d · Sin recaptación", "Activa los canales de Ca²⁺, apaga la recaptación del astrocito y prueba:",
-            [("Canales de Ca²⁺ activos", "caOn"), ("Recaptación apagada", "recapOff"), ("Da 1 potencial de acción", "largo"), ("Da un tren: entra Ca²⁺ en masa a la neurona", "excito")],
+            [("Canales de Ca²⁺ activos", "caOn"), ("Recaptación apagada", "recapOff"), ("Da 1 potencial de acción", "largo")],
             "¿Por qué el PPSE fue más grande y más largo?",
             ["El glutamato quedó más tiempo en la hendidura", "Se liberaron más vesículas por cada PA", "Entró más Ca²⁺ al botón presináptico", "Los receptores se cerraron más tarde por el voltaje"],
-            "Enciende «Canales de Ca²⁺», apaga «Recaptación (astrocito)» y presiona ⚡ 1 potencial de acción (compara con el registro gris); después, el tren.",
+            "Enciende «Canales de Ca²⁺», apaga «Recaptación (astrocito)» y presiona ⚡ 1 potencial de acción. Compara con el registro gris anterior.",
             "Fíjate en la hendidura: ¿cuánto tiempo queda el glutamato después de liberarse?",
             "La señal termina cuando el neurotransmisor sale de la hendidura. El glutamato lo recaptan sobre todo los astrocitos, con transportadores que dependen del gradiente de Na⁺. Si fallan, el glutamato sigue activando los receptores: el PPSE crece y dura más. Con un tren sin recaptación, el glutamato se acumula, la neurona queda despolarizada y entra Ca²⁺ en masa (por receptores NMDA): ese exceso activa enzimas que la dañan. Es la excitotoxicidad, como en el ACV. Los ISRS hacen algo parecido a propósito, con la serotonina.",
             ["Sin recaptación", "El glutamato queda más tiempo", "PPSE más grande y largo"]),
@@ -198,6 +198,16 @@ S2 = {"n": 2, "tipo": "escenas", "modo": "casos", "simulador": "sinapsis", "dx":
             "El receptor muscarínico no es un canal: activa una proteína G que, después de un momento, abre canales de K⁺. Sale K⁺ y la neurona se hiperpolariza, más tarde y por más tiempo (en una célula real, de cientos de milisegundos a segundos). Así el nervio vago enlentece el corazón. El efecto lo decide el receptor, no el neurotransmisor.",
             ["Acetilcolina · muscarínico", "Metabotrópico (proteína G)", "Sale K⁺ (canal que abre la proteína G)", "Hiperpolarización lenta: inhibe"]),
       ]}
+
+# Caso d: segundo paso (tren sin recaptación → excitotoxicidad) con su pregunta de cierre
+_d = next(c for c in S1["casos"] if c["clave"] == "recap")
+if len(_d["pasos"]) == 1:
+    _d["pasos"].append({"tipo": "sim", "p": "Ahora, con la recaptación apagada, manda un tren:",
+        "checks": [{"t": "Da un tren: entra Ca²⁺ en masa a la neurona", "c": "excito"}],
+        "pista": "Deja «Recaptación (astrocito)» apagada y presiona ⚡⚡⚡ Tren de potenciales. Mira el receptor NMDA y el interior de la neurona.",
+        "q": {"p": "Entró Ca²⁺ en masa y se quedó adentro. ¿Qué le ocurre a la neurona?",
+              "ops": ["Se daña por excitotoxicidad", "Se protege por inhibición", "Se refuerza por plasticidad", "Se hiperpolariza por el Ca²⁺"],
+              "ok": 0, "pista": "Recuerda el caso del ACV: ¿qué hace el exceso de Ca²⁺ dentro de la neurona?"}})
 
 A16 = {"laminas": {}, "niveles": [S1, S2]}
 CARRERA16 = [
